@@ -1,6 +1,6 @@
 <p align="center">
   <h1 align="center">:star2: Train Me :star2:</h1>
-  <p align="center">No-code Labelling and Training Toolkit for Computer Vision<p>
+  <p align="center">No-code Labeling and Training Toolkit for Computer Vision<p>
   <p align="center">With <b>Improved Labelme</b> for Image Labeling<p>
 </p>
 
