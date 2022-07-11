@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=TrainMe
-Comment=No-code labelling and training toolkit for computer vision
+Comment=No-code labeling and training toolkit for computer vision
 Exec=trainme
 Icon=trainme
 Terminal=false
