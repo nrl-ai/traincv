@@ -1,0 +1,11 @@
+/data
+__pycache__
+*.pyc
+/exp_*
+/Exp*
+*/exp/
+/R
+/dist
+/build
+
+.DS_Store
