@@ -23,8 +23,11 @@
        </property>
        <item>
         <widget class="QGroupBox" name="train_state_wrapper">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <property name="title">
-          <string>Status</string>
+          <string/>
          </property>
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0">
@@ -47,6 +50,9 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="model_architecture_line">
+         <property name="topMargin">
+          <number>15</number>
+         </property>
          <item>
           <widget class="QLabel" name="model_architecture_title">
            <property name="text">
@@ -89,6 +95,9 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="training_config_line">
+         <property name="bottomMargin">
+          <number>15</number>
+         </property>
          <item>
           <widget class="QLabel" name="epochs_title">
            <property name="text">
@@ -197,7 +206,7 @@
           <number>6</number>
          </property>
          <property name="bottomMargin">
-          <number>6</number>
+          <number>20</number>
          </property>
          <item>
           <widget class="QPushButton" name="train_button">
@@ -315,6 +324,9 @@ padding-left: 20;</string>
        </property>
        <item>
         <widget class="QLabel" name="system_monitor_title">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <property name="text">
           <string>System monitor</string>
          </property>
