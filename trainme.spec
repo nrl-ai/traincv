@@ -11,10 +11,10 @@ a = Analysis(
     ['trainme/app.py'],
     pathex=['trainme'],
     binaries=[],
-    #datas=[
-    #    ('trainme/config/default_config.yaml', 'trainme/config'),
-    #    ('trainme/icons/*', 'trainme/icons'),
-    #],
+    datas=[
+       ('trainme/widgets/labeling/labelme/labelme/config/default_config.yaml', 'trainme/widgets/labeling/labelme/labelme/config'),
+       ('trainme/widgets/labeling/labelme/labelme/icons/*', 'trainme/widgets/labeling/labelme/labelme/icons'),
+    ],
     hiddenimports=[],
     hookspath=[],
     runtime_hooks=[],

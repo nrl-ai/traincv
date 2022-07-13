@@ -1,0 +1,8 @@
+path: # dataset root
+train: # train folder
+val: # val folder
+test:  # test folder (optional)
+
+# Classes
+nc: 1
+names: [ 'object' ]
