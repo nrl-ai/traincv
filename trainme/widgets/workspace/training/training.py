@@ -3,7 +3,7 @@ import os
 import pyqtgraph as pg
 from PyQt5 import uic
 from PyQt5.QtCore import QThread
-from PyQt5.QtWidgets import QMessageBox, QWidget
+from PyQt5.QtWidgets import QWidget
 
 from .system_monitor import SystemMonitor
 from .training_state import TrainingState
@@ -20,15 +20,7 @@ class TrainingTab(QWidget):
         uic.loadUi(os.path.join(current_dir, "training.ui"), self)
 
         # System monitor
-        self.system_monitor_thread = QThread()
-        self.system_monitor = SystemMonitor()
-        self.system_monitor.moveToThread(self.system_monitor_thread)
-        self.system_monitor_thread.started.connect(self.system_monitor.run)
-        self.system_monitor.finished.connect(self.system_monitor_thread.quit)
-        self.system_monitor.new_system_status.connect(
-            self.system_monitor_edit.setText)
-        self.system_monitor_thread.start()
-
+        self.system_monitor = SystemMonitor(self.system_monitor_edit, seconds_between_refresh=2)
         self.train_button.clicked.connect(self.start_training)
 
     def draw_losses(self, losses):
