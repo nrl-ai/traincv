@@ -180,12 +180,12 @@ class LabelmeWidget(LabelDialog):
         )
         self.canvas.zoomRequest.connect(self.zoomRequest)
 
-        scrollArea = QtWidgets.QScrollArea()
-        scrollArea.setWidget(self.canvas)
-        scrollArea.setWidgetResizable(True)
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidget(self.canvas)
+        scroll_area.setWidgetResizable(True)
         self.scrollBars = {
-            Qt.Vertical: scrollArea.verticalScrollBar(),
-            Qt.Horizontal: scrollArea.horizontalScrollBar(),
+            Qt.Vertical: scroll_area.verticalScrollBar(),
+            Qt.Horizontal: scroll_area.horizontalScrollBar(),
         }
         self.canvas.scrollRequest.connect(self.scrollRequest)
 
@@ -194,7 +194,7 @@ class LabelmeWidget(LabelDialog):
         self.canvas.selectionChanged.connect(self.shapeSelectionChanged)
         self.canvas.drawingPolygon.connect(self.toggleDrawingSensitive)
 
-        self._centralWidget = scrollArea
+        self._centralWidget = scroll_area
 
         features = QtWidgets.QDockWidget.DockWidgetFeatures()
         for dock in ["flag_dock", "label_dock", "shape_dock", "file_dock"]:
@@ -217,13 +217,6 @@ class LabelmeWidget(LabelDialog):
             shortcuts["tracking"],
             "app",
             self.tr("Track object"),
-        )
-        quit = action(
-            self.tr("&Quit"),
-            self.close,
-            shortcuts["quit"],
-            "quit",
-            self.tr("Quit application"),
         )
         open_ = action(
             self.tr("&Open"),
@@ -311,7 +304,7 @@ class LabelmeWidget(LabelDialog):
             "&Close",
             self.closeFile,
             shortcuts["close"],
-            "close",
+            "cancel",
             "Close current file",
         )
 
@@ -620,7 +613,7 @@ class LabelmeWidget(LabelDialog):
             zoomActions=zoomActions,
             openNextImg=openNextImg,
             openPrevImg=openPrevImg,
-            fileMenuActions=(open_, opendir, save, saveAs, close, quit),
+            fileMenuActions=(open_, opendir, save, saveAs, close),
             tool=(),
             # XXX: need to add some actions here to activate the shortcut
             editMenu=(
@@ -693,8 +686,7 @@ class LabelmeWidget(LabelDialog):
                 saveWithImageData,
                 close,
                 deleteFile,
-                None,
-                quit,
+                None
             ),
         )
         utils.addActions(self.menus.help, (help,))
@@ -768,16 +760,17 @@ class LabelmeWidget(LabelDialog):
         layout.setContentsMargins(0, 0, 0, 0)
 
         layout.addWidget(self.tools)
-        centralLayout = QVBoxLayout()
-        centralLayout.setContentsMargins(0, 0, 0, 0)
-        labelInstruction = QLabel(
-            "<b>Navigation</b> Previous: <b>a</b>, Next: <b>d</b>")
-        centralLayout.addWidget(labelInstruction)
-        centralLayout.addWidget(scrollArea)
-        layout.addItem(centralLayout)
+        central_layout = QVBoxLayout()
+        central_layout.setContentsMargins(0, 0, 0, 0)
+        label_instruction = QLabel(
+            "<b>Shortcuts:</b> Previous: <b>A</b>, Next: <b>D</b>, Rectangle: <b>R</b>, Polygon: <b>P</b>")
+        label_instruction.setContentsMargins(0, 10, 0, 10)
+        central_layout.addWidget(label_instruction)
+        central_layout.addWidget(scroll_area)
+        layout.addItem(central_layout)
 
         # Save central area for resize
-        self._centralWidget = scrollArea
+        self._centralWidget = scroll_area
 
         # Stretch central area (image view)
         layout.setStretch(1, 1)
@@ -2128,6 +2121,9 @@ class LabelmeWidget(LabelDialog):
         return images
 
     def track(self):
+        QMessageBox.warning(self, "Warning", "Tracking is not supported now.")
+        return
+
         predictedShapes = self.tracker.get(self.image)
         self.loadShapes(predictedShapes, replace=True)
         self.setDirty()
