@@ -58,14 +58,14 @@ def test_MainWindow_open_dir(qtbot):
     return win
 
 
-def test_MainWindow_openNextImg(qtbot):
+def test_MainWindow_open_next_image(qtbot):
     win = test_MainWindow_open_dir(qtbot)
-    win.openNextImg()
+    win.open_next_image()
 
 
-def test_MainWindow_openPrevImg(qtbot):
+def test_MainWindow_open_prev_image(qtbot):
     win = test_MainWindow_open_dir(qtbot)
-    win.openNextImg()
+    win.open_next_image()
 
 
 def test_MainWindow_annotate_jpg(qtbot):

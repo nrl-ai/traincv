@@ -106,3 +106,5 @@ shortcuts:
   remove_selected_point: [Meta+H, Backspace]
 
   tracking: T
+  load_ai_model: L
+  auto_label: I

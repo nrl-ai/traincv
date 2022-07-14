@@ -32,6 +32,8 @@ from .widgets import UniqueLabelQListWidget
 from .widgets import ZoomWidget
 from .tracker import Tracker
 
+from trainme.inference_services.yolov5 import YOLOv5Predictor
+
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -68,6 +70,9 @@ class LabelmeWidget(LabelDialog):
 
         # Tracker
         self.tracker = Tracker()
+
+        # AI models for auto labeling
+        self.ai_model = None
 
         # see labelme/config/default_config.yaml for valid configuration
         if config is None:
@@ -123,7 +128,7 @@ class LabelmeWidget(LabelDialog):
         if config["flags"]:
             self.loadFlags({k: False for k in config["flags"]})
         self.flag_dock.setWidget(self.flag_widget)
-        self.flag_widget.itemChanged.connect(self.setDirty)
+        self.flag_widget.itemChanged.connect(self.set_dirty)
 
         self.labelList.itemSelectionChanged.connect(self.labelSelectionChanged)
         self.labelList.itemDoubleClicked.connect(self.editLabel)
@@ -190,7 +195,7 @@ class LabelmeWidget(LabelDialog):
         self.canvas.scrollRequest.connect(self.scrollRequest)
 
         self.canvas.newShape.connect(self.newShape)
-        self.canvas.shapeMoved.connect(self.setDirty)
+        self.canvas.shapeMoved.connect(self.set_dirty)
         self.canvas.selectionChanged.connect(self.shapeSelectionChanged)
         self.canvas.drawingPolygon.connect(self.toggleDrawingSensitive)
 
@@ -211,13 +216,6 @@ class LabelmeWidget(LabelDialog):
         # Actions
         action = functools.partial(utils.newAction, self)
         shortcuts = self._config["shortcuts"]
-        tracking = action(
-            self.tr("&Tracking"),
-            self.track,
-            shortcuts["tracking"],
-            "app",
-            self.tr("Track object"),
-        )
         open_ = action(
             self.tr("&Open"),
             self.openFile,
@@ -227,22 +225,22 @@ class LabelmeWidget(LabelDialog):
         )
         opendir = action(
             self.tr("&Open Dir"),
-            self.openDirDialog,
+            self.open_folder_dialog,
             shortcuts["open_dir"],
             "open",
             self.tr("Open Dir"),
         )
-        openNextImg = action(
+        open_next_image = action(
             self.tr("&Next Image"),
-            self.openNextImg,
+            self.open_next_image,
             shortcuts["open_next"],
             "next",
             self.tr("Open next (hold Ctl+Shift to copy labels)"),
             enabled=False,
         )
-        openPrevImg = action(
+        open_prev_image = action(
             self.tr("&Prev Image"),
-            self.openPrevImg,
+            self.open_prev_image,
             shortcuts["open_prev"],
             "prev",
             self.tr("Open prev (hold Ctl+Shift to copy labels)"),
@@ -294,7 +292,7 @@ class LabelmeWidget(LabelDialog):
 
         saveWithImageData = action(
             text="Save With Image Data",
-            slot=self.enableSaveImageWithData,
+            slot=self.enable_save_image_with_data,
             tip="Save image data in label file",
             checkable=True,
             checked=self._config["store_data"],
@@ -318,55 +316,55 @@ class LabelmeWidget(LabelDialog):
         )
         toggle_keep_prev_mode.setChecked(self._config["keep_prev"])
 
-        createMode = action(
+        create_mode = action(
             self.tr("Create Polygons"),
-            lambda: self.toggleDrawMode(False, createMode="polygon"),
+            lambda: self.toggleDrawMode(False, create_mode="polygon"),
             shortcuts["create_polygon"],
             "polygon",
             self.tr("Start drawing polygons"),
             enabled=False,
         )
-        createRectangleMode = action(
+        create_rectangle_mode = action(
             self.tr("Create Rectangle"),
-            lambda: self.toggleDrawMode(False, createMode="rectangle"),
+            lambda: self.toggleDrawMode(False, create_mode="rectangle"),
             shortcuts["create_rectangle"],
             "rectangle",
             self.tr("Start drawing rectangles"),
             enabled=False,
         )
-        createCircleMode = action(
+        create_cirle_mode = action(
             self.tr("Create Circle"),
-            lambda: self.toggleDrawMode(False, createMode="circle"),
+            lambda: self.toggleDrawMode(False, create_mode="circle"),
             shortcuts["create_circle"],
             "circle",
             self.tr("Start drawing circles"),
             enabled=False,
         )
-        createLineMode = action(
+        create_line_mode = action(
             self.tr("Create Line"),
-            lambda: self.toggleDrawMode(False, createMode="line"),
+            lambda: self.toggleDrawMode(False, create_mode="line"),
             shortcuts["create_line"],
             "line",
             self.tr("Start drawing lines"),
             enabled=False,
         )
-        createPointMode = action(
+        create_point_mode = action(
             self.tr("Create Point"),
-            lambda: self.toggleDrawMode(False, createMode="point"),
+            lambda: self.toggleDrawMode(False, create_mode="point"),
             shortcuts["create_point"],
             "point",
             self.tr("Start drawing points"),
             enabled=False,
         )
-        createLineStripMode = action(
+        create_line_strip_mode = action(
             self.tr("Create LineStrip"),
-            lambda: self.toggleDrawMode(False, createMode="linestrip"),
+            lambda: self.toggleDrawMode(False, create_mode="linestrip"),
             shortcuts["create_linestrip"],
             "line-strip",
             self.tr("Start drawing linestrip. Ctrl+LeftClick ends creation."),
             enabled=False,
         )
-        editMode = action(
+        edit_mode = action(
             self.tr("Edit Object"),
             self.setEditMode,
             shortcuts["edit_polygon"],
@@ -407,15 +405,15 @@ class LabelmeWidget(LabelDialog):
             self.tr("Paste copied polygons"),
             enabled=False,
         )
-        undoLastPoint = action(
+        undo_last_point = action(
             self.tr("Undo last point"),
-            self.canvas.undoLastPoint,
+            self.canvas.undo_last_point,
             shortcuts["undo_last_point"],
             "undo",
             self.tr("Undo last drawn point"),
             enabled=False,
         )
-        removePoint = action(
+        remove_point = action(
             text="Remove Selected Point",
             slot=self.removeSelectedPoint,
             shortcut=shortcuts["remove_selected_point"],
@@ -433,16 +431,16 @@ class LabelmeWidget(LabelDialog):
             enabled=False,
         )
 
-        hideAll = action(
+        hide_all = action(
             self.tr("&Hide\nPolygons"),
-            functools.partial(self.togglePolygons, False),
+            functools.partial(self.toggle_polygons, False),
             icon="eye",
             tip=self.tr("Hide all polygons"),
             enabled=False,
         )
-        showAll = action(
+        show_all = action(
             self.tr("&Show\nPolygons"),
-            functools.partial(self.togglePolygons, True),
+            functools.partial(self.toggle_polygons, True),
             icon="eye",
             tip=self.tr("Show all polygons"),
             enabled=False,
@@ -472,7 +470,7 @@ class LabelmeWidget(LabelDialog):
         )
         self.zoomWidget.setEnabled(False)
 
-        zoomIn = action(
+        zoom_in = action(
             self.tr("Zoom &In"),
             functools.partial(self.addZoom, 1.1),
             shortcuts["zoom_in"],
@@ -480,7 +478,7 @@ class LabelmeWidget(LabelDialog):
             self.tr("Increase zoom level"),
             enabled=False,
         )
-        zoomOut = action(
+        zoom_out = action(
             self.tr("&Zoom Out"),
             functools.partial(self.addZoom, 0.9),
             shortcuts["zoom_out"],
@@ -488,7 +486,7 @@ class LabelmeWidget(LabelDialog):
             self.tr("Decrease zoom level"),
             enabled=False,
         )
-        zoomOrg = action(
+        zoom_org = action(
             self.tr("&Original size"),
             functools.partial(self.setZoom, 100),
             shortcuts["zoom_to_original"],
@@ -504,27 +502,27 @@ class LabelmeWidget(LabelDialog):
             checked=self._config["keep_prev_scale"],
             enabled=True,
         )
-        fitWindow = action(
+        fit_window = action(
             self.tr("&Fit Window"),
-            self.setFitWindow,
+            self.set_fit_window,
             shortcuts["fit_window"],
             "fit-window",
             self.tr("Zoom follows window size"),
             checkable=True,
             enabled=False,
         )
-        fitWidth = action(
+        fit_width = action(
             self.tr("Fit &Width"),
-            self.setFitWidth,
+            self.set_fit_width,
             shortcuts["fit_width"],
             "fit-width",
             self.tr("Zoom follows window width"),
             checkable=True,
             enabled=False,
         )
-        brightnessContrast = action(
+        brightness_contrast = action(
             "&Brightness Contrast",
-            self.brightnessContrast,
+            self.brightness_contrast,
             None,
             "color",
             "Adjust brightness and contrast",
@@ -533,17 +531,17 @@ class LabelmeWidget(LabelDialog):
         # Group zoom controls into a list for easier toggling.
         zoomActions = (
             self.zoomWidget,
-            zoomIn,
-            zoomOut,
-            zoomOrg,
-            fitWindow,
-            fitWidth,
+            zoom_in,
+            zoom_out,
+            zoom_org,
+            fit_window,
+            fit_width,
         )
-        self.zoomMode = self.FIT_WINDOW
-        fitWindow.setChecked(Qt.Checked)
+        self.zoom_mode = self.FIT_WINDOW
+        fit_window.setChecked(Qt.Checked)
         self.scalers = {
-            self.FIT_WINDOW: self.scaleFitWindow,
-            self.FIT_WIDTH: self.scaleFitWidth,
+            self.FIT_WINDOW: self.scale_fit_window,
+            self.FIT_WIDTH: self.scale_fit_width,
             # Set to one to scale to 100% when loading files.
             self.MANUAL_ZOOM: lambda: 1,
         }
@@ -567,6 +565,29 @@ class LabelmeWidget(LabelDialog):
             enabled=True,
         )
         fill_drawing.trigger()
+
+        # AI Actions
+        track = action(
+            self.tr("&Tracking"),
+            self.track,
+            shortcuts["tracking"],
+            "app",
+            self.tr("Track object"),
+        )
+        ai_load_model = action(
+            self.tr("&Load AI Model"),
+            self.ai_load_model,
+            shortcuts["load_ai_model"],
+            "upload_brain",
+            self.tr("Load AI Model"),
+        )
+        ai_predict = action(
+            self.tr("&Predict Shapes"),
+            self.ai_predict,
+            shortcuts["auto_label"],
+            "brain",
+            self.tr("Predict shapes"),
+        )
 
         # Lavel list context menu.
         labelMenu = QtWidgets.QMenu()
@@ -592,27 +613,27 @@ class LabelmeWidget(LabelDialog):
             duplicate=duplicate,
             copy=copy,
             paste=paste,
-            undoLastPoint=undoLastPoint,
+            undo_last_point=undo_last_point,
             undo=undo,
-            removePoint=removePoint,
-            createMode=createMode,
-            editMode=editMode,
-            createRectangleMode=createRectangleMode,
-            createCircleMode=createCircleMode,
-            createLineMode=createLineMode,
-            createPointMode=createPointMode,
-            createLineStripMode=createLineStripMode,
+            remove_point=remove_point,
+            create_mode=create_mode,
+            edit_mode=edit_mode,
+            create_rectangle_mode=create_rectangle_mode,
+            create_cirle_mode=create_cirle_mode,
+            create_line_mode=create_line_mode,
+            create_point_mode=create_point_mode,
+            create_line_strip_mode=create_line_strip_mode,
             zoom=zoom,
-            zoomIn=zoomIn,
-            zoomOut=zoomOut,
-            zoomOrg=zoomOrg,
+            zoom_in=zoom_in,
+            zoom_out=zoom_out,
+            zoom_org=zoom_org,
             keepPrevScale=keepPrevScale,
-            fitWindow=fitWindow,
-            fitWidth=fitWidth,
-            brightnessContrast=brightnessContrast,
+            fit_window=fit_window,
+            fit_width=fit_width,
+            brightness_contrast=brightness_contrast,
             zoomActions=zoomActions,
-            openNextImg=openNextImg,
-            openPrevImg=openPrevImg,
+            open_next_image=open_next_image,
+            open_prev_image=open_prev_image,
             fileMenuActions=(open_, opendir, save, saveAs, close),
             tool=(),
             # XXX: need to add some actions here to activate the shortcut
@@ -622,52 +643,52 @@ class LabelmeWidget(LabelDialog):
                 delete,
                 None,
                 undo,
-                undoLastPoint,
+                undo_last_point,
                 None,
-                removePoint,
+                remove_point,
                 None,
                 toggle_keep_prev_mode,
             ),
             # menu shown at right click
             menu=(
-                createMode,
-                createRectangleMode,
-                createCircleMode,
-                createLineMode,
-                createPointMode,
-                createLineStripMode,
-                editMode,
+                create_mode,
+                create_rectangle_mode,
+                create_cirle_mode,
+                create_line_mode,
+                create_point_mode,
+                create_line_strip_mode,
+                edit_mode,
                 edit,
                 duplicate,
                 copy,
                 paste,
                 delete,
                 undo,
-                undoLastPoint,
-                removePoint,
+                undo_last_point,
+                remove_point,
             ),
             onLoadActive=(
                 close,
-                createMode,
-                createRectangleMode,
-                createCircleMode,
-                createLineMode,
-                createPointMode,
-                createLineStripMode,
-                editMode,
-                brightnessContrast,
+                create_mode,
+                create_rectangle_mode,
+                create_cirle_mode,
+                create_line_mode,
+                create_point_mode,
+                create_line_strip_mode,
+                edit_mode,
+                brightness_contrast,
             ),
-            onShapesPresent=(saveAs, hideAll, showAll),
+            onShapesPresent=(saveAs, hide_all, show_all),
         )
 
-        self.canvas.vertexSelected.connect(self.actions.removePoint.setEnabled)
+        self.canvas.vertexSelected.connect(self.actions.remove_point.setEnabled)
 
         self.menus = utils.struct(
             file=self.menu(self.tr("&File")),
             edit=self.menu(self.tr("&Edit")),
             view=self.menu(self.tr("&View")),
             help=self.menu(self.tr("&Help")),
-            recentFiles=QtWidgets.QMenu(self.tr("Open &Recent")),
+            recent_files=QtWidgets.QMenu(self.tr("Open &Recent")),
             labelList=labelMenu,
         )
 
@@ -675,10 +696,10 @@ class LabelmeWidget(LabelDialog):
             self.menus.file,
             (
                 open_,
-                openNextImg,
-                openPrevImg,
+                open_next_image,
+                open_prev_image,
                 opendir,
-                self.menus.recentFiles,
+                self.menus.recent_files,
                 save,
                 saveAs,
                 saveAuto,
@@ -700,18 +721,18 @@ class LabelmeWidget(LabelDialog):
                 None,
                 fill_drawing,
                 None,
-                hideAll,
-                showAll,
+                hide_all,
+                show_all,
                 None,
-                zoomIn,
-                zoomOut,
-                zoomOrg,
+                zoom_in,
+                zoom_out,
+                zoom_org,
                 keepPrevScale,
                 None,
-                fitWindow,
-                fitWidth,
+                fit_window,
+                fit_width,
                 None,
-                brightnessContrast,
+                brightness_contrast,
             ),
         )
 
@@ -732,28 +753,30 @@ class LabelmeWidget(LabelDialog):
         self.actions.tool = (
             # open_,
             opendir,
-            openNextImg,
-            openPrevImg,
+            open_next_image,
+            open_prev_image,
             save,
             deleteFile,
             None,
-            createMode,
-            self.actions.createRectangleMode,
-            self.actions.createCircleMode,
-            self.actions.createLineMode,
-            self.actions.createPointMode,
-            self.actions.createLineStripMode,
-            editMode,
+            create_mode,
+            self.actions.create_rectangle_mode,
+            self.actions.create_cirle_mode,
+            self.actions.create_line_mode,
+            self.actions.create_point_mode,
+            self.actions.create_line_strip_mode,
+            edit_mode,
             duplicate,
             copy,
             paste,
             delete,
             undo,
-            brightnessContrast,
+            brightness_contrast,
             None,
             zoom,
-            fitWidth,
-            tracking
+            fit_width,
+            track,
+            ai_load_model,
+            ai_predict,
         )
 
         layout = QHBoxLayout()
@@ -808,20 +831,20 @@ class LabelmeWidget(LabelDialog):
         # Application state.
         self.image = QtGui.QImage()
         self.imagePath = None
-        self.recentFiles = []
+        self.recent_files = []
         self.maxRecent = 7
         self.otherData = None
         self.zoom_level = 100
         self.fit_window = False
         self.zoom_values = {}  # key=filename, value=(zoom_mode, zoom_value)
-        self.brightnessContrast_values = {}
+        self.brightness_contrast_values = {}
         self.scroll_values = {
             Qt.Horizontal: {},
             Qt.Vertical: {},
         }  # key=filename, value=scroll_value
 
         if filename is not None and osp.isdir(filename):
-            self.importDirImages(filename, load=False)
+            self.import_image_folder(filename, load=False)
         else:
             self.filename = filename
 
@@ -832,7 +855,7 @@ class LabelmeWidget(LabelDialog):
         # XXX: Could be completely declarative.
         # Restore application settings.
         self.settings = QtCore.QSettings("labelme", "labelme")
-        self.recentFiles = self.settings.value("recentFiles", []) or []
+        self.recent_files = self.settings.value("recent_files", []) or []
         size = self.settings.value("window/size", QtCore.QSize(600, 500))
         position = self.settings.value("window/position", QtCore.QPoint(0, 0))
         state = self.settings.value("window/state", QtCore.QByteArray())
@@ -852,7 +875,7 @@ class LabelmeWidget(LabelDialog):
         # Callbacks:
         self.zoomWidget.valueChanged.connect(self.paintCanvas)
 
-        self.populateModeActions()
+        self.populate_mode_actions()
 
         self.firstStart = True
         if self.firstStart:
@@ -881,10 +904,10 @@ class LabelmeWidget(LabelDialog):
     def statusBar(self):
         return self.parent.parent.parent.statusBar()
 
-    def noShapes(self):
-        return not len(self.labelList)
+    def no_shape(self):
+        return len(self.labelList) == 0
 
-    def populateModeActions(self):
+    def populate_mode_actions(self):
         tool = self.actions.tool
         menu = self.actions.menu
         self.tools.clear()
@@ -894,17 +917,17 @@ class LabelmeWidget(LabelDialog):
         utils.addActions(self.canvas.menus[0], menu)
         self.menus.edit.clear()
         actions = (
-            self.actions.createMode,
-            self.actions.createRectangleMode,
-            self.actions.createCircleMode,
-            self.actions.createLineMode,
-            self.actions.createPointMode,
-            self.actions.createLineStripMode,
-            self.actions.editMode,
+            self.actions.create_mode,
+            self.actions.create_rectangle_mode,
+            self.actions.create_cirle_mode,
+            self.actions.create_line_mode,
+            self.actions.create_point_mode,
+            self.actions.create_line_strip_mode,
+            self.actions.edit_mode,
         )
         utils.addActions(self.menus.edit, actions + self.actions.editMenu)
 
-    def setDirty(self):
+    def set_dirty(self):
         # Even if we autosave the file, we keep the ability to undo
         self.actions.undo.setEnabled(self.canvas.isShapeRestorable)
 
@@ -925,12 +948,12 @@ class LabelmeWidget(LabelDialog):
     def setClean(self):
         self.dirty = False
         self.actions.save.setEnabled(False)
-        self.actions.createMode.setEnabled(True)
-        self.actions.createRectangleMode.setEnabled(True)
-        self.actions.createCircleMode.setEnabled(True)
-        self.actions.createLineMode.setEnabled(True)
-        self.actions.createPointMode.setEnabled(True)
-        self.actions.createLineStripMode.setEnabled(True)
+        self.actions.create_mode.setEnabled(True)
+        self.actions.create_rectangle_mode.setEnabled(True)
+        self.actions.create_cirle_mode.setEnabled(True)
+        self.actions.create_line_mode.setEnabled(True)
+        self.actions.create_point_mode.setEnabled(True)
+        self.actions.create_line_strip_mode.setEnabled(True)
         title = __appname__
         if self.filename is not None:
             title = "{} - {}".format(title, self.filename)
@@ -941,7 +964,7 @@ class LabelmeWidget(LabelDialog):
         else:
             self.actions.deleteFile.setEnabled(False)
 
-    def toggleActions(self, value=True):
+    def toggle_actions(self, value=True):
         """Enable/Disable widgets which depend on an opened image."""
         for z in self.actions.zoomActions:
             z.setEnabled(value)
@@ -969,19 +992,19 @@ class LabelmeWidget(LabelDialog):
             return items[0]
         return None
 
-    def addRecentFile(self, filename):
-        if filename in self.recentFiles:
-            self.recentFiles.remove(filename)
-        elif len(self.recentFiles) >= self.maxRecent:
-            self.recentFiles.pop()
-        self.recentFiles.insert(0, filename)
+    def add_recent_file(self, filename):
+        if filename in self.recent_files:
+            self.recent_files.remove(filename)
+        elif len(self.recent_files) >= self.maxRecent:
+            self.recent_files.pop()
+        self.recent_files.insert(0, filename)
 
     # Callbacks
 
     def undoShapeEdit(self):
         self.canvas.restoreShape()
         self.labelList.clear()
-        self.loadShapes(self.canvas.shapes)
+        self.load_shapes(self.canvas.shapes)
         self.actions.undo.setEnabled(self.canvas.isShapeRestorable)
 
     def contact(self):
@@ -993,67 +1016,67 @@ class LabelmeWidget(LabelDialog):
 
         In the middle of drawing, toggling between modes should be disabled.
         """
-        self.actions.editMode.setEnabled(not drawing)
-        self.actions.undoLastPoint.setEnabled(drawing)
+        self.actions.edit_mode.setEnabled(not drawing)
+        self.actions.undo_last_point.setEnabled(drawing)
         self.actions.undo.setEnabled(not drawing)
         self.actions.delete.setEnabled(not drawing)
 
-    def toggleDrawMode(self, edit=True, createMode="rectangle"):
+    def toggleDrawMode(self, edit=True, create_mode="rectangle"):
         self.canvas.setEditing(edit)
-        self.canvas.createMode = createMode
+        self.canvas.create_mode = create_mode
         if edit:
-            self.actions.createMode.setEnabled(True)
-            self.actions.createRectangleMode.setEnabled(True)
-            self.actions.createCircleMode.setEnabled(True)
-            self.actions.createLineMode.setEnabled(True)
-            self.actions.createPointMode.setEnabled(True)
-            self.actions.createLineStripMode.setEnabled(True)
+            self.actions.create_mode.setEnabled(True)
+            self.actions.create_rectangle_mode.setEnabled(True)
+            self.actions.create_cirle_mode.setEnabled(True)
+            self.actions.create_line_mode.setEnabled(True)
+            self.actions.create_point_mode.setEnabled(True)
+            self.actions.create_line_strip_mode.setEnabled(True)
         else:
-            if createMode == "polygon":
-                self.actions.createMode.setEnabled(False)
-                self.actions.createRectangleMode.setEnabled(True)
-                self.actions.createCircleMode.setEnabled(True)
-                self.actions.createLineMode.setEnabled(True)
-                self.actions.createPointMode.setEnabled(True)
-                self.actions.createLineStripMode.setEnabled(True)
-            elif createMode == "rectangle":
-                self.actions.createMode.setEnabled(True)
-                self.actions.createRectangleMode.setEnabled(False)
-                self.actions.createCircleMode.setEnabled(True)
-                self.actions.createLineMode.setEnabled(True)
-                self.actions.createPointMode.setEnabled(True)
-                self.actions.createLineStripMode.setEnabled(True)
-            elif createMode == "line":
-                self.actions.createMode.setEnabled(True)
-                self.actions.createRectangleMode.setEnabled(True)
-                self.actions.createCircleMode.setEnabled(True)
-                self.actions.createLineMode.setEnabled(False)
-                self.actions.createPointMode.setEnabled(True)
-                self.actions.createLineStripMode.setEnabled(True)
-            elif createMode == "point":
-                self.actions.createMode.setEnabled(True)
-                self.actions.createRectangleMode.setEnabled(True)
-                self.actions.createCircleMode.setEnabled(True)
-                self.actions.createLineMode.setEnabled(True)
-                self.actions.createPointMode.setEnabled(False)
-                self.actions.createLineStripMode.setEnabled(True)
-            elif createMode == "circle":
-                self.actions.createMode.setEnabled(True)
-                self.actions.createRectangleMode.setEnabled(True)
-                self.actions.createCircleMode.setEnabled(False)
-                self.actions.createLineMode.setEnabled(True)
-                self.actions.createPointMode.setEnabled(True)
-                self.actions.createLineStripMode.setEnabled(True)
-            elif createMode == "linestrip":
-                self.actions.createMode.setEnabled(True)
-                self.actions.createRectangleMode.setEnabled(True)
-                self.actions.createCircleMode.setEnabled(True)
-                self.actions.createLineMode.setEnabled(True)
-                self.actions.createPointMode.setEnabled(True)
-                self.actions.createLineStripMode.setEnabled(False)
+            if create_mode == "polygon":
+                self.actions.create_mode.setEnabled(False)
+                self.actions.create_rectangle_mode.setEnabled(True)
+                self.actions.create_cirle_mode.setEnabled(True)
+                self.actions.create_line_mode.setEnabled(True)
+                self.actions.create_point_mode.setEnabled(True)
+                self.actions.create_line_strip_mode.setEnabled(True)
+            elif create_mode == "rectangle":
+                self.actions.create_mode.setEnabled(True)
+                self.actions.create_rectangle_mode.setEnabled(False)
+                self.actions.create_cirle_mode.setEnabled(True)
+                self.actions.create_line_mode.setEnabled(True)
+                self.actions.create_point_mode.setEnabled(True)
+                self.actions.create_line_strip_mode.setEnabled(True)
+            elif create_mode == "line":
+                self.actions.create_mode.setEnabled(True)
+                self.actions.create_rectangle_mode.setEnabled(True)
+                self.actions.create_cirle_mode.setEnabled(True)
+                self.actions.create_line_mode.setEnabled(False)
+                self.actions.create_point_mode.setEnabled(True)
+                self.actions.create_line_strip_mode.setEnabled(True)
+            elif create_mode == "point":
+                self.actions.create_mode.setEnabled(True)
+                self.actions.create_rectangle_mode.setEnabled(True)
+                self.actions.create_cirle_mode.setEnabled(True)
+                self.actions.create_line_mode.setEnabled(True)
+                self.actions.create_point_mode.setEnabled(False)
+                self.actions.create_line_strip_mode.setEnabled(True)
+            elif create_mode == "circle":
+                self.actions.create_mode.setEnabled(True)
+                self.actions.create_rectangle_mode.setEnabled(True)
+                self.actions.create_cirle_mode.setEnabled(False)
+                self.actions.create_line_mode.setEnabled(True)
+                self.actions.create_point_mode.setEnabled(True)
+                self.actions.create_line_strip_mode.setEnabled(True)
+            elif create_mode == "linestrip":
+                self.actions.create_mode.setEnabled(True)
+                self.actions.create_rectangle_mode.setEnabled(True)
+                self.actions.create_cirle_mode.setEnabled(True)
+                self.actions.create_line_mode.setEnabled(True)
+                self.actions.create_point_mode.setEnabled(True)
+                self.actions.create_line_strip_mode.setEnabled(False)
             else:
-                raise ValueError("Unsupported createMode: %s" % createMode)
-        self.actions.editMode.setEnabled(not edit)
+                raise ValueError("Unsupported create_mode: %s" % create_mode)
+        self.actions.edit_mode.setEnabled(not edit)
 
     def setEditMode(self):
         self.toggleDrawMode(True)
@@ -1064,15 +1087,15 @@ class LabelmeWidget(LabelDialog):
         def exists(filename):
             return osp.exists(str(filename))
 
-        menu = self.menus.recentFiles
+        menu = self.menus.recent_files
         menu.clear()
-        files = [f for f in self.recentFiles if f != current and exists(f)]
+        files = [f for f in self.recent_files if f != current and exists(f)]
         for i, f in enumerate(files):
             icon = utils.newIcon("labels")
             action = QtWidgets.QAction(
                 icon, "&%d %s" % (i + 1, QtCore.QFileInfo(f).fileName()), self
             )
-            action.triggered.connect(functools.partial(self.loadRecent, f))
+            action.triggered.connect(functools.partial(self.load_recent, f))
             menu.addAction(action)
 
     def popLabelListMenu(self, point):
@@ -1131,14 +1154,14 @@ class LabelmeWidget(LabelDialog):
             )
         else:
             item.setText("{} ({})".format(shape.label, shape.group_id))
-        self.setDirty()
+        self.set_dirty()
         if not self.uniqLabelList.findItemsByLabel(shape.label):
             item = QtWidgets.QListWidgetItem()
             item.setData(Qt.UserRole, shape.label)
             self.uniqLabelList.addItem(item)
 
     def fileSearchChanged(self):
-        self.importDirImages(
+        self.import_image_folder(
             self.lastOpenDir,
             pattern=self.fileSearch.text(),
             load=False,
@@ -1231,13 +1254,13 @@ class LabelmeWidget(LabelDialog):
             item = self.labelList.findItemByShape(shape)
             self.labelList.removeItem(item)
 
-    def loadShapes(self, shapes, replace=True):
+    def load_shapes(self, shapes, replace=True):
         self._noSelectionSlot = True
         for shape in shapes:
             self.addLabel(shape)
         self.labelList.clearSelection()
         self._noSelectionSlot = False
-        self.canvas.loadShapes(shapes, replace=replace)
+        self.canvas.load_shapes(shapes, replace=replace)
 
     def loadLabels(self, shapes):
         s = []
@@ -1273,7 +1296,7 @@ class LabelmeWidget(LabelDialog):
             shape.other_data = other_data
 
             s.append(shape)
-        self.loadShapes(s)
+        self.load_shapes(s)
 
     def loadFlags(self, flags):
         self.flag_widget.clear()
@@ -1343,11 +1366,11 @@ class LabelmeWidget(LabelDialog):
         self.labelList.clearSelection()
         for shape in added_shapes:
             self.addLabel(shape)
-        self.setDirty()
+        self.set_dirty()
 
     def pasteSelectedShape(self):
-        self.loadShapes(self._copied_shapes, replace=False)
-        self.setDirty()
+        self.load_shapes(self._copied_shapes, replace=False)
+        self.set_dirty()
 
     def copySelectedShape(self):
         self._copied_shapes = [s.copy() for s in self.canvas.selectedShapes]
@@ -1370,8 +1393,8 @@ class LabelmeWidget(LabelDialog):
         self.canvas.setShapeVisible(shape, item.checkState() == Qt.Checked)
 
     def labelOrderChanged(self):
-        self.setDirty()
-        self.canvas.loadShapes([item.shape() for item in self.labelList])
+        self.set_dirty()
+        self.canvas.load_shapes([item.shape() for item in self.labelList])
 
     # Callback functions:
 
@@ -1405,10 +1428,10 @@ class LabelmeWidget(LabelDialog):
             shape = self.canvas.setLastLabel(text, flags)
             shape.group_id = group_id
             self.addLabel(shape)
-            self.actions.editMode.setEnabled(True)
-            self.actions.undoLastPoint.setEnabled(False)
+            self.actions.edit_mode.setEnabled(True)
+            self.actions.undo_last_point.setEnabled(False)
             self.actions.undo.setEnabled(True)
-            self.setDirty()
+            self.set_dirty()
         else:
             self.canvas.undoLastLine()
             self.canvas.shapesBackups.pop()
@@ -1424,11 +1447,11 @@ class LabelmeWidget(LabelDialog):
         self.scroll_values[orientation][self.filename] = value
 
     def setZoom(self, value):
-        self.actions.fitWidth.setChecked(False)
-        self.actions.fitWindow.setChecked(False)
-        self.zoomMode = self.MANUAL_ZOOM
+        self.actions.fit_width.setChecked(False)
+        self.actions.fit_window.setChecked(False)
+        self.zoom_mode = self.MANUAL_ZOOM
         self.zoomWidget.setValue(value)
-        self.zoom_values[self.filename] = (self.zoomMode, value)
+        self.zoom_values[self.filename] = (self.zoom_mode, value)
 
     def addZoom(self, increment=1.1):
         zoom_value = self.zoomWidget.value() * increment
@@ -1461,17 +1484,17 @@ class LabelmeWidget(LabelDialog):
                 self.scrollBars[Qt.Vertical].value() + y_shift,
             )
 
-    def setFitWindow(self, value=True):
+    def set_fit_window(self, value=True):
         if value:
-            self.actions.fitWidth.setChecked(False)
-        self.zoomMode = self.FIT_WINDOW if value else self.MANUAL_ZOOM
-        self.adjustScale()
+            self.actions.fit_width.setChecked(False)
+        self.zoom_mode = self.FIT_WINDOW if value else self.MANUAL_ZOOM
+        self.adjust_scale()
 
-    def setFitWidth(self, value=True):
+    def set_fit_width(self, value=True):
         if value:
-            self.actions.fitWindow.setChecked(False)
-        self.zoomMode = self.FIT_WIDTH if value else self.MANUAL_ZOOM
-        self.adjustScale()
+            self.actions.fit_window.setChecked(False)
+        self.zoom_mode = self.FIT_WIDTH if value else self.MANUAL_ZOOM
+        self.adjust_scale()
 
     def enableKeepPrevScale(self, enabled):
         self._config["keep_prev_scale"] = enabled
@@ -1482,13 +1505,13 @@ class LabelmeWidget(LabelDialog):
             QtGui.QPixmap.fromImage(qimage), clear_shapes=False
         )
 
-    def brightnessContrast(self, value):
+    def brightness_contrast(self, value):
         dialog = BrightnessContrastDialog(
             utils.img_data_to_pil(self.imageData),
             self.onNewBrightnessContrast,
             parent=self,
         )
-        brightness, contrast = self.brightnessContrast_values.get(
+        brightness, contrast = self.brightness_contrast_values.get(
             self.filename, (None, None)
         )
         if brightness is not None:
@@ -1499,9 +1522,9 @@ class LabelmeWidget(LabelDialog):
 
         brightness = dialog.slider_brightness.value()
         contrast = dialog.slider_contrast.value()
-        self.brightnessContrast_values[self.filename] = (brightness, contrast)
+        self.brightness_contrast_values[self.filename] = (brightness, contrast)
 
-    def togglePolygons(self, value):
+    def toggle_polygons(self, value):
         for item in self.labelList:
             item.setCheckState(Qt.Checked if value else Qt.Unchecked)
 
@@ -1591,19 +1614,19 @@ class LabelmeWidget(LabelDialog):
             if self.labelFile.flags is not None:
                 flags.update(self.labelFile.flags)
         self.loadFlags(flags)
-        if self._config["keep_prev"] and self.noShapes():
-            self.loadShapes(prev_shapes, replace=False)
-            self.setDirty()
+        if self._config["keep_prev"] and self.no_shape():
+            self.load_shapes(prev_shapes, replace=False)
+            self.set_dirty()
         else:
             self.setClean()
         self.canvas.setEnabled(True)
         # set zoom values
         is_initial_load = not self.zoom_values
         if self.filename in self.zoom_values:
-            self.zoomMode = self.zoom_values[self.filename][0]
+            self.zoom_mode = self.zoom_values[self.filename][0]
             self.setZoom(self.zoom_values[self.filename][1])
         elif is_initial_load or not self._config["keep_prev_scale"]:
-            self.adjustScale(initial=True)
+            self.adjust_scale(initial=True)
         # set scroll values
         for orientation in self.scroll_values:
             if self.filename in self.scroll_values[orientation]:
@@ -1616,27 +1639,27 @@ class LabelmeWidget(LabelDialog):
             self.onNewBrightnessContrast,
             parent=self,
         )
-        brightness, contrast = self.brightnessContrast_values.get(
+        brightness, contrast = self.brightness_contrast_values.get(
             self.filename, (None, None)
         )
-        if self._config["keep_prev_brightness"] and self.recentFiles:
-            brightness, _ = self.brightnessContrast_values.get(
-                self.recentFiles[0], (None, None)
+        if self._config["keep_prev_brightness"] and self.recent_files:
+            brightness, _ = self.brightness_contrast_values.get(
+                self.recent_files[0], (None, None)
             )
-        if self._config["keep_prev_contrast"] and self.recentFiles:
-            _, contrast = self.brightnessContrast_values.get(
-                self.recentFiles[0], (None, None)
+        if self._config["keep_prev_contrast"] and self.recent_files:
+            _, contrast = self.brightness_contrast_values.get(
+                self.recent_files[0], (None, None)
             )
         if brightness is not None:
             dialog.slider_brightness.setValue(brightness)
         if contrast is not None:
             dialog.slider_contrast.setValue(contrast)
-        self.brightnessContrast_values[self.filename] = (brightness, contrast)
+        self.brightness_contrast_values[self.filename] = (brightness, contrast)
         if brightness is not None or contrast is not None:
             dialog.onNewValue(None)
         self.paintCanvas()
-        self.addRecentFile(self.filename)
-        self.toggleActions(True)
+        self.add_recent_file(self.filename)
+        self.toggle_actions(True)
         self.canvas.setFocus()
         self.status(str(self.tr("Loaded %s")) % osp.basename(str(filename)))
         return True
@@ -1645,9 +1668,9 @@ class LabelmeWidget(LabelDialog):
         if (
             self.canvas
             and not self.image.isNull()
-            and self.zoomMode != self.MANUAL_ZOOM
+            and self.zoom_mode != self.MANUAL_ZOOM
         ):
-            self.adjustScale()
+            self.adjust_scale()
 
     def paintCanvas(self):
         assert not self.image.isNull(), "cannot paint null image"
@@ -1655,13 +1678,13 @@ class LabelmeWidget(LabelDialog):
         self.canvas.adjustSize()
         self.canvas.update()
 
-    def adjustScale(self, initial=False):
-        value = self.scalers[self.FIT_WINDOW if initial else self.zoomMode]()
+    def adjust_scale(self, initial=False):
+        value = self.scalers[self.FIT_WINDOW if initial else self.zoom_mode]()
         value = int(100 * value)
         self.zoomWidget.setValue(value)
-        self.zoom_values[self.filename] = (self.zoomMode, value)
+        self.zoom_values[self.filename] = (self.zoom_mode, value)
 
-    def scaleFitWindow(self):
+    def scale_fit_window(self):
         """Figure out the size of the pixmap to fit the main widget."""
         e = 2.0  # So that no scrollbars are generated.
         w1 = self.centralWidget().width() - e
@@ -1673,12 +1696,12 @@ class LabelmeWidget(LabelDialog):
         a2 = w2 / h2
         return w1 / w2 if a2 >= a1 else h1 / h2
 
-    def scaleFitWidth(self):
+    def scale_fit_width(self):
         # The epsilon does not seem to work too well here.
         w = self.centralWidget().width() - 2.0
         return w / self.canvas.pixmap.width()
 
-    def enableSaveImageWithData(self, enabled):
+    def enable_save_image_with_data(self, enabled):
         self._config["store_data"] = enabled
         self.actions.saveWithImageData.setChecked(enabled)
 
@@ -1693,7 +1716,7 @@ class LabelmeWidget(LabelDialog):
         self.settings.setValue(
             "window/state",
             self.parent.parent.parent.saveState())
-        self.settings.setValue("recentFiles", self.recentFiles)
+        self.settings.setValue("recent_files", self.recent_files)
         # ask the use for where to save the labels
         # self.settings.setValue('window/geometry', self.saveGeometry())
 
@@ -1714,15 +1737,13 @@ class LabelmeWidget(LabelDialog):
             event.ignore()
             return
         items = [i.toLocalFile() for i in event.mimeData().urls()]
-        self.importDroppedImageFiles(items)
+        self.import_dropped_image_files(items)
 
-    # User Dialogs #
-
-    def loadRecent(self, filename):
+    def load_recent(self, filename):
         if self.mayContinue():
             self.loadFile(filename)
 
-    def openPrevImg(self, _value=False):
+    def open_prev_image(self, _value=False):
         keep_prev = self._config["keep_prev"]
         if QtWidgets.QApplication.keyboardModifiers() == (
             Qt.ControlModifier | Qt.ShiftModifier
@@ -1746,7 +1767,7 @@ class LabelmeWidget(LabelDialog):
 
         self._config["keep_prev"] = keep_prev
 
-    def openNextImg(self, _value=False, load=True):
+    def open_next_image(self, _value=False, load=True):
         keep_prev = self._config["keep_prev"]
         if QtWidgets.QApplication.keyboardModifiers() == (
             Qt.ControlModifier | Qt.ShiftModifier
@@ -1827,7 +1848,7 @@ class LabelmeWidget(LabelDialog):
         self.statusBar().show()
 
         current_filename = self.filename
-        self.importDirImages(self.lastOpenDir, load=False)
+        self.import_image_folder(self.lastOpenDir, load=False)
 
         if current_filename in self.imageList:
             # retain currently selected file
@@ -1887,7 +1908,7 @@ class LabelmeWidget(LabelDialog):
 
     def _saveFile(self, filename):
         if filename and self.saveLabels(filename):
-            self.addRecentFile(filename)
+            self.add_recent_file(filename)
             self.setClean()
 
     def closeFile(self, _value=False):
@@ -1895,7 +1916,7 @@ class LabelmeWidget(LabelDialog):
             return
         self.resetState()
         self.setClean()
-        self.toggleActions(False)
+        self.toggle_actions(False)
         self.canvas.setEnabled(False)
         self.actions.saveAs.setEnabled(False)
 
@@ -1929,7 +1950,7 @@ class LabelmeWidget(LabelDialog):
 
     # Message Dialogs. #
     def hasLabels(self):
-        if self.noShapes():
+        if self.no_shape():
             self.errorMessage(
                 "No objects labeled",
                 "You must label at least one object to save the file.",
@@ -1983,8 +2004,8 @@ class LabelmeWidget(LabelDialog):
         if not self.canvas.hShape.points:
             self.canvas.deleteShape(self.canvas.hShape)
             self.remLabels([self.canvas.hShape])
-            self.setDirty()
-            if self.noShapes():
+            self.set_dirty()
+            if self.no_shape():
                 for action in self.actions.onShapesPresent:
                     action.setEnabled(False)
 
@@ -1998,8 +2019,8 @@ class LabelmeWidget(LabelDialog):
             self, self.tr("Attention"), msg, yes | no, yes
         ):
             self.remLabels(self.canvas.deleteSelected())
-            self.setDirty()
-            if self.noShapes():
+            self.set_dirty()
+            if self.no_shape():
                 for action in self.actions.onShapesPresent:
                     action.setEnabled(False)
 
@@ -2008,13 +2029,13 @@ class LabelmeWidget(LabelDialog):
         for shape in self.canvas.selectedShapes:
             self.addLabel(shape)
         self.labelList.clearSelection()
-        self.setDirty()
+        self.set_dirty()
 
     def moveShape(self):
         self.canvas.endMove(copy=False)
-        self.setDirty()
+        self.set_dirty()
 
-    def openDirDialog(self, _value=False, dirpath=None):
+    def open_folder_dialog(self, _value=False, dirpath=None):
         if not self.mayContinue():
             return
 
@@ -2035,7 +2056,7 @@ class LabelmeWidget(LabelDialog):
                 | QtWidgets.QFileDialog.DontResolveSymlinks,
             )
         )
-        self.importDirImages(targetDirPath)
+        self.import_image_folder(targetDirPath)
 
     @property
     def imageList(self):
@@ -2045,7 +2066,7 @@ class LabelmeWidget(LabelDialog):
             lst.append(item.text())
         return lst
 
-    def importDroppedImageFiles(self, imageFiles):
+    def import_dropped_image_files(self, imageFiles):
         extensions = [
             ".%s" % fmt.data().decode().lower()
             for fmt in QtGui.QImageReader.supportedImageFormats()
@@ -2072,14 +2093,14 @@ class LabelmeWidget(LabelDialog):
             self.fileListWidget.addItem(item)
 
         if len(self.imageList) > 1:
-            self.actions.openNextImg.setEnabled(True)
-            self.actions.openPrevImg.setEnabled(True)
+            self.actions.open_next_image.setEnabled(True)
+            self.actions.open_prev_image.setEnabled(True)
 
-        self.openNextImg()
+        self.open_next_image()
 
-    def importDirImages(self, dirpath, pattern=None, load=True):
-        self.actions.openNextImg.setEnabled(True)
-        self.actions.openPrevImg.setEnabled(True)
+    def import_image_folder(self, dirpath, pattern=None, load=True):
+        self.actions.open_next_image.setEnabled(True)
+        self.actions.open_prev_image.setEnabled(True)
 
         if not self.mayContinue() or not dirpath:
             return
@@ -2087,7 +2108,7 @@ class LabelmeWidget(LabelDialog):
         self.lastOpenDir = dirpath
         self.filename = None
         self.fileListWidget.clear()
-        for filename in self.scanAllImages(dirpath):
+        for filename in self.scan_all_images(dirpath):
             if pattern and pattern not in filename:
                 continue
             label_file = osp.splitext(filename)[0] + ".json"
@@ -2103,9 +2124,9 @@ class LabelmeWidget(LabelDialog):
             else:
                 item.setCheckState(Qt.Unchecked)
             self.fileListWidget.addItem(item)
-        self.openNextImg(load=load)
+        self.open_next_image(load=load)
 
-    def scanAllImages(self, folderPath):
+    def scan_all_images(self, folderPath):
         extensions = [
             ".%s" % fmt.data().decode().lower()
             for fmt in QtGui.QImageReader.supportedImageFormats()
@@ -2123,7 +2144,37 @@ class LabelmeWidget(LabelDialog):
     def track(self):
         QMessageBox.warning(self, "Warning", "Tracking is not supported now.")
         return
+        # predicted_shapes = self.tracker.get(self.image)
+        # self.load_shapes(predicted_shapes, replace=True)
+        # self.set_dirty()
 
-        predictedShapes = self.tracker.get(self.image)
-        self.loadShapes(predictedShapes, replace=True)
-        self.setDirty()
+    def ai_load_model(self):
+        """Load AI model from disk."""
+        file_path = QtWidgets.QFileDialog.getOpenFileName(
+            self, "Select AI Model Config", ".", "Model config file (*.yaml)"
+        )
+        if not file_path[0]:
+            return
+        file_path = file_path[0]
+        try:
+            self.ai_model = YOLOv5Predictor(file_path)
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"Failed to load AI model: {e}")
+            return
+        self.statusBar().showMessage(
+            "AI Model loaded from {}".format(file_path), 5000
+        )
+
+    def ai_predict(self):
+        """Predict shapes using AI model
+        """
+        if self.imagePath is None:
+            QMessageBox.warning(self, "Warning", "Please load images first.")
+            return
+        if self.ai_model is None:
+            QMessageBox.warning(self, "Warning", "No AI model is loaded. Please load a model first.")
+            return
+
+        shapes = self.ai_model.predict_shapes(self.image)
+        self.load_shapes(shapes, replace=True)
+        self.set_dirty()

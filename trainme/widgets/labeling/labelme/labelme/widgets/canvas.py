@@ -31,7 +31,7 @@ class Canvas(QtWidgets.QWidget):
     CREATE, EDIT = 0, 1
 
     # polygon, rectangle, line, or point
-    _createMode = "polygon"
+    _create_mode = "polygon"
 
     _fill_drawing = False
 
@@ -54,10 +54,10 @@ class Canvas(QtWidgets.QWidget):
         self.selectedShapes = []  # save the selected shapes here
         self.selectedShapesCopy = []
         # self.line represents:
-        #   - createMode == 'polygon': edge from last point to current
-        #   - createMode == 'rectangle': diagonal line of the rectangle
-        #   - createMode == 'line': the line
-        #   - createMode == 'point': the point
+        #   - create_mode == 'polygon': edge from last point to current
+        #   - create_mode == 'rectangle': diagonal line of the rectangle
+        #   - create_mode == 'line': the line
+        #   - create_mode == 'point': the point
         self.line = Shape()
         self.prevPoint = QtCore.QPoint()
         self.prevMovePoint = QtCore.QPoint()
@@ -93,11 +93,11 @@ class Canvas(QtWidgets.QWidget):
         self._fill_drawing = value
 
     @property
-    def createMode(self):
-        return self._createMode
+    def create_mode(self):
+        return self._create_mode
 
-    @createMode.setter
-    def createMode(self, value):
+    @create_mode.setter
+    def create_mode(self, value):
         if value not in [
             "polygon",
             "rectangle",
@@ -106,8 +106,8 @@ class Canvas(QtWidgets.QWidget):
             "point",
             "linestrip",
         ]:
-            raise ValueError("Unsupported createMode: %s" % value)
-        self._createMode = value
+            raise ValueError("Unsupported create_mode: %s" % value)
+        self._create_mode = value
 
     def storeShapes(self):
         shapesBackup = []
@@ -129,12 +129,12 @@ class Canvas(QtWidgets.QWidget):
     def restoreShape(self):
         # This does _part_ of the job of restoring shapes.
         # The complete process is also done in app.py::undoShapeEdit
-        # and app.py::loadShapes and our own Canvas::loadShapes function.
+        # and app.py::load_shapes and our own Canvas::load_shapes function.
         if not self.isShapeRestorable:
             return
         self.shapesBackups.pop()  # latest
 
-        # The application will eventually call Canvas.loadShapes which will
+        # The application will eventually call Canvas.load_shapes which will
         # push this right back onto the stack.
         shapesBackup = self.shapesBackups.pop()
         self.shapes = shapesBackup
@@ -196,7 +196,7 @@ class Canvas(QtWidgets.QWidget):
 
         # Polygon drawing.
         if self.drawing():
-            self.line.shape_type = self.createMode
+            self.line.shape_type = self.create_mode
 
             self.overrideCursor(CURSOR_DRAW)
             if not self.current:
@@ -209,7 +209,7 @@ class Canvas(QtWidgets.QWidget):
             elif (
                 self.snapping
                 and len(self.current) > 1
-                and self.createMode == "polygon"
+                and self.create_mode == "polygon"
                 and self.closeEnough(pos, self.current[0])
             ):
                 # Attract line to starting point and
@@ -217,19 +217,19 @@ class Canvas(QtWidgets.QWidget):
                 pos = self.current[0]
                 self.overrideCursor(CURSOR_POINT)
                 self.current.highlightVertex(0, Shape.NEAR_VERTEX)
-            if self.createMode in ["polygon", "linestrip"]:
+            if self.create_mode in ["polygon", "linestrip"]:
                 self.line[0] = self.current[-1]
                 self.line[1] = pos
-            elif self.createMode == "rectangle":
+            elif self.create_mode == "rectangle":
                 self.line.points = [self.current[0], pos]
                 self.line.close()
-            elif self.createMode == "circle":
+            elif self.create_mode == "circle":
                 self.line.points = [self.current[0], pos]
                 self.line.shape_type = "circle"
-            elif self.createMode == "line":
+            elif self.create_mode == "line":
                 self.line.points = [self.current[0], pos]
                 self.line.close()
-            elif self.createMode == "point":
+            elif self.create_mode == "point":
                 self.line.points = [self.current[0]]
                 self.line.close()
             self.repaint()
@@ -334,7 +334,7 @@ class Canvas(QtWidgets.QWidget):
         index = self.prevhVertex
         if shape is None or index is None:
             return
-        shape.removePoint(index)
+        shape.remove_point(index)
         shape.highlightClear()
         self.hShape = shape
         self.prevhVertex = None
@@ -346,28 +346,28 @@ class Canvas(QtWidgets.QWidget):
             if self.drawing():
                 if self.current:
                     # Add point to existing shape.
-                    if self.createMode == "polygon":
+                    if self.create_mode == "polygon":
                         self.current.addPoint(self.line[1])
                         self.line[0] = self.current[-1]
                         if self.current.isClosed():
                             self.finalise()
-                    elif self.createMode in ["rectangle", "circle", "line"]:
+                    elif self.create_mode in ["rectangle", "circle", "line"]:
                         assert len(self.current.points) == 1
                         self.current.points = self.line.points
                         self.finalise()
-                    elif self.createMode == "linestrip":
+                    elif self.create_mode == "linestrip":
                         self.current.addPoint(self.line[1])
                         self.line[0] = self.current[-1]
                         if int(ev.modifiers()) == QtCore.Qt.ControlModifier:
                             self.finalise()
                 elif not self.outOfPixmap(pos):
                     # Create new shape.
-                    self.current = Shape(shape_type=self.createMode)
+                    self.current = Shape(shape_type=self.create_mode)
                     self.current.addPoint(pos)
-                    if self.createMode == "point":
+                    if self.create_mode == "point":
                         self.finalise()
                     else:
-                        if self.createMode == "circle":
+                        if self.create_mode == "circle":
                             self.current.shape_type = "circle"
                         self.line.points = [pos, pos]
                         self.setHiding()
@@ -625,7 +625,7 @@ class Canvas(QtWidgets.QWidget):
 
         if (
             self.fillDrawing()
-            and self.createMode == "polygon"
+            and self.create_mode == "polygon"
             and self.current is not None
             and len(self.current.points) >= 2
         ):
@@ -817,15 +817,15 @@ class Canvas(QtWidgets.QWidget):
         assert self.shapes
         self.current = self.shapes.pop()
         self.current.setOpen()
-        if self.createMode in ["polygon", "linestrip"]:
+        if self.create_mode in ["polygon", "linestrip"]:
             self.line.points = [self.current[-1], self.current[0]]
-        elif self.createMode in ["rectangle", "line", "circle"]:
+        elif self.create_mode in ["rectangle", "line", "circle"]:
             self.current.points = self.current.points[0:1]
-        elif self.createMode == "point":
+        elif self.create_mode == "point":
             self.current = None
         self.drawingPolygon.emit(True)
 
-    def undoLastPoint(self):
+    def undo_last_point(self):
         if not self.current or self.current.isClosed():
             return
         self.current.popPoint()
@@ -842,7 +842,7 @@ class Canvas(QtWidgets.QWidget):
             self.shapes = []
         self.update()
 
-    def loadShapes(self, shapes, replace=True):
+    def load_shapes(self, shapes, replace=True):
         if replace:
             self.shapes = list(shapes)
         else:
