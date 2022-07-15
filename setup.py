@@ -5,8 +5,7 @@ import shlex
 import subprocess
 import sys
 
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages, setup
 
 
 def get_version():

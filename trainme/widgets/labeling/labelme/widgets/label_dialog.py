@@ -1,12 +1,9 @@
 import re
 
-from PyQt5 import QtCore
-from PyQt5 import QtGui
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
-from ..logger import logger
 from .. import utils
-
+from ..logger import logger
 
 # TODO(unknown):
 # - Calculate optimal position so as not to go out of screen area.

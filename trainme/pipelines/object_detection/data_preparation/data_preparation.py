@@ -1,12 +1,11 @@
-import os
-import random
-import logging
 import json
+import logging
+import os
 import pathlib
+import random
 import shutil
 
 import cv2
-
 from imutils import paths
 
 logging.getLogger().setLevel(logging.DEBUG)

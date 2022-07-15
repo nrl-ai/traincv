@@ -2,8 +2,7 @@ import os
 
 import cv2
 from imutils import paths
-
-from PyQt5 import uic, QtGui
+from PyQt5 import QtGui, uic
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QWidget

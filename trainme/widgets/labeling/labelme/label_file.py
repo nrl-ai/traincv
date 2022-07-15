@@ -6,10 +6,8 @@ import os.path as osp
 
 import PIL.Image
 
-from . import __version__
+from . import __version__, utils
 from .logger import logger
-from . import utils
-
 
 PIL.Image.MAX_IMAGE_PIXELS = None
 

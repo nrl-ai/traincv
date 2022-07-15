@@ -5,7 +5,6 @@ import pathlib
 import cv2
 import numpy as np
 import yaml
-
 from PyQt5 import QtCore
 
 from trainme.widgets.labeling.labelme.shape import Shape

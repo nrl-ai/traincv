@@ -1,12 +1,8 @@
-from math import sqrt
 import os.path as osp
+from math import sqrt
 
 import numpy as np
-
-from PyQt5 import QtCore
-from PyQt5 import QtGui
-from PyQt5 import QtWidgets
-
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 here = osp.dirname(osp.abspath(__file__))
 

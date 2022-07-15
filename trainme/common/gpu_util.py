@@ -1,11 +1,11 @@
-from subprocess import Popen, PIPE
-from distutils import spawn
-import os
 import math
-import random
-import time
-import sys
+import os
 import platform
+import random
+import sys
+import time
+from distutils import spawn
+from subprocess import PIPE, Popen
 
 
 class GPU:

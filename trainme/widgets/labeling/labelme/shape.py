@@ -2,12 +2,9 @@ import copy
 import math
 
 import numpy as np
-
-from PyQt5 import QtCore
-from PyQt5 import QtGui
+from PyQt5 import QtCore, QtGui
 
 from . import utils
-
 
 # TODO(unknown):
 # - [opt] Store paths instead of creating new ones at each paint.

@@ -3,7 +3,6 @@
 import logging
 import sys
 
-
 __appname__ = "labelme"
 
 # Semantic Versioning 2.0.0: https://semver.org/

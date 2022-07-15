@@ -4,8 +4,8 @@ import pandas as pd
 from PyQt5 import QtCore, uic
 from PyQt5.QtWidgets import QFileDialog, QHeaderView, QWidget
 
-from trainme.widgets.common.toaster import QToaster
 from trainme.widgets.common.tablemodel import TableModel
+from trainme.widgets.common.toaster import QToaster
 
 
 class DataSubsetTable(QWidget):

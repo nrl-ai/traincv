@@ -1,30 +1,34 @@
 # -*- coding: utf-8 -*-
 
+import functools
+import html
+import math
+import os
+import os.path as osp
+import re
+import sys
+import webbrowser
+
+import imgviz
+import natsort
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import *
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
+from trainme.inference_services.yolov5 import YOLOv5Predictor
+
+from . import __appname__, utils
+from .config import get_config
+from .label_file import LabelFile, LabelFileError
+from .logger import logger
+from .shape import Shape
+from .tracker import Tracker
 from .widgets import (BrightnessContrastDialog, Canvas, FileDialogPreview,
                       LabelDialog, LabelListWidget, LabelListWidgetItem,
                       ToolBar, UniqueLabelQListWidget, ZoomWidget)
-from .tracker import Tracker
-from .shape import Shape
-from .logger import logger
-from .label_file import LabelFile, LabelFileError
-from .config import get_config
-from . import __appname__, utils
-from trainme.inference_services.yolov5 import YOLOv5Predictor
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import Qt
-from PyQt5.QtCore import *
-from PyQt5 import QtCore, QtGui, QtWidgets
-import natsort
-import imgviz
-import webbrowser
-import re
-import os.path as osp
-import os
-import math
-import html
-import functools
-import sys
+
 sys.path.append(".")
 
 

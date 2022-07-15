@@ -11,7 +11,6 @@ if os.name == "nt":  # Windows
 
 from . import __appname__
 
-
 COLORS = {
     "WARNING": "yellow",
     "INFO": "white",

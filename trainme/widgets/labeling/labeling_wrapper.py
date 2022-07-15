@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import (QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import QVBoxLayout, QWidget
 
 from .labelme.labelme_widget import LabelmeWidget
 

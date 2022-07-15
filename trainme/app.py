@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import QApplication
 from resources.resources import *
 from widgets.mainwindow import MainWindow
 
-
 # Enable scaling for high dpi screens
 QtWidgets.QApplication.setAttribute(
     QtCore.Qt.AA_EnableHighDpiScaling,

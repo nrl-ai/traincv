@@ -1,5 +1,6 @@
 import cv2
 from PyQt5 import QtCore
+
 from .utils import opencv as ocvutil
 
 
