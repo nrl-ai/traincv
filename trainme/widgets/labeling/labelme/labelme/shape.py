@@ -63,9 +63,9 @@ class Shape(object):
         self.flags = flags
         self.other_data = {}
 
-        self._highlightIndex = None
+        self._highlight_index = None
         self._highlightMode = self.NEAR_VERTEX
-        self._highlightSettings = {
+        self._highlight_settings = {
             self.NEAR_VERTEX: (4, self.P_ROUND),
             self.MOVE_VERTEX: (1.5, self.P_SQUARE),
         }
@@ -102,33 +102,33 @@ class Shape(object):
     def close(self):
         self._closed = True
 
-    def addPoint(self, point):
+    def add_point(self, point):
         if self.points and point == self.points[0]:
             self.close()
         else:
             self.points.append(point)
 
-    def canAddPoint(self):
+    def can_add_point(self):
         return self.shape_type in ["polygon", "linestrip"]
 
-    def popPoint(self):
+    def pop_point(self):
         if self.points:
             return self.points.pop()
         return None
 
-    def insertPoint(self, i, point):
+    def insert_point(self, i, point):
         self.points.insert(i, point)
 
     def remove_point(self, i):
         self.points.pop(i)
 
-    def isClosed(self):
+    def is_closed(self):
         return self._closed
 
-    def setOpen(self):
+    def set_open(self):
         self._closed = False
 
-    def getRectFromLine(self, pt1, pt2):
+    def get_rect_from_line(self, pt1, pt2):
         x1, y1 = pt1.x(), pt1.y()
         x2, y2 = pt2.x(), pt2.y()
         return QtCore.QRectF(x1, y1, x2 - x1, y2 - y1)
@@ -149,33 +149,33 @@ class Shape(object):
             if self.shape_type == "rectangle":
                 assert len(self.points) in [1, 2]
                 if len(self.points) == 2:
-                    rectangle = self.getRectFromLine(*self.points)
+                    rectangle = self.get_rect_from_line(*self.points)
                     line_path.addRect(rectangle)
                 for i in range(len(self.points)):
-                    self.drawVertex(vrtx_path, i)
+                    self.draw_vertex(vrtx_path, i)
             elif self.shape_type == "circle":
                 assert len(self.points) in [1, 2]
                 if len(self.points) == 2:
-                    rectangle = self.getCircleRectFromLine(self.points)
+                    rectangle = self.get_circle_rect_from_line(self.points)
                     line_path.addEllipse(rectangle)
                 for i in range(len(self.points)):
-                    self.drawVertex(vrtx_path, i)
+                    self.draw_vertex(vrtx_path, i)
             elif self.shape_type == "linestrip":
                 line_path.moveTo(self.points[0])
                 for i, p in enumerate(self.points):
                     line_path.lineTo(p)
-                    self.drawVertex(vrtx_path, i)
+                    self.draw_vertex(vrtx_path, i)
             else:
                 line_path.moveTo(self.points[0])
                 # Uncommenting the following line will draw 2 paths
                 # for the 1st vertex, and make it non-filled, which
                 # may be desirable.
-                # self.drawVertex(vrtx_path, 0)
+                # self.draw_vertex(vrtx_path, 0)
 
                 for i, p in enumerate(self.points):
                     line_path.lineTo(p)
-                    self.drawVertex(vrtx_path, i)
-                if self.isClosed():
+                    self.draw_vertex(vrtx_path, i)
+                if self.is_closed():
                     line_path.lineTo(self.points[0])
 
             painter.drawPath(line_path)
@@ -189,14 +189,14 @@ class Shape(object):
                 )
                 painter.fillPath(line_path, color)
 
-    def drawVertex(self, path, i):
+    def draw_vertex(self, path, i):
         d = self.point_size / self.scale
         shape = self.point_type
         point = self.points[i]
-        if i == self._highlightIndex:
-            size, shape = self._highlightSettings[self._highlightMode]
+        if i == self._highlight_index:
+            size, shape = self._highlight_settings[self._highlightMode]
             d *= size
-        if self._highlightIndex is not None:
+        if self._highlight_index is not None:
             self._vertex_fill_color = self.hvertex_fill_color
         else:
             self._vertex_fill_color = self.vertex_fill_color
@@ -207,7 +207,7 @@ class Shape(object):
         else:
             assert False, "unsupported vertex shape"
 
-    def nearestVertex(self, point, epsilon):
+    def nearest_vertex(self, point, epsilon):
         min_distance = float("inf")
         min_i = None
         for i, p in enumerate(self.points):
@@ -217,7 +217,7 @@ class Shape(object):
                 min_i = i
         return min_i
 
-    def nearestEdge(self, point, epsilon):
+    def nearest_edge(self, point, epsilon):
         min_distance = float("inf")
         post_i = None
         for i in range(len(self.points)):
@@ -228,10 +228,10 @@ class Shape(object):
                 post_i = i
         return post_i
 
-    def containsPoint(self, point):
-        return self.makePath().contains(point)
+    def contains_point(self, point):
+        return self.make_path().contains(point)
 
-    def getCircleRectFromLine(self, line):
+    def get_circle_rect_from_line(self, line):
         """Computes parameters to draw with `QPainterPath::addEllipse`"""
         if len(line) != 2:
             return None
@@ -241,16 +241,16 @@ class Shape(object):
         rectangle = QtCore.QRectF(c.x() - d, c.y() - d, 2 * d, 2 * d)
         return rectangle
 
-    def makePath(self):
+    def make_path(self):
         if self.shape_type == "rectangle":
             path = QtGui.QPainterPath()
             if len(self.points) == 2:
-                rectangle = self.getRectFromLine(*self.points)
+                rectangle = self.get_rect_from_line(*self.points)
                 path.addRect(rectangle)
         elif self.shape_type == "circle":
             path = QtGui.QPainterPath()
             if len(self.points) == 2:
-                rectangle = self.getCircleRectFromLine(self.points)
+                rectangle = self.get_circle_rect_from_line(self.points)
                 path.addEllipse(rectangle)
         else:
             path = QtGui.QPainterPath(self.points[0])
@@ -258,16 +258,16 @@ class Shape(object):
                 path.lineTo(p)
         return path
 
-    def boundingRect(self):
-        return self.makePath().boundingRect()
+    def bounding_rect(self):
+        return self.make_path().boundingRect()
 
-    def moveBy(self, offset):
+    def move_by(self, offset):
         self.points = [p + offset for p in self.points]
 
-    def moveVertexBy(self, i, offset):
+    def move_vertex_by(self, i, offset):
         self.points[i] = self.points[i] + offset
 
-    def highlightVertex(self, i, action):
+    def highlight_vertex(self, i, action):
         """Highlight a vertex appropriately based on the current action
 
         Args:
@@ -275,12 +275,12 @@ class Shape(object):
             action (int): The action
             (see Shape.NEAR_VERTEX and Shape.MOVE_VERTEX)
         """
-        self._highlightIndex = i
+        self._highlight_index = i
         self._highlightMode = action
 
-    def highlightClear(self):
+    def highlight_clear(self):
         """Clear the highlighted point"""
-        self._highlightIndex = None
+        self._highlight_index = None
 
     def copy(self):
         return copy.deepcopy(self)

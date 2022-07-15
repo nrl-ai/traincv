@@ -7,30 +7,29 @@ class OCVTracker():
 
     def __init__(self, *args, **kwargs):
         self.shape = None
-        self.prevImage = None
+        self.prev_image = None
 
-    def getRectForTracker(self, img, shape):
-        qrect = shape.boundingRect()
+    def get_rect_for_tracker(self, img, shape):
+        qrect = shape.bounding_rect()
         tl = qrect.topLeft()
         h = qrect.height()
         w = qrect.width()
         rect = (tl.x(), tl.y(), w, h)
         return [int(_) for _ in rect]
 
-    def initTracker(self, qimg, shape):
+    def init_tracker(self, qimg, shape):
         status = False
         self.shape = shape
         if qimg.isNull() or not shape:
             print("No object initialized")
             return status
-        else:
-            fimg = ocvutil.qtImg2CvMat(qimg)
-            fimg = cv2.cvtColor(fimg, cv2.COLOR_BGR2GRAY)
-            self.prevImage = fimg
-            status = True
+        fimg = ocvutil.qt_img_to_cv_img(qimg)
+        fimg = cv2.cvtColor(fimg, cv2.COLOR_BGR2GRAY)
+        self.prev_image = fimg
+        status = True
         return status
 
-    def updateTracker(self, qimg):
+    def update_tracker(self, qimg):
         shape = self.shape.copy()
         assert (shape and shape.label ==
                 self.shape.label), "Invalid tracker state!"
@@ -39,7 +38,7 @@ class OCVTracker():
             print("No image to update tracker")
             return shape, status
 
-        mimg = ocvutil.qtImg2CvMat(qimg)
+        mimg = ocvutil.qt_img_to_cv_img(qimg)
         mimg = cv2.cvtColor(mimg, cv2.COLOR_BGR2GRAY)
 
         p1 = (int(self.shape.points[0].x()), int(self.shape.points[0].y()))
@@ -47,7 +46,7 @@ class OCVTracker():
         prevBox = (p1[0], p1[1], p2[0] - p1[0], p2[1] - p1[1])
 
         self.tracker = cv2.TrackerKCF_create()
-        self.tracker.init(self.prevImage, prevBox)
+        self.tracker.init(self.prev_image, prevBox)
         success, box = self.tracker.update(mimg)
 
         if(success):
@@ -64,25 +63,25 @@ class OCVTracker():
 
 class Tracker:
     def __init__(self) -> None:
-        self.prevImage = None
-        self.prevShapes = None
-        self.ocvTracker = OCVTracker()
+        self.prev_image = None
+        self.prev_shapes = None
+        self.ocv_tracker = OCVTracker()
 
     def update(self, prevShapes, prevImage):
-        self.prevShapes = prevShapes
-        self.prevImage = prevImage
+        self.prev_shapes = prevShapes
+        self.prev_image = prevImage
 
     def get(self, img):
-        if self.prevImage is None:
+        if self.prev_image is None:
             return []
 
-        newShapes = []
-        for shape in self.prevShapes:
+        new_shapes = []
+        for shape in self.prev_shapes:
             if shape.shape_type != "rectangle":
                 newShape.append(shape)
                 continue
-            self.ocvTracker.initTracker(self.prevImage, shape)
-            newShape, _ = self.ocvTracker.updateTracker(img)
-            newShapes.append(newShape)
+            self.ocv_tracker.init_tracker(self.prev_image, shape)
+            newShape, _ = self.ocv_tracker.update_tracker(img)
+            new_shapes.append(newShape)
 
-        return newShapes
+        return new_shapes

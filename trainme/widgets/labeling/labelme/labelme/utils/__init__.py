@@ -19,7 +19,7 @@ from .shape import shapes_to_label
 from .qt import newIcon
 from .qt import newButton
 from .qt import newAction
-from .qt import addActions
+from .qt import add_actions
 from .qt import labelValidator
 from .qt import struct
 from .qt import distance

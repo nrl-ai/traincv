@@ -62,12 +62,12 @@ class LabelFile(object):
     def load(self, filename):
         keys = [
             "version",
-            "image_data",
-            "image_path",
+            "imageData",
+            "imagePath",
             "shapes",  # polygonal annotations
             "flags",  # image level flags
-            "image_height",
-            "image_width",
+            "imageHeight",
+            "imageWidth",
         ]
         shape_keys = [
             "label",
@@ -95,18 +95,29 @@ class LabelFile(object):
                     )
                 )
 
-            if data["image_data"] is not None:
-                image_data = base64.b64decode(data["image_data"])
+            # Upgrade old data format
+            if "image_data" in data:
+                data["imageData"] = data["image_data"]
+                data["imagePath"] = data["image_path"]
+                data["imageHeight"] = data["image_height"]
+                data["imageWidth"] = data["image_width"]
+                del data["image_data"]
+                del data["image_path"]
+                del data["image_height"]
+                del data["image_width"]
+
+            if data["imageData"] is not None:
+                image_data = base64.b64decode(data["imageData"])
             else:
                 # relative path from label file to relative path from cwd
-                image_path = osp.join(osp.dirname(filename), data["image_path"])
+                image_path = osp.join(osp.dirname(filename), data["imagePath"])
                 image_data = self.load_image_file(image_path)
             flags = data.get("flags") or {}
-            image_path = data["image_path"]
+            image_path = data["imagePath"]
             self._check_image_height_and_width(
                 base64.b64encode(image_data).decode("utf-8"),
-                data.get("image_height"),
-                data.get("image_width"),
+                data.get("imageHeight"),
+                data.get("imageWidth"),
             )
             shapes = [
                 dict(
@@ -124,10 +135,10 @@ class LabelFile(object):
         except Exception as e:
             raise LabelFileError(e)
 
-        otherData = {}
+        other_data = {}
         for key, value in data.items():
             if key not in keys:
-                otherData[key] = value
+                other_data[key] = value
 
         # Only replace data after everything is loaded.
         self.flags = flags
@@ -135,7 +146,7 @@ class LabelFile(object):
         self.image_path = image_path
         self.image_data = image_data
         self.filename = filename
-        self.otherData = otherData
+        self.other_data = other_data
 
     @staticmethod
     def _check_image_height_and_width(image_data, image_height, image_width):
@@ -178,10 +189,10 @@ class LabelFile(object):
             version=__version__,
             flags=flags,
             shapes=shapes,
-            image_path=image_path,
-            image_data=image_data,
-            image_height=image_height,
-            image_width=image_width,
+            imagePath=image_path,
+            imageData=image_data,
+            imageHeight=image_height,
+            imageWidth=image_width,
         )
         for key, value in other_data.items():
             assert key not in data

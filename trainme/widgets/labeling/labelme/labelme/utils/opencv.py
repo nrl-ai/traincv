@@ -3,14 +3,14 @@ import cv2
 from PyQt5 import QtGui
 
 
-def qtImg2CvMat(inImage):
-    inImage = inImage.convertToFormat(13)  # format QImage::Format_RGB888
+def qt_img_to_cv_img(in_image):
+    in_image = in_image.convertToFormat(13)  # format QImage::Format_RGB888
 
-    width = inImage.width()
-    height = inImage.height()
+    width = in_image.width()
+    height = in_image.height()
 
-    ptr = inImage.bits()
-    ptr.setsize(inImage.byteCount())
+    ptr = in_image.bits()
+    ptr.setsize(in_image.byteCount())
     mat = np.array(ptr).reshape(height, width, 3)  # Shape the data
 
     rgb = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)
@@ -18,13 +18,13 @@ def qtImg2CvMat(inImage):
     return rgb
 
 
-def cvMask2QImg(inMat):
+def cv_img_to_qt_img(inMat):
     assert len(inMat.shape) == 2 and inMat.dtype == np.uint8
     arr2 = np.require(inMat, np.uint8, 'C')
-    qImg = QtGui.QImage(
+    qimg = QtGui.QImage(
         arr2,
         inMat.shape[1],
         inMat.shape[0],
         inMat.shape[1],
         QtGui.QImage.Format_Indexed8)
-    return qImg
+    return qimg

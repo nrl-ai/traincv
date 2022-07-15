@@ -9,7 +9,7 @@ import yaml
 from PyQt5 import QtCore
 
 from trainme.widgets.labeling.labelme.labelme.shape import Shape
-from trainme.widgets.labeling.labelme.labelme.utils.opencv import qtImg2CvMat
+from trainme.widgets.labeling.labelme.labelme.utils.opencv import qt_img_to_cv_img
 
 INPUT_WIDTH = 640
 INPUT_HEIGHT = 640
@@ -143,7 +143,7 @@ class YOLOv5Predictor:
             return []
         
         try:
-            image = qtImg2CvMat(image)
+            image = qt_img_to_cv_img(image)
         except Exception as e:
             logging.warning("Could not inference model")
             logging.warning(e)
@@ -158,8 +158,8 @@ class YOLOv5Predictor:
                 shape_type="rectangle",
                 flags={}
             )
-            shape.addPoint(QtCore.QPointF(box["x1"], box["y1"]))
-            shape.addPoint(QtCore.QPointF(box["x2"], box["y2"]))
+            shape.add_point(QtCore.QPointF(box["x1"], box["y1"]))
+            shape.add_point(QtCore.QPointF(box["x2"], box["y2"]))
             shapes.append(shape)
 
         return shapes
