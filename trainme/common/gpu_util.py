@@ -178,19 +178,19 @@ def get_available(
     gp_us = [gp_us[g] for g in avail_able_gp_uindex]
 
     # Sort available gp_us according to the order argument
-    if (order == 'first'):
+    if order == 'first':
         gp_us.sort(key=lambda x: float('inf') if math.isnan(
             x.id) else x.id, reverse=False)
-    elif (order == 'last'):
+    elif order == 'last':
         gp_us.sort(key=lambda x: float('-inf')
                    if math.isnan(x.id) else x.id, reverse=True)
-    elif (order == 'random'):
+    elif order == 'random':
         gp_us = [gp_us[g]
                  for g in random.sample(range(0, len(gp_us)), len(gp_us))]
-    elif (order == 'load'):
+    elif order == 'load':
         gp_us.sort(key=lambda x: float('inf') if math.isnan(
             x.load) else x.load, reverse=False)
-    elif (order == 'memory'):
+    elif order == 'memory':
         gp_us.sort(key=lambda x: float('inf') if math.isnan(
             x.memory_util) else x.memory_util, reverse=False)
 
@@ -284,8 +284,8 @@ def get_first_available(
 
 def show_utilization(all=False, attr_list=None, use_old_code=False):
     gp_us = get_gp_us()
-    if (all):
-        if (use_old_code):
+    if all:
+        if use_old_code:
             print(' ID | Name | Serial | UUID || GPU util. | Memory util. || Memory total | Memory used | Memory free || Display mode | Display active |')
             print('------------------------------------------------------------------------------------------------------------------------------')
             for gpu in gp_us:
@@ -346,7 +346,7 @@ def show_utilization(all=False, attr_list=None, use_old_code=False):
                           'name': 'Display active'}]]
 
     else:
-        if (use_old_code):
+        if use_old_code:
             print(' ID  GPU  MEM')
             print('--------------')
             for gpu in gp_us:
@@ -368,7 +368,7 @@ def show_utilization(all=False, attr_list=None, use_old_code=False):
                           'precision': 0}],
                          ]
 
-    if (not use_old_code):
+    if not use_old_code:
         if (attr_list is not None):
             header_string = ''
             gp_ustrings = [''] * len(gp_us)

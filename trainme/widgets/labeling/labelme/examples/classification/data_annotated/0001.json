@@ -6,8 +6,8 @@
     "dog": false
   },
   "shapes": [],
-  "imagePath": "0001.jpg",
-  "imageData": null,
-  "imageHeight": 480,
-  "imageWidth": 640
+  "image_path": "0001.jpg",
+  "image_data": null,
+  "image_height": 480,
+  "image_width": 640
 }

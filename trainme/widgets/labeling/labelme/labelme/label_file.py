@@ -32,8 +32,8 @@ class LabelFile(object):
 
     def __init__(self, filename=None):
         self.shapes = []
-        self.imagePath = None
-        self.imageData = None
+        self.image_path = None
+        self.image_data = None
         if filename is not None:
             self.load(filename)
         self.filename = filename
@@ -62,12 +62,12 @@ class LabelFile(object):
     def load(self, filename):
         keys = [
             "version",
-            "imageData",
-            "imagePath",
+            "image_data",
+            "image_path",
             "shapes",  # polygonal annotations
             "flags",  # image level flags
-            "imageHeight",
-            "imageWidth",
+            "image_height",
+            "image_width",
         ]
         shape_keys = [
             "label",
@@ -95,18 +95,18 @@ class LabelFile(object):
                     )
                 )
 
-            if data["imageData"] is not None:
-                imageData = base64.b64decode(data["imageData"])
+            if data["image_data"] is not None:
+                image_data = base64.b64decode(data["image_data"])
             else:
                 # relative path from label file to relative path from cwd
-                imagePath = osp.join(osp.dirname(filename), data["imagePath"])
-                imageData = self.load_image_file(imagePath)
+                image_path = osp.join(osp.dirname(filename), data["image_path"])
+                image_data = self.load_image_file(image_path)
             flags = data.get("flags") or {}
-            imagePath = data["imagePath"]
+            image_path = data["image_path"]
             self._check_image_height_and_width(
-                base64.b64encode(imageData).decode("utf-8"),
-                data.get("imageHeight"),
-                data.get("imageWidth"),
+                base64.b64encode(image_data).decode("utf-8"),
+                data.get("image_height"),
+                data.get("image_width"),
             )
             shapes = [
                 dict(
@@ -132,58 +132,58 @@ class LabelFile(object):
         # Only replace data after everything is loaded.
         self.flags = flags
         self.shapes = shapes
-        self.imagePath = imagePath
-        self.imageData = imageData
+        self.image_path = image_path
+        self.image_data = image_data
         self.filename = filename
         self.otherData = otherData
 
     @staticmethod
-    def _check_image_height_and_width(imageData, imageHeight, imageWidth):
-        img_arr = utils.img_b64_to_arr(imageData)
-        if imageHeight is not None and img_arr.shape[0] != imageHeight:
+    def _check_image_height_and_width(image_data, image_height, image_width):
+        img_arr = utils.img_b64_to_arr(image_data)
+        if image_height is not None and img_arr.shape[0] != image_height:
             logger.error(
-                "imageHeight does not match with imageData or imagePath, "
-                "so getting imageHeight from actual image."
+                "image_height does not match with image_data or image_path, "
+                "so getting image_height from actual image."
             )
-            imageHeight = img_arr.shape[0]
-        if imageWidth is not None and img_arr.shape[1] != imageWidth:
+            image_height = img_arr.shape[0]
+        if image_width is not None and img_arr.shape[1] != image_width:
             logger.error(
-                "imageWidth does not match with imageData or imagePath, "
-                "so getting imageWidth from actual image."
+                "image_width does not match with image_data or image_path, "
+                "so getting image_width from actual image."
             )
-            imageWidth = img_arr.shape[1]
-        return imageHeight, imageWidth
+            image_width = img_arr.shape[1]
+        return image_height, image_width
 
     def save(
         self,
         filename,
         shapes,
-        imagePath,
-        imageHeight,
-        imageWidth,
-        imageData=None,
-        otherData=None,
+        image_path,
+        image_height,
+        image_width,
+        image_data=None,
+        other_data=None,
         flags=None,
     ):
-        if imageData is not None:
-            imageData = base64.b64encode(imageData).decode("utf-8")
-            imageHeight, imageWidth = self._check_image_height_and_width(
-                imageData, imageHeight, imageWidth
+        if image_data is not None:
+            image_data = base64.b64encode(image_data).decode("utf-8")
+            image_height, image_width = self._check_image_height_and_width(
+                image_data, image_height, image_width
             )
-        if otherData is None:
-            otherData = {}
+        if other_data is None:
+            other_data = {}
         if flags is None:
             flags = {}
         data = dict(
             version=__version__,
             flags=flags,
             shapes=shapes,
-            imagePath=imagePath,
-            imageData=imageData,
-            imageHeight=imageHeight,
-            imageWidth=imageWidth,
+            image_path=image_path,
+            image_data=image_data,
+            image_height=image_height,
+            image_width=image_width,
         )
-        for key, value in otherData.items():
+        for key, value in other_data.items():
             assert key not in data
             data[key] = value
         try:

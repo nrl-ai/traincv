@@ -147,8 +147,8 @@
       "flags": {}
     }
   ],
-  "imagePath": "00000101.jpg",
-  "imageData": null,
-  "imageHeight": 563,
-  "imageWidth": 1000
+  "image_path": "00000101.jpg",
+  "image_data": null,
+  "image_height": 563,
+  "image_width": 1000
 }

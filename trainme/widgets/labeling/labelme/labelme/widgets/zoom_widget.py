@@ -16,6 +16,6 @@ class ZoomWidget(QtWidgets.QSpinBox):
 
     def minimumSizeHint(self):
         height = super(ZoomWidget, self).minimumSizeHint().height()
-        fm = QtGui.QFontMetrics(self.font())
-        width = fm.horizontalAdvance(str(self.maximum()))
+        font_metric = QtGui.QFontMetrics(self.font())
+        width = font_metric.horizontalAdvance(str(self.maximum()))
         return QtCore.QSize(width, height)

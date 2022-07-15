@@ -14,12 +14,12 @@ class ScrollAreaPreview(QtWidgets.QScrollArea):
         content = QtWidgets.QWidget(self)
         self.setWidget(content)
 
-        lay = QtWidgets.QVBoxLayout(content)
+        layout = QtWidgets.QVBoxLayout(content)
 
         self.label = QtWidgets.QLabel(content)
         self.label.setWordWrap(True)
 
-        lay.addWidget(self.label)
+        layout.addWidget(self.label)
 
     def setText(self, text):
         self.label.setText(text)

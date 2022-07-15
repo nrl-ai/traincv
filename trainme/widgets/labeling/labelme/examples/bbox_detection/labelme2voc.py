@@ -73,7 +73,7 @@ def main():
                 args.output_dir, "AnnotationsVisualization", base + ".jpg"
             )
 
-        img = labelme.utils.img_data_to_arr(label_file.imageData)
+        img = labelme.utils.img_data_to_arr(label_file.image_data)
         imgviz.io.imsave(out_img_file, img)
 
         maker = lxml.builder.ElementMaker()

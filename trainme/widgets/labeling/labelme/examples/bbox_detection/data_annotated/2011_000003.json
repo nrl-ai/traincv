@@ -35,8 +35,8 @@
       "flags": {}
     }
   ],
-  "imagePath": "2011_000003.jpg",
-  "imageData": null,
-  "imageHeight": 338,
-  "imageWidth": 500
+  "image_path": "2011_000003.jpg",
+  "image_data": null,
+  "image_height": 338,
+  "image_width": 500
 }

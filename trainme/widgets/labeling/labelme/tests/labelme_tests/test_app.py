@@ -11,14 +11,14 @@ here = osp.dirname(osp.abspath(__file__))
 data_dir = osp.join(here, "data")
 
 
-def _win_show_and_wait_imageData(qtbot, win):
+def _win_show_and_wait_image_data(qtbot, win):
     win.show()
 
-    def check_imageData():
-        assert hasattr(win, "imageData")
-        assert win.imageData is not None
+    def check_image_data():
+        assert hasattr(win, "image_data")
+        assert win.image_data is not None
 
-    qtbot.waitUntil(check_imageData)  # wait for loadFile
+    qtbot.waitUntil(check_image_data)  # wait for loadFile
 
 
 def test_MainWindow_open(qtbot):
@@ -32,7 +32,7 @@ def test_MainWindow_open_img(qtbot):
     img_file = osp.join(data_dir, "raw/2011_000003.jpg")
     win = labelme.app.MainWindow(filename=img_file)
     qtbot.addWidget(win)
-    _win_show_and_wait_imageData(qtbot, win)
+    _win_show_and_wait_image_data(qtbot, win)
     win.close()
 
 
@@ -46,7 +46,7 @@ def test_MainWindow_open_json(qtbot):
 
         win = labelme.app.MainWindow(filename=json_file)
         qtbot.addWidget(win)
-        _win_show_and_wait_imageData(qtbot, win)
+        _win_show_and_wait_image_data(qtbot, win)
         win.close()
 
 
@@ -54,7 +54,7 @@ def test_MainWindow_open_dir(qtbot):
     directory = osp.join(data_dir, "raw")
     win = labelme.app.MainWindow(filename=directory)
     qtbot.addWidget(win)
-    _win_show_and_wait_imageData(qtbot, win)
+    _win_show_and_wait_image_data(qtbot, win)
     return win
 
 
@@ -78,7 +78,7 @@ def test_MainWindow_annotate_jpg(qtbot):
         config=config, filename=input_file, output_file=out_file,
     )
     qtbot.addWidget(win)
-    _win_show_and_wait_imageData(qtbot, win)
+    _win_show_and_wait_image_data(qtbot, win)
 
     label = "whole"
     points = [

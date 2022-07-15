@@ -59,7 +59,7 @@ class LabelDialog(QtWidgets.QDialog):
             layout_edit.addWidget(self.edit_group_id, 2)
             layout.addLayout(layout_edit)
         # buttons
-        self.buttonBox = bb = QtWidgets.QDialogButtonBox(
+        self.button_box = bb = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
             QtCore.Qt.Horizontal,
             self,
@@ -96,9 +96,9 @@ class LabelDialog(QtWidgets.QDialog):
         if flags is None:
             flags = {}
         self._flags = flags
-        self.flagsLayout = QtWidgets.QVBoxLayout()
+        self.flags_layout = QtWidgets.QVBoxLayout()
         self.resetFlags()
-        layout.addItem(self.flagsLayout)
+        layout.addItem(self.flags_layout)
         self.edit.textChanged.connect(self.updateFlags)
         self.setLayout(layout)
         # completion
@@ -157,9 +157,9 @@ class LabelDialog(QtWidgets.QDialog):
         self.setFlags(flags_new)
 
     def deleteFlags(self):
-        for i in reversed(range(self.flagsLayout.count())):
-            item = self.flagsLayout.itemAt(i).widget()
-            self.flagsLayout.removeWidget(item)
+        for i in reversed(range(self.flags_layout.count())):
+            item = self.flags_layout.itemAt(i).widget()
+            self.flags_layout.removeWidget(item)
             item.setParent(None)
 
     def resetFlags(self, label=""):
@@ -175,23 +175,23 @@ class LabelDialog(QtWidgets.QDialog):
         for key in flags:
             item = QtWidgets.QCheckBox(key, self)
             item.setChecked(flags[key])
-            self.flagsLayout.addWidget(item)
+            self.flags_layout.addWidget(item)
             item.show()
 
     def getFlags(self):
         flags = {}
-        for i in range(self.flagsLayout.count()):
-            item = self.flagsLayout.itemAt(i).widget()
+        for i in range(self.flags_layout.count()):
+            item = self.flags_layout.itemAt(i).widget()
             flags[item.text()] = item.isChecked()
         return flags
 
-    def getGroupId(self):
+    def get_group_id(self):
         group_id = self.edit_group_id.text()
         if group_id:
             return int(group_id)
         return None
 
-    def popUp(self, text=None, move=True, flags=None, group_id=None):
+    def pop_up(self, text=None, move=True, flags=None, group_id=None):
         if self._fit_to_content["row"]:
             self.labelList.setMinimumHeight(
                 self.labelList.sizeHintForRow(0) * self.labelList.count() + 2
@@ -224,6 +224,6 @@ class LabelDialog(QtWidgets.QDialog):
         if move:
             self.move(QtGui.QCursor.pos())
         if self.exec_():
-            return self.edit.text(), self.getFlags(), self.getGroupId()
+            return self.edit.text(), self.getFlags(), self.get_group_id()
 
         return None, None, None

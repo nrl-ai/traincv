@@ -13,9 +13,9 @@ class ColorDialog(QtWidgets.QColorDialog):
         self.default = None
         self.bb = self.layout().itemAt(1).widget()
         self.bb.addButton(QtWidgets.QDialogButtonBox.RestoreDefaults)
-        self.bb.clicked.connect(self.checkRestore)
+        self.bb.clicked.connect(self.check_restore)
 
-    def getColor(self, value=None, title=None, default=None):
+    def get_color(self, value=None, title=None, default=None):
         self.default = default
         if title:
             self.setWindowTitle(title)
@@ -23,7 +23,7 @@ class ColorDialog(QtWidgets.QColorDialog):
             self.setCurrentColor(value)
         return self.currentColor() if self.exec_() else None
 
-    def checkRestore(self, button):
+    def check_restore(self, button):
         if (
             self.bb.buttonRole(button) & QtWidgets.QDialogButtonBox.ResetRole
             and self.default

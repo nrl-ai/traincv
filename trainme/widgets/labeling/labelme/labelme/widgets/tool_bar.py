@@ -6,13 +6,13 @@ class ToolBar(QtWidgets.QToolBar):
     def __init__(self, title):
         super(ToolBar, self).__init__(title)
         layout = self.layout()
-        m = (0, 0, 0, 0)
+        margin = (0, 0, 0, 0)
         layout.setSpacing(0)
-        layout.setContentsMargins(*m)
-        self.setContentsMargins(*m)
+        layout.setContentsMargins(*margin)
+        self.setContentsMargins(*margin)
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint)
 
-    def addAction(self, action):
+    def add_action(self, action):
         if isinstance(action, QtWidgets.QWidgetAction):
             return super(ToolBar, self).addAction(action)
         btn = QtWidgets.QToolButton()

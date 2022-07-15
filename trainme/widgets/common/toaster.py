@@ -180,13 +180,13 @@ class QToaster(QtWidgets.QFrame):
         self.layout().addWidget(self.label)
 
         if closable:
-            self.closeButton = QtWidgets.QToolButton()
-            self.layout().addWidget(self.closeButton)
+            self.close_button = QtWidgets.QToolButton()
+            self.layout().addWidget(self.close_button)
             close_icon = self.style().standardIcon(
                 QtWidgets.QStyle.SP_TitleBarCloseButton)
-            self.closeButton.setIcon(close_icon)
-            self.closeButton.setAutoRaise(True)
-            self.closeButton.clicked.connect(self.close)
+            self.close_button.setIcon(close_icon)
+            self.close_button.setAutoRaise(True)
+            self.close_button.clicked.connect(self.close)
 
         self.timer.start()
 

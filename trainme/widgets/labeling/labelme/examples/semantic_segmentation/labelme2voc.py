@@ -79,8 +79,8 @@ def main():
             )
 
         with open(out_img_file, "wb") as f:
-            f.write(label_file.imageData)
-        img = labelme.utils.img_data_to_arr(label_file.imageData)
+            f.write(label_file.image_data)
+        img = labelme.utils.img_data_to_arr(label_file.image_data)
 
         lbl, _ = labelme.utils.shapes_to_label(
             img_shape=img.shape,

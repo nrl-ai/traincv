@@ -14,7 +14,7 @@ class UniqueLabelQListWidget(EscapableQListWidget):
         if not self.indexAt(event.pos()).isValid():
             self.clearSelection()
 
-    def findItemsByLabel(self, label):
+    def find_items_by_label(self, label):
         items = []
         for row in range(self.count()):
             item = self.item(row)
@@ -22,12 +22,12 @@ class UniqueLabelQListWidget(EscapableQListWidget):
                 items.append(item)
         return items
 
-    def createItemFromLabel(self, label):
+    def create_item_from_label(self, label):
         item = QtWidgets.QListWidgetItem()
         item.setData(Qt.UserRole, label)
         return item
 
-    def setItemLabel(self, item, label, color=None):
+    def set_item_label(self, item, label, color=None):
         qlabel = QtWidgets.QLabel()
         if color is None:
             qlabel.setText("{}".format(label))

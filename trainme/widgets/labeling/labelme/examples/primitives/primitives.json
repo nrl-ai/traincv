@@ -123,8 +123,8 @@
       "flags": {}
     }
   ],
-  "imagePath": "primitives.jpg",
-  "imageData": null,
-  "imageHeight": 450,
-  "imageWidth": 560
+  "image_path": "primitives.jpg",
+  "image_data": null,
+  "image_height": 450,
+  "image_width": 560
 }

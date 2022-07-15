@@ -85,6 +85,7 @@ class Canvas(QtWidgets.QWidget):
         # Set widget options.
         self.setMouseTracking(True)
         self.setFocusPolicy(QtCore.Qt.WheelFocus)
+        self.show_cross_line = True
 
     def fillDrawing(self):
         return self._fill_drawing
@@ -635,14 +636,21 @@ class Canvas(QtWidgets.QWidget):
             drawing_shape.paint(p)
 
         # Draw mouse coordinates
-        # TODO (vietanhdev): Add an option to menu
-        pen = QtGui.QPen(QtGui.QColor("#88ff00"), 4, Qt.DashDotLine)
-        p.setPen(pen)
-        p.setOpacity(1.0)
-        p.drawLine(QtCore.QPoint(self.prevMovePoint.x(), 0),
-                   QtCore.QPoint(self.prevMovePoint.x(), self.pixmap.height()))
-        p.drawLine(QtCore.QPoint(0, self.prevMovePoint.y()),
-                   QtCore.QPoint(self.pixmap.width(), self.prevMovePoint.y()))
+        if self.show_cross_line:
+            pen = QtGui.QPen(QtGui.QColor("#000000"), 3, Qt.SolidLine)
+            p.setPen(pen)
+            p.setOpacity(1.0)
+            p.drawLine(QtCore.QPoint(self.prevMovePoint.x() - 2, 0),
+                    QtCore.QPoint(self.prevMovePoint.x() - 2, self.pixmap.height()))
+            p.drawLine(QtCore.QPoint(0, self.prevMovePoint.y() - 2),
+                    QtCore.QPoint(self.pixmap.width(), self.prevMovePoint.y() - 2))
+            pen = QtGui.QPen(QtGui.QColor("#FFFFFF"), 3, Qt.SolidLine)
+            p.setPen(pen)
+            p.setOpacity(1.0)
+            p.drawLine(QtCore.QPoint(self.prevMovePoint.x() + 2, 0),
+                    QtCore.QPoint(self.prevMovePoint.x() + 2, self.pixmap.height()))
+            p.drawLine(QtCore.QPoint(0, self.prevMovePoint.y() + 2),
+                    QtCore.QPoint(self.pixmap.width(), self.prevMovePoint.y() + 2))
 
         p.end()
 
@@ -871,3 +879,6 @@ class Canvas(QtWidgets.QWidget):
         self.pixmap = None
         self.shapesBackups = []
         self.update()
+
+    def set_show_cross_line(self, enabled):
+        self.show_cross_line = enabled

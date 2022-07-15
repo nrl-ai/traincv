@@ -37,14 +37,14 @@ def main():
         os.mkdir(out_dir)
 
     data = json.load(open(json_file))
-    imageData = data.get("imageData")
+    image_data = data.get("image_data")
 
-    if not imageData:
-        imagePath = os.path.join(os.path.dirname(json_file), data["imagePath"])
-        with open(imagePath, "rb") as f:
-            imageData = f.read()
-            imageData = base64.b64encode(imageData).decode("utf-8")
-    img = utils.img_b64_to_arr(imageData)
+    if not image_data:
+        image_path = os.path.join(os.path.dirname(json_file), data["image_path"])
+        with open(image_path, "rb") as f:
+            image_data = f.read()
+            image_data = base64.b64encode(image_data).decode("utf-8")
+    img = utils.img_b64_to_arr(image_data)
 
     label_name_to_value = {"_background_": 0}
     for shape in sorted(data["shapes"], key=lambda x: x["label"]):

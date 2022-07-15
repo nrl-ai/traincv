@@ -89,7 +89,7 @@ def main():
         base = osp.splitext(osp.basename(filename))[0]
         out_img_file = osp.join(args.output_dir, "JPEGImages", base + ".jpg")
 
-        img = labelme.utils.img_data_to_arr(label_file.imageData)
+        img = labelme.utils.img_data_to_arr(label_file.image_data)
         imgviz.io.imsave(out_img_file, img)
         data["images"].append(
             dict(

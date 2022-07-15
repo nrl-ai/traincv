@@ -16,10 +16,10 @@ class BrightnessContrastDialog(QtWidgets.QDialog):
         self.slider_brightness = self._create_slider()
         self.slider_contrast = self._create_slider()
 
-        formLayout = QtWidgets.QFormLayout()
-        formLayout.addRow(self.tr("Brightness"), self.slider_brightness)
-        formLayout.addRow(self.tr("Contrast"), self.slider_contrast)
-        self.setLayout(formLayout)
+        form_layout = QtWidgets.QFormLayout()
+        form_layout.addRow(self.tr("Brightness"), self.slider_brightness)
+        form_layout.addRow(self.tr("Contrast"), self.slider_contrast)
+        self.setLayout(form_layout)
 
         assert isinstance(img, PIL.Image.Image)
         self.img = img
