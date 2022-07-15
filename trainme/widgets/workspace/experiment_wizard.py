@@ -1,8 +1,9 @@
 from PyQt5.QtWidgets import QTabWidget
 
-from trainme.widgets.workspace.data_preparation.data_preparation import DataPreparationTab
-from trainme.widgets.workspace.export.export import ExportTab
+from trainme.widgets.workspace.data_preparation.data_preparation import \
+    DataPreparationTab
 from trainme.widgets.workspace.evaluation.evaluation import EvaluationTab
+from trainme.widgets.workspace.export.export import ExportTab
 from trainme.widgets.workspace.training.training import TrainingTab
 
 

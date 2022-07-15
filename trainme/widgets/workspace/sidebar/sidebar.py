@@ -1,7 +1,7 @@
 import os
 
-from PyQt5.QtWidgets import QFileDialog, QMessageBox, QWidget
 from PyQt5 import uic
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QWidget
 
 
 class SideBar(QWidget):

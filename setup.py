@@ -5,8 +5,7 @@ import shlex
 import subprocess
 import sys
 
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages, setup
 
 
 def get_version():
@@ -140,10 +139,12 @@ def main():
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3 :: Only",
         ],
-        package_data={"trainme": ["trainme/widgets/labeling/labelme/labelme/icons/*", "trainme/widgets/labeling/labelme/labelme/config/*.yaml"]},
+        package_data={
+            "trainme": [
+                "trainme/widgets/labeling/labelme/icons/*",
+                "trainme/widgets/labeling/labelme/config/*.yaml"]},
     )
 
 
 if __name__ == "__main__":
     main()
-

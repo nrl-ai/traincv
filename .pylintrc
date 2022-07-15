@@ -21,13 +21,14 @@ analyse-fallback-blocks=no
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code.
-extension-pkg-allow-list=
+extension-pkg-allow-list=PyQt5,
+                        cv2
 
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
 # run arbitrary code. (This is an alternative name to extension-pkg-allow-list
 # for backward compatibility.)
-extension-pkg-whitelist=PyQt5,cv2
+extension-pkg-whitelist=
 
 # Return non-zero exit code if any of these messages/categories are detected,
 # even if score is above --fail-under value. Syntax same as enable. Messages
@@ -57,7 +58,7 @@ ignore-patterns=^\.#
 # (useful for modules/projects where namespaces are manipulated during runtime
 # and thus existing member attributes cannot be deduced by static analysis). It
 # supports qualified module names, as well as Unix pattern matching.
-ignored-modules=
+ignored-modules=cv2
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
@@ -151,7 +152,8 @@ disable=raw-checker-failed,
         suppressed-message,
         useless-suppression,
         deprecated-pragma,
-        use-symbolic-message-instead
+        use-symbolic-message-instead,
+        no-member
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -315,6 +317,9 @@ function-naming-style=snake_case
 good-names=i,
            j,
            k,
+           s,
+           g,
+           b,
            ex,
            Run,
            _,
@@ -326,6 +331,20 @@ good-names=i,
            x2,
            y2,
            f,
+           h,
+           w,
+           ch,
+           cx,
+           cy,
+           r,
+           ev, e,
+           p, v,
+           W, H,
+           h1, w1, h2, w2,
+           p1, p2, p3,
+           pt1, pt2, pt3,
+           dw, dh,
+           tl, br,
            headerData,
            setEditableCols,
            rowCount,
@@ -333,7 +352,21 @@ good-names=i,
            addRow,
            removeRow,
            setData,
-           addWidget
+           addWidget,
+           enterEvent,
+           eventFilter,
+           paintEvent,
+           enterEvent,
+           leaveEvent,
+           keyPressEvent,
+           itemDropped,
+           itemChanged,
+           itemSelectionChangedEvent,
+           resizeEvent,
+           closeEvent,
+           dragEnterEvent,
+           dropEvent,
+           mousePressEvent
 
 # Good variable names regexes, separated by a comma. If names match any regex,
 # they will always be accepted

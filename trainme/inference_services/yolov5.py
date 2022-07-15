@@ -5,17 +5,17 @@ import pathlib
 import cv2
 import numpy as np
 import yaml
-
 from PyQt5 import QtCore
 
-from trainme.widgets.labeling.labelme.labelme.shape import Shape
-from trainme.widgets.labeling.labelme.labelme.utils.opencv import qtImg2CvMat
+from trainme.widgets.labeling.labelme.shape import Shape
+from trainme.widgets.labeling.labelme.utils.opencv import qt_img_to_cv_img
 
 INPUT_WIDTH = 640
 INPUT_HEIGHT = 640
 SCORE_THRESHOLD = 0.5
 NMS_THRESHOLD = 0.45
 CONFIDENCE_THRESHOLD = 0.45
+
 
 class YOLOv5Predictor:
     def __init__(self, config_path) -> None:
@@ -40,7 +40,6 @@ class YOLOv5Predictor:
         self.net = cv2.dnn.readNet(model_abs_path)
         self.classes = self.config["classes"]
 
-
     def check_missing_config(self, config_names, config):
         for name in config_names:
             if name not in config:
@@ -53,8 +52,15 @@ class YOLOv5Predictor:
 
     def pre_process(self, input_image, net):
         # Create a 4D blob from a frame.
-        blob = cv2.dnn.blobFromImage(
-            input_image, 1/255, (self.config["input_width"], self.config["input_height"]), [0, 0, 0], 1, crop=False)
+        blob = cv2.dnn.blobFromImage(input_image,
+                                     1 / 255,
+                                     (self.config["input_width"],
+                                      self.config["input_height"]),
+                                     [0,
+                                         0,
+                                         0],
+                                     1,
+                                     crop=False)
 
         # Sets the input to the network.
         net.setInput(blob)
@@ -64,7 +70,6 @@ class YOLOv5Predictor:
         outputs = net.forward(output_layers)
 
         return outputs
-
 
     def post_process(self, input_image, outputs):
         # Lists to hold respective values while unwrapping.
@@ -94,14 +99,14 @@ class YOLOv5Predictor:
                 class_id = np.argmax(classes_scores)
 
                 #  Continue if the class score is above threshold.
-                if (classes_scores[class_id] > self.config["score_threshold"]):
+                if classes_scores[class_id] > self.config["score_threshold"]:
                     confidences.append(confidence)
                     class_ids.append(class_id)
 
                     cx, cy, w, h = row[0], row[1], row[2], row[3]
 
-                    left = int((cx - w/2) * x_factor)
-                    top = int((cy - h/2) * y_factor)
+                    left = int((cx - w / 2) * x_factor)
+                    top = int((cy - h / 2) * y_factor)
                     width = int(w * x_factor)
                     height = int(h * y_factor)
 
@@ -113,8 +118,7 @@ class YOLOv5Predictor:
         indices = cv2.dnn.NMSBoxes(
             boxes, confidences, self.config["confidence_threshold"], self.config["nms_threshold"])
 
-
-        output_boxes = []        
+        output_boxes = []
         for i in indices:
             box = boxes[i]
             left = box[0]
@@ -137,18 +141,17 @@ class YOLOv5Predictor:
 
         return output_boxes
 
-    
     def predict_shapes(self, image):
         if image is None:
             return []
-        
+
         try:
-            image = qtImg2CvMat(image)
+            image = qt_img_to_cv_img(image)
         except Exception as e:
             logging.warning("Could not inference model")
             logging.warning(e)
             return []
-        
+
         boxes = self.predict(image)
         shapes = []
 
@@ -158,8 +161,8 @@ class YOLOv5Predictor:
                 shape_type="rectangle",
                 flags={}
             )
-            shape.addPoint(QtCore.QPointF(box["x1"], box["y1"]))
-            shape.addPoint(QtCore.QPointF(box["x2"], box["y2"]))
+            shape.add_point(QtCore.QPointF(box["x1"], box["y1"]))
+            shape.add_point(QtCore.QPointF(box["x2"], box["y2"]))
             shapes.append(shape)
 
         return shapes

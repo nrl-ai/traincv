@@ -1,17 +1,17 @@
-from subprocess import Popen, PIPE
-from distutils import spawn
-import os
 import math
-import random
-import time
-import sys
+import os
 import platform
+import random
+import sys
+import time
+from distutils import spawn
+from subprocess import PIPE, Popen
 
 
 class GPU:
     def __init__(
             self,
-            ID,
+            id,
             uuid,
             load,
             memory_total,
@@ -23,7 +23,7 @@ class GPU:
             display_mode,
             display_active,
             temp_gpu):
-        self.id = ID
+        self.id = id
         self.uuid = uuid
         self.load = load
         self.memory_util = float(memory_used) / float(memory_total)
@@ -173,24 +173,24 @@ def get_available(
         exclude_id=exclude_id,
         exclude_uuid=exclude_uuid)
     avail_able_gp_uindex = [idx for idx in range(
-        0, len(gp_uavailability)) if (gp_uavailability[idx] == 1)]
+        0, len(gp_uavailability)) if gp_uavailability[idx] == 1]
     # Discard unavailable gp_us
     gp_us = [gp_us[g] for g in avail_able_gp_uindex]
 
     # Sort available gp_us according to the order argument
-    if (order == 'first'):
+    if order == 'first':
         gp_us.sort(key=lambda x: float('inf') if math.isnan(
             x.id) else x.id, reverse=False)
-    elif (order == 'last'):
+    elif order == 'last':
         gp_us.sort(key=lambda x: float('-inf')
                    if math.isnan(x.id) else x.id, reverse=True)
-    elif (order == 'random'):
+    elif order == 'random':
         gp_us = [gp_us[g]
                  for g in random.sample(range(0, len(gp_us)), len(gp_us))]
-    elif (order == 'load'):
+    elif order == 'load':
         gp_us.sort(key=lambda x: float('inf') if math.isnan(
             x.load) else x.load, reverse=False)
-    elif (order == 'memory'):
+    elif order == 'memory':
         gp_us.sort(key=lambda x: float('inf') if math.isnan(
             x.memory_util) else x.memory_util, reverse=False)
 
@@ -248,7 +248,7 @@ def get_first_available(
         exclude_uuid = []
 
     for i in range(attempts):
-        if (verbose):
+        if verbose:
             print('Attempting (' + str(i + 1) + '/' +
                   str(attempts) + ') to locate available GPU.')
         # Get first available GPU
@@ -261,12 +261,12 @@ def get_first_available(
             exclude_id=exclude_id,
             exclude_uuid=exclude_uuid)
         # If an available GPU was found, break for loop.
-        if (available):
-            if (verbose):
+        if available:
+            if verbose:
                 print('GPU ' + str(available) + ' located!')
             break
         # If this is not the last attempt, sleep for 'interval' seconds
-        if (i != attempts - 1):
+        if i != attempts - 1:
             time.sleep(interval)
     # Check if an GPU was found, or if the attempts simply ran out. Throw
     # error, if no GPU was found
@@ -284,8 +284,8 @@ def get_first_available(
 
 def show_utilization(all=False, attr_list=None, use_old_code=False):
     gp_us = get_gp_us()
-    if (all):
-        if (use_old_code):
+    if all:
+        if use_old_code:
             print(' ID | Name | Serial | UUID || GPU util. | Memory util. || Memory total | Memory used | Memory free || Display mode | Display active |')
             print('------------------------------------------------------------------------------------------------------------------------------')
             for gpu in gp_us:
@@ -346,7 +346,7 @@ def show_utilization(all=False, attr_list=None, use_old_code=False):
                           'name': 'Display active'}]]
 
     else:
-        if (use_old_code):
+        if use_old_code:
             print(' ID  GPU  MEM')
             print('--------------')
             for gpu in gp_us:
@@ -368,8 +368,8 @@ def show_utilization(all=False, attr_list=None, use_old_code=False):
                           'precision': 0}],
                          ]
 
-    if (not use_old_code):
-        if (attr_list is not None):
+    if not use_old_code:
+        if attr_list is not None:
             header_string = ''
             gp_ustrings = [''] * len(gp_us)
             for attr_group in attr_list:
@@ -391,14 +391,14 @@ def show_utilization(all=False, attr_list=None, use_old_code=False):
 
                         attr = attr_transform(attr)
 
-                        if (isinstance(attr, float)):
+                        if isinstance(attr, float):
                             attr_str = (
                                 '{0:' + attr_precision + 'f}').format(attr)
-                        elif (isinstance(attr, int)):
+                        elif isinstance(attr, int):
                             attr_str = ('{0:d}').format(attr)
-                        elif (isinstance(attr, str)):
+                        elif isinstance(attr, str):
                             attr_str = attr
-                        elif (sys.version_info[0] == 2):
+                        elif sys.version_info[0] == 2:
                             if (isinstance(attr, unicode)):
                                 attr_str = attr.encode('ascii', 'ignore')
                         else:
@@ -431,7 +431,7 @@ def show_utilization(all=False, attr_list=None, use_old_code=False):
                             attr_str = (
                                 '{0:' + min_width_str + 's}').format(attr)
                         elif sys.version_info[0] == 2:
-                            if (isinstance(attr, unicode)):
+                            if isinstance(attr, unicode):
                                 attr_str = (
                                     '{0:' +
                                     min_width_str +

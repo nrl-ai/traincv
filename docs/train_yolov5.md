@@ -23,7 +23,7 @@ pip install opencv-contrib-python-headless==4.4.0.46
 
 ```shell
 cd trainme/models/yolov5
-python train.py --img 640 --batch 16 --epochs 30 --data ../../../configs/yolov5-data.yaml --weights yolov5n.pt
+python train.py --img 640 --batch 16 --epochs 30 --data ../../../configs/yolov5_data.yaml --weights yolov5n.pt
 ```
 
 ## 3. Use model for labeling

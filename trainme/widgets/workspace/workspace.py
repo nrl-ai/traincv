@@ -1,7 +1,7 @@
-from PyQt5.QtWidgets import QWidget, QHBoxLayout
+from PyQt5.QtWidgets import QHBoxLayout, QWidget
 
-from trainme.widgets.workspace.sidebar.sidebar import SideBar
 from trainme.widgets.workspace.experiment_wizard import ExperimentWizard
+from trainme.widgets.workspace.sidebar.sidebar import SideBar
 
 
 class WorkspaceWidget(QWidget):
