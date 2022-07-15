@@ -140,10 +140,12 @@ def main():
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3 :: Only",
         ],
-        package_data={"trainme": ["trainme/widgets/labeling/labelme/labelme/icons/*", "trainme/widgets/labeling/labelme/labelme/config/*.yaml"]},
+        package_data={
+            "trainme": [
+                "trainme/widgets/labeling/labelme/icons/*",
+                "trainme/widgets/labeling/labelme/config/*.yaml"]},
     )
 
 
 if __name__ == "__main__":
     main()
-

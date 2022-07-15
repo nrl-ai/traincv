@@ -8,6 +8,7 @@ from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QWidget
 
+
 class EvaluationTab(QWidget):
 
     change_pixmap = pyqtSignal(QImage)
@@ -100,14 +101,15 @@ class EvaluationTab(QWidget):
 
     def infer_current_image(self):
         if self.current_image_id < 0 or \
-            self.current_image_id >= len(self.image_list):
+                self.current_image_id >= len(self.image_list):
             self.image_view.setText("No Image")
         else:
             self.image_view.setText("Running Inference...")
             frame = cv2.imread(self.image_list[self.current_image_id])
             ret, result_frame = self.run_infer(frame)
             if not ret:
-                self.image_view.setText(f"Failed to run inference on image: {self.image_list[self.current_image_id]}")
+                self.image_view.setText(
+                    f"Failed to run inference on image: {self.image_list[self.current_image_id]}")
             rgb_image = cv2.cvtColor(result_frame, cv2.COLOR_BGR2RGB)
             h, w, ch = rgb_image.shape
             bytes_per_line = ch * w

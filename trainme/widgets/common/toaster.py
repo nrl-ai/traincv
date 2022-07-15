@@ -99,13 +99,13 @@ class QToaster(QtWidgets.QFrame):
             self.timer.start()
         return super(QToaster, self).event_filter(source, event)
 
-    def enterEvent(self, event):
+    def enterEvent(self, _):
         self.restore()
 
-    def leaveEvent(self, event):
+    def leaveEvent(self, _):
         self.timer.start()
 
-    def closeEvent(self, event):
+    def closeEvent(self, _):
         # we don't need the notification anymore, delete it!
         self.deleteLater()
 

@@ -11,7 +11,7 @@ import platform
 class GPU:
     def __init__(
             self,
-            ID,
+            id,
             uuid,
             load,
             memory_total,
@@ -23,7 +23,7 @@ class GPU:
             display_mode,
             display_active,
             temp_gpu):
-        self.id = ID
+        self.id = id
         self.uuid = uuid
         self.load = load
         self.memory_util = float(memory_used) / float(memory_total)
@@ -173,7 +173,7 @@ def get_available(
         exclude_id=exclude_id,
         exclude_uuid=exclude_uuid)
     avail_able_gp_uindex = [idx for idx in range(
-        0, len(gp_uavailability)) if (gp_uavailability[idx] == 1)]
+        0, len(gp_uavailability)) if gp_uavailability[idx] == 1]
     # Discard unavailable gp_us
     gp_us = [gp_us[g] for g in avail_able_gp_uindex]
 
@@ -248,7 +248,7 @@ def get_first_available(
         exclude_uuid = []
 
     for i in range(attempts):
-        if (verbose):
+        if verbose:
             print('Attempting (' + str(i + 1) + '/' +
                   str(attempts) + ') to locate available GPU.')
         # Get first available GPU
@@ -261,12 +261,12 @@ def get_first_available(
             exclude_id=exclude_id,
             exclude_uuid=exclude_uuid)
         # If an available GPU was found, break for loop.
-        if (available):
-            if (verbose):
+        if available:
+            if verbose:
                 print('GPU ' + str(available) + ' located!')
             break
         # If this is not the last attempt, sleep for 'interval' seconds
-        if (i != attempts - 1):
+        if i != attempts - 1:
             time.sleep(interval)
     # Check if an GPU was found, or if the attempts simply ran out. Throw
     # error, if no GPU was found
@@ -369,7 +369,7 @@ def show_utilization(all=False, attr_list=None, use_old_code=False):
                          ]
 
     if not use_old_code:
-        if (attr_list is not None):
+        if attr_list is not None:
             header_string = ''
             gp_ustrings = [''] * len(gp_us)
             for attr_group in attr_list:
@@ -391,14 +391,14 @@ def show_utilization(all=False, attr_list=None, use_old_code=False):
 
                         attr = attr_transform(attr)
 
-                        if (isinstance(attr, float)):
+                        if isinstance(attr, float):
                             attr_str = (
                                 '{0:' + attr_precision + 'f}').format(attr)
-                        elif (isinstance(attr, int)):
+                        elif isinstance(attr, int):
                             attr_str = ('{0:d}').format(attr)
-                        elif (isinstance(attr, str)):
+                        elif isinstance(attr, str):
                             attr_str = attr
-                        elif (sys.version_info[0] == 2):
+                        elif sys.version_info[0] == 2:
                             if (isinstance(attr, unicode)):
                                 attr_str = attr.encode('ascii', 'ignore')
                         else:
@@ -431,7 +431,7 @@ def show_utilization(all=False, attr_list=None, use_old_code=False):
                             attr_str = (
                                 '{0:' + min_width_str + 's}').format(attr)
                         elif sys.version_info[0] == 2:
-                            if (isinstance(attr, unicode)):
+                            if isinstance(attr, unicode):
                                 attr_str = (
                                     '{0:' +
                                     min_width_str +

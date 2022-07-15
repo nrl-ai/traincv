@@ -36,16 +36,16 @@ def scan_labelme_labels(root_path):
 def convert_box(size, box):
     """Convert labelme bounding box to YOLO bounding box
     """
-    dw = 1./size[0]
-    dh = 1./size[1]
-    x = (box[0] + box[1])/2.0
-    y = (box[2] + box[3])/2.0
+    dw = 1. / size[0]
+    dh = 1. / size[1]
+    x = (box[0] + box[1]) / 2.0
+    y = (box[2] + box[3]) / 2.0
     w = box[1] - box[0]
     h = box[3] - box[2]
-    x = x*dw
-    w = w*dw
-    y = y*dh
-    h = h*dh
+    x = x * dw
+    w = w * dw
+    y = y * dh
+    h = h * dh
     return (x, y, w, h)
 
 
@@ -54,9 +54,9 @@ def labelme_to_yolo(img_label_sets, output_path):
     """
     pathlib.Path(output_path).mkdir(exist_ok=True, parents=True)
 
-    n = len(img_label_sets)
+    len_labels = len(img_label_sets)
     for i, (image_path, label_path) in enumerate(img_label_sets):
-        print(f"{i} / {n}")
+        print(f"{i} / {len_labels}")
         label_basename = os.path.basename(label_path)
         pre_name, _ = os.path.splitext(label_basename)
         output_label_path = os.path.join(output_path, f"{pre_name}.txt")
@@ -68,7 +68,7 @@ def labelme_to_yolo(img_label_sets, output_path):
             for shape in shapes:
                 label = shape["label"]
 
-                if label not in label_id_map.keys():
+                if label not in label_id_map:
                     logging.warning(
                         f"Skip label: {label}")
                     continue
@@ -116,9 +116,8 @@ def main(args):
     # Scan training
     if args.train_path is None:
         raise Exception("At least one `train_path` must be present")
-    else:
-        for path in args.train_path:
-            train_sets += scan_labelme_labels(path)
+    for path in args.train_path:
+        train_sets += scan_labelme_labels(path)
     original_train_sets_size = len(train_sets)
 
     random.seed(42)
@@ -128,7 +127,7 @@ def main(args):
     if args.val_path is not None and args.split_val_from_train:
         raise Exception(
             "`val_path` and `split_val_from_train` cannot exist together")
-    elif args.val_path is not None:
+    if args.val_path is not None:
         for path in args.val_path:
             val_sets += scan_labelme_labels(path)
     elif args.split_val_from_train:
@@ -142,7 +141,7 @@ def main(args):
     if args.test_path is not None and args.split_test_from_train:
         raise Exception(
             "`test_path` and `split_test_from_train` cannot exist together")
-    elif args.test_path is not None:
+    if args.test_path is not None:
         for path in args.test_path:
             test_sets += scan_labelme_labels(path)
     elif args.split_test_from_train:
@@ -170,9 +169,9 @@ def main(args):
         logging.info("Converting test set")
         labelme_to_yolo(test_sets, args.output_test_path)
 
-    logging.info(f"Training size: {len(train_sets)}")
-    logging.info(f"Validation size: {len(val_sets)}")
-    logging.info(f"Test size: {len(test_sets)}")
+    logging.info(f"Training size: %d" % len(train_sets))
+    logging.info(f"Validation size: %d" % len(val_sets))
+    logging.info(f"Test size: %d" % len(test_sets))
 
     return 0
 
