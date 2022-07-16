@@ -1,7 +1,6 @@
 import copy
 import math
 
-import numpy as np
 from PyQt5 import QtCore, QtGui
 
 from . import utils
@@ -18,7 +17,7 @@ DEFAULT_VERTEX_FILL_COLOR = QtGui.QColor(0, 255, 0, 255)  # hovering
 DEFAULT_HVERTEX_FILL_COLOR = QtGui.QColor(255, 255, 255, 255)  # hovering
 
 
-class Shape(object):
+class Shape:
 
     # Render handles as squares
     P_SQUARE = 0
@@ -61,11 +60,13 @@ class Shape(object):
         self.other_data = {}
 
         self._highlight_index = None
-        self._highlightMode = self.NEAR_VERTEX
+        self._highlight_mode = self.NEAR_VERTEX
         self._highlight_settings = {
             self.NEAR_VERTEX: (4, self.P_ROUND),
             self.MOVE_VERTEX: (1.5, self.P_SQUARE),
         }
+
+        self._vertex_fill_color = None
 
         self._closed = False
 
@@ -93,7 +94,7 @@ class Shape(object):
             "circle",
             "linestrip",
         ]:
-            raise ValueError("Unexpected shape_type: {}".format(value))
+            raise ValueError(f"Unexpected shape_type: {value}")
         self._shape_type = value
 
     def close(self):
@@ -191,7 +192,7 @@ class Shape(object):
         shape = self.point_type
         point = self.points[i]
         if i == self._highlight_index:
-            size, shape = self._highlight_settings[self._highlightMode]
+            size, shape = self._highlight_settings[self._highlight_mode]
             d *= size
         if self._highlight_index is not None:
             self._vertex_fill_color = self.hvertex_fill_color
@@ -219,7 +220,7 @@ class Shape(object):
         post_i = None
         for i in range(len(self.points)):
             line = [self.points[i - 1], self.points[i]]
-            dist = utils.distancetoline(point, line)
+            dist = utils.distance_to_line(point, line)
             if dist <= epsilon and dist < min_distance:
                 min_distance = dist
                 post_i = i
@@ -232,7 +233,7 @@ class Shape(object):
         """Computes parameters to draw with `QPainterPath::addEllipse`"""
         if len(line) != 2:
             return None
-        (c, point) = line
+        (c, _) = line
         r = line[0] - line[1]
         d = math.sqrt(math.pow(r.x(), 2) + math.pow(r.y(), 2))
         rectangle = QtCore.QRectF(c.x() - d, c.y() - d, 2 * d, 2 * d)
@@ -273,7 +274,7 @@ class Shape(object):
             (see Shape.NEAR_VERTEX and Shape.MOVE_VERTEX)
         """
         self._highlight_index = i
-        self._highlightMode = action
+        self._highlight_mode = action
 
     def highlight_clear(self):
         """Clear the highlighted point"""

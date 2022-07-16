@@ -20,7 +20,9 @@ class TrainingTab(QWidget):
         uic.loadUi(os.path.join(current_dir, "training.ui"), self)
 
         # System monitor
-        self.system_monitor = SystemMonitor(self.system_monitor_edit, seconds_between_refresh=2)
+        self.system_monitor = SystemMonitor(
+            self.system_monitor_edit, seconds_between_refresh=2
+        )
         self.train_button.clicked.connect(self.start_training)
 
     def draw_losses(self, losses):
@@ -28,10 +30,18 @@ class TrainingTab(QWidget):
         plt = self.loss_graph.getPlotItem()
         plt.showGrid(x=True, y=True)
         plt.addLegend()
-        plt.plot(losses["train_loss"], pen=pg.mkPen(
-            {'color': "orange", 'width': 2}), symbol=None, name='train_loss')
-        plt.plot(losses["val_loss"], pen=pg.mkPen(
-            {'color': "blue", 'width': 2}), symbol=None, name='val_loss')
+        plt.plot(
+            losses["train_loss"],
+            pen=pg.mkPen({"color": "orange", "width": 2}),
+            symbol=None,
+            name="train_loss",
+        )
+        plt.plot(
+            losses["val_loss"],
+            pen=pg.mkPen({"color": "blue", "width": 2}),
+            symbol=None,
+            name="val_loss",
+        )
 
     def on_open(self):
         pass

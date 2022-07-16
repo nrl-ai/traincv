@@ -2,7 +2,6 @@ from PyQt5.QtCore import QAbstractTableModel, Qt
 
 
 class TableModel(QAbstractTableModel):
-
     def __init__(self, data, on_changed_cb=None):
         QAbstractTableModel.__init__(self)
         self.data = data
@@ -24,7 +23,7 @@ class TableModel(QAbstractTableModel):
                 return str(self.data.iloc[index.row(), index.column()])
             column_count = self.columnCount(self)
             for column in range(0, column_count):
-                if (index.column() == column and role == Qt.TextAlignmentRole):
+                if index.column() == column and role == Qt.TextAlignmentRole:
                     return Qt.AlignLeft | Qt.AlignVCenter
         return None
 

@@ -1,7 +1,8 @@
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QMainWindow, QStatusBar,
                              QVBoxLayout, QWidget)
-from widgets.maintabs import MainTabsWidget
+
+from .maintabs import MainTabsWidget
 
 
 class MainWindow(QMainWindow):
@@ -10,13 +11,14 @@ class MainWindow(QMainWindow):
         self.app = app
 
         self.setContentsMargins(0, 0, 0, 0)
-        self.setWindowTitle('TrainMe')
+        self.setWindowTitle("TrainMe")
 
         header_widget = QWidget(self)
         header_layout = QHBoxLayout(header_widget)
         program_title = QLabel("TrainMe - AI toolkit")
         program_title.setStyleSheet(
-            'QLabel {background-color: #333; color: #fff; font: bold;}')
+            "QLabel {background-color: #333; color: #fff; font: bold;}"
+        )
         program_title.setFont(QFont("Arial", 16))
         header_layout.addWidget(program_title)
         header_widget.setStyleSheet("background-color: #333;")
@@ -33,5 +35,6 @@ class MainWindow(QMainWindow):
 
         status_bar = QStatusBar()
         status_bar.showMessage(
-            "TrainMe - No-code labeling and training toolkit")
+            "TrainMe - No-code labeling and training toolkit"
+        )
         self.setStatusBar(status_bar)

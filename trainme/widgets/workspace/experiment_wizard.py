@@ -35,10 +35,13 @@ class ExperimentWizard(QTabWidget):
         self.last_tab_index = 0
         self.currentChanged.connect(self.on_change)
 
-        self.setStyleSheet('''
-        QTabWidget::tab-bar {
-            alignment: center;
-        }''')
+        self.setStyleSheet(
+            """
+            QTabWidget::tab-bar {
+                alignment: center;
+            }
+            """
+        )
 
     def on_change(self, i):
         if i == self.last_tab_index:

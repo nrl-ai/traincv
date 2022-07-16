@@ -1,21 +1,17 @@
-# -*- coding: utf-8 -*-
-
 import functools
 import html
 import math
 import os
 import os.path as osp
 import re
-import sys
 import webbrowser
 
 import imgviz
 import natsort
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import *
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import (QDockWidget, QHBoxLayout, QLabel, QMessageBox,
+                             QVBoxLayout, QWhatsThis)
 
 from trainme.inference_services.yolov5 import YOLOv5Predictor
 
@@ -28,9 +24,6 @@ from .tracker import Tracker
 from .widgets import (BrightnessContrastDialog, Canvas, FileDialogPreview,
                       LabelDialog, LabelListWidget, LabelListWidgetItem,
                       ToolBar, UniqueLabelQListWidget, ZoomWidget)
-
-sys.path.append(".")
-
 
 LABEL_COLORMAP = imgviz.label_colormap()
 
@@ -59,6 +52,12 @@ class LabelmeWidget(LabelDialog):
             )
             if output_file is None:
                 output_file = output
+
+        self.filename = None
+        self.image_path = None
+        self.image_data = None
+        self.label_file = None
+        self.other_data = None
 
         # Tracker
         self.tracker = Tracker()
@@ -122,13 +121,13 @@ class LabelmeWidget(LabelDialog):
         self.flag_dock.setWidget(self.flag_widget)
         self.flag_widget.itemChanged.connect(self.set_dirty)
 
-        self.label_list.item_selection_changed.connect(self.label_selection_changed)
+        self.label_list.item_selection_changed.connect(
+            self.label_selection_changed
+        )
         self.label_list.item_double_clicked.connect(self.edit_label)
         self.label_list.item_changed.connect(self.label_item_changed)
         self.label_list.item_dropped.connect(self.label_order_changed)
-        self.shape_dock = QtWidgets.QDockWidget(
-            self.tr("Objects"), self
-        )
+        self.shape_dock = QtWidgets.QDockWidget(self.tr("Objects"), self)
         self.shape_dock.setObjectName("Labels")
         self.shape_dock.setWidget(self.label_list)
 
@@ -206,7 +205,7 @@ class LabelmeWidget(LabelDialog):
                 getattr(self, dock).setVisible(False)
 
         # Actions
-        action = functools.partial(utils.newAction, self)
+        action = functools.partial(utils.new_action, self)
         shortcuts = self._config["shortcuts"]
         open_ = action(
             self.tr("&Open"),
@@ -438,7 +437,7 @@ class LabelmeWidget(LabelDialog):
             enabled=False,
         )
 
-        help = action(
+        contact = action(
             self.tr("&Contact me"),
             self.contact,
             icon="help",
@@ -454,10 +453,10 @@ class LabelmeWidget(LabelDialog):
                     "{} and {} from the canvas."
                 )
             ).format(
-                utils.fmtShortcut(
+                utils.fmt_shortcut(
                     f"{shortcuts['zoom_in']},{shortcuts['zoom_out']}"
                 ),
-                utils.fmtShortcut(self.tr("Ctrl+Wheel")),
+                utils.fmt_shortcut(self.tr("Ctrl+Wheel")),
             )
         )
         self.zoom_widget.setEnabled(False)
@@ -600,7 +599,7 @@ class LabelmeWidget(LabelDialog):
         )
 
         # Store actions for further handling.
-        self.actions = utils.struct(
+        self.actions = utils.Struct(
             save_auto=save_auto,
             save_with_image_data=save_with_image_data,
             change_output_dir=change_output_dir,
@@ -684,9 +683,11 @@ class LabelmeWidget(LabelDialog):
             on_shapes_present=(save_as, hide_all, show_all),
         )
 
-        self.canvas.vertex_selected.connect(self.actions.remove_point.setEnabled)
+        self.canvas.vertex_selected.connect(
+            self.actions.remove_point.setEnabled
+        )
 
-        self.menus = utils.struct(
+        self.menus = utils.Struct(
             file=self.menu(self.tr("&File")),
             edit=self.menu(self.tr("&Edit")),
             view=self.menu(self.tr("&View")),
@@ -710,10 +711,10 @@ class LabelmeWidget(LabelDialog):
                 save_with_image_data,
                 close,
                 delete_file,
-                None
+                None,
             ),
         )
-        utils.add_actions(self.menus.help, (help,))
+        utils.add_actions(self.menus.help, (contact,))
         utils.add_actions(
             self.menus.view,
             (
@@ -790,7 +791,8 @@ class LabelmeWidget(LabelDialog):
         central_layout = QVBoxLayout()
         central_layout.setContentsMargins(0, 0, 0, 0)
         label_instruction = QLabel(
-            "<b>Shortcuts:</b> Previous: <b>A</b>, Next: <b>D</b>, Rectangle: <b>R</b>, Polygon: <b>P</b>")
+            "<b>Shortcuts:</b> Previous: <b>A</b>, Next: <b>D</b>, Rectangle: <b>R</b>, Polygon: <b>P</b>"
+        )
         label_instruction.setContentsMargins(0, 10, 0, 10)
         central_layout.addWidget(label_instruction)
         central_layout.addWidget(scroll_area)
@@ -809,16 +811,24 @@ class LabelmeWidget(LabelDialog):
         right_sidebar_layout.addWidget(self.shape_dock)
         right_sidebar_layout.addWidget(self.file_dock)
         self.file_dock.setFeatures(QDockWidget.DockWidgetFloatable)
-        dock_features = ~QDockWidget.DockWidgetMovable | ~QDockWidget.DockWidgetFloatable | ~QDockWidget.DockWidgetClosable
+        dock_features = (
+            ~QDockWidget.DockWidgetMovable
+            | ~QDockWidget.DockWidgetFloatable
+            | ~QDockWidget.DockWidgetClosable
+        )
         rev_dock_features = ~dock_features
         self.label_dock.setFeatures(
-            self.label_dock.features() & rev_dock_features)
+            self.label_dock.features() & rev_dock_features
+        )
         self.file_dock.setFeatures(
-            self.file_dock.features() & rev_dock_features)
+            self.file_dock.features() & rev_dock_features
+        )
         self.flag_dock.setFeatures(
-            self.flag_dock.features() & rev_dock_features)
+            self.flag_dock.features() & rev_dock_features
+        )
         self.shape_dock.setFeatures(
-            self.shape_dock.features() & rev_dock_features)
+            self.shape_dock.features() & rev_dock_features
+        )
 
         layout.addItem(right_sidebar_layout)
         self.setLayout(layout)
@@ -891,12 +901,12 @@ class LabelmeWidget(LabelDialog):
             utils.add_actions(menu, actions)
         return menu
 
-    def centralWidget(self):
+    def central_widget(self):
         return self._central_widget
 
     def toolbar(self, title, actions=None):
         toolbar = ToolBar(title)
-        toolbar.setObjectName("%sToolBar" % title)
+        toolbar.setObjectName(f"{title}ToolBar")
         toolbar.setOrientation(Qt.Vertical)
         toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonIconOnly)
         toolbar.setIconSize(QtCore.QSize(20, 20))
@@ -946,7 +956,7 @@ class LabelmeWidget(LabelDialog):
         self.actions.save.setEnabled(True)
         title = __appname__
         if self.filename is not None:
-            title = "{} - {}*".format(title, self.filename)
+            title = f"{title} - {self.filename}*"
         self.setWindowTitle(title)
 
     def set_clean(self):
@@ -960,7 +970,7 @@ class LabelmeWidget(LabelDialog):
         self.actions.create_line_strip_mode.setEnabled(True)
         title = __appname__
         if self.filename is not None:
-            title = "{} - {}".format(title, self.filename)
+            title = f"{title} - {self.filename}"
         self.setWindowTitle(title)
 
         if self.has_label_file():
@@ -970,8 +980,8 @@ class LabelmeWidget(LabelDialog):
 
     def toggle_actions(self, value=True):
         """Enable/Disable widgets which depend on an opened image."""
-        for z in self.actions.zoom_actions:
-            z.setEnabled(value)
+        for action in self.actions.zoom_actions:
+            action.setEnabled(value)
         for action in self.actions.on_load_active:
             action.setEnabled(value)
 
@@ -1095,7 +1105,7 @@ class LabelmeWidget(LabelDialog):
         menu.clear()
         files = [f for f in self.recent_files if f != current and exists(f)]
         for i, f in enumerate(files):
-            icon = utils.newIcon("labels")
+            icon = utils.new_icon("labels")
             action = QtWidgets.QAction(
                 icon, "&%d %s" % (i + 1, QtCore.QFileInfo(f).fileName()), self
             )
@@ -1157,7 +1167,7 @@ class LabelmeWidget(LabelDialog):
                 )
             )
         else:
-            item.setText("{} ({})".format(shape.label, shape.group_id))
+            item.setText(f"{shape.label} ({shape.group_id})")
         self.set_dirty()
         if not self.unique_label_list.find_items_by_label(shape.label):
             item = QtWidgets.QListWidgetItem()
@@ -1180,9 +1190,9 @@ class LabelmeWidget(LabelDialog):
         if not self.may_continue():
             return
 
-        currIndex = self.image_list.index(str(item.text()))
-        if currIndex < len(self.image_list):
-            filename = self.image_list[currIndex]
+        current_index = self.image_list.index(str(item.text()))
+        if current_index < len(self.image_list):
+            filename = self.image_list[current_index]
             if filename:
                 self.load_file(filename)
 
@@ -1209,7 +1219,7 @@ class LabelmeWidget(LabelDialog):
         if shape.group_id is None:
             text = shape.label
         else:
-            text = "{} ({})".format(shape.label, shape.group_id)
+            text = f"{shape.label} ({shape.group_id})"
         label_list_item = LabelListWidgetItem(text, shape)
         self.label_list.add_iem(label_list_item)
         if not self.unique_label_list.find_items_by_label(shape.label):
@@ -1243,13 +1253,13 @@ class LabelmeWidget(LabelDialog):
             label_id = self.unique_label_list.indexFromItem(item).row() + 1
             label_id += self._config["shift_auto_shape_color"]
             return LABEL_COLORMAP[label_id % len(LABEL_COLORMAP)]
-        elif (
+        if (
             self._config["shape_color"] == "manual"
             and self._config["label_colors"]
             and label in self._config["label_colors"]
         ):
             return self._config["label_colors"][label]
-        elif self._config["default_shape_color"]:
+        if self._config["default_shape_color"]:
             return self._config["default_shape_color"]
         return (0, 255, 0)
 
@@ -1335,7 +1345,9 @@ class LabelmeWidget(LabelDialog):
             flags[key] = flag
         try:
             image_path = osp.relpath(self.image_path, osp.dirname(filename))
-            image_data = self.image_data if self._config["store_data"] else None
+            image_data = (
+                self.image_data if self._config["store_data"] else None
+            )
             if osp.dirname(filename) and not osp.exists(osp.dirname(filename)):
                 os.makedirs(osp.dirname(filename))
             label_file.save(
@@ -1514,7 +1526,7 @@ class LabelmeWidget(LabelDialog):
             QtGui.QPixmap.fromImage(qimage), clear_shapes=False
         )
 
-    def brightness_contrast(self, value):
+    def brightness_contrast(self, _):
         dialog = BrightnessContrastDialog(
             utils.img_data_to_pil(self.image_data),
             self.on_new_brightness_contrast,
@@ -1545,11 +1557,14 @@ class LabelmeWidget(LabelDialog):
 
         # Changing file_list_widget loads file
         if filename in self.image_list and (
-            self.file_list_widget.currentRow() != self.image_list.index(filename)
+            self.file_list_widget.currentRow()
+            != self.image_list.index(filename)
         ):
-            self.file_list_widget.setCurrentRow(self.image_list.index(filename))
+            self.file_list_widget.setCurrentRow(
+                self.image_list.index(filename)
+            )
             self.file_list_widget.repaint()
-            return
+            return False
 
         self.reset_state()
         self.canvas.setEnabled(False)
@@ -1699,8 +1714,8 @@ class LabelmeWidget(LabelDialog):
     def scale_fit_window(self):
         """Figure out the size of the pixmap to fit the main widget."""
         e = 2.0  # So that no scrollbars are generated.
-        w1 = self.centralWidget().width() - e
-        h1 = self.centralWidget().height() - e
+        w1 = self.central_widget().width() - e
+        h1 = self.central_widget().height() - e
         wh_ratio1 = w1 / h1
         # Calculate a new scale value based on the pixmap's aspect ratio.
         w2 = self.canvas.pixmap.width() - 0.0
@@ -1710,7 +1725,7 @@ class LabelmeWidget(LabelDialog):
 
     def scale_fit_width(self):
         # The epsilon does not seem to work too well here.
-        w = self.centralWidget().width() - 2.0
+        w = self.central_widget().width() - 2.0
         return w / self.canvas.pixmap.width()
 
     def enable_save_image_with_data(self, enabled):
@@ -1727,8 +1742,8 @@ class LabelmeWidget(LabelDialog):
         self.settings.setValue("window/size", self.size())
         self.settings.setValue("window/position", self.pos())
         self.settings.setValue(
-            "window/state",
-            self.parent.parent.parent.saveState())
+            "window/state", self.parent.parent.parent.saveState()
+        )
         self.settings.setValue("recent_files", self.recent_files)
         # ask the use for where to save the labels
         # self.settings.setValue('window/geometry', self.saveGeometry())
@@ -1736,12 +1751,12 @@ class LabelmeWidget(LabelDialog):
     # QT Overload
     def dragEnterEvent(self, event):
         extensions = [
-            ".%s" % fmt.data().decode().lower()
+            f".{fmt.data().decode().lower()}"
             for fmt in QtGui.QImageReader.supportedImageFormats()
         ]
         if event.mimeData().hasUrls():
             items = [i.toLocalFile() for i in event.mimeData().urls()]
-            if any([i.lower().endswith(tuple(extensions)) for i in items]):
+            if any(i.lower().endswith(tuple(extensions)) for i in items):
                 event.accept()
         else:
             event.ignore()
@@ -1816,11 +1831,11 @@ class LabelmeWidget(LabelDialog):
             return
         path = osp.dirname(str(self.filename)) if self.filename else "."
         formats = [
-            "*.{}".format(fmt.data().decode())
+            f"*.{fmt.data().decode()}"
             for fmt in QtGui.QImageReader.supportedImageFormats()
         ]
         filters = self.tr("Image & Label files (%s)") % " ".join(
-            formats + ["*%s" % LabelFile.suffix]
+            formats + [f"*{LabelFile.suffix}"]
         )
         file_dialog = FileDialogPreview(self)
         file_dialog.setFileMode(FileDialogPreview.ExistingFile)
@@ -1831,9 +1846,9 @@ class LabelmeWidget(LabelDialog):
         file_dialog.setWindowFilePath(path)
         file_dialog.setViewMode(FileDialogPreview.Detail)
         if file_dialog.exec_():
-            fileName = file_dialog.selectedFiles()[0]
-            if fileName:
-                self.load_file(fileName)
+            filename = file_dialog.selectedFiles()[0]
+            if filename:
+                self.load_file(filename)
 
     def change_output_dir_dialog(self, _value=False):
         default_output_dir = self.output_dir
@@ -1900,7 +1915,9 @@ class LabelmeWidget(LabelDialog):
             )
         file_dialog.setDefaultSuffix(LabelFile.suffix[1:])
         file_dialog.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
-        file_dialog.setOption(QtWidgets.QFileDialog.DontConfirmOverwrite, False)
+        file_dialog.setOption(
+            QtWidgets.QFileDialog.DontConfirmOverwrite, False
+        )
         file_dialog.setOption(QtWidgets.QFileDialog.DontUseNativeDialog, False)
         basename = osp.basename(osp.splitext(self.filename)[0])
         if self.output_dir:
@@ -1956,7 +1973,7 @@ class LabelmeWidget(LabelDialog):
         label_file = self.get_label_file()
         if osp.exists(label_file):
             os.remove(label_file)
-            logger.info(f"Label file is removed: {label_file}")
+            logger.info("Label file is removed: %s", label_file)
 
             item = self.file_list_widget.currentItem()
             item.setCheckState(Qt.Unchecked)
@@ -2079,14 +2096,14 @@ class LabelmeWidget(LabelDialog):
             lst.append(item.text())
         return lst
 
-    def import_dropped_image_files(self, imageFiles):
+    def import_dropped_image_files(self, image_files):
         extensions = [
-            ".%s" % fmt.data().decode().lower()
+            f".{fmt.data().decode().lower()}"
             for fmt in QtGui.QImageReader.supportedImageFormats()
         ]
 
         self.filename = None
-        for file in imageFiles:
+        for file in image_files:
             if file in self.image_list or not file.lower().endswith(
                 tuple(extensions)
             ):
@@ -2139,14 +2156,14 @@ class LabelmeWidget(LabelDialog):
             self.file_list_widget.addItem(item)
         self.open_next_image(load=load)
 
-    def scan_all_images(self, folderPath):
+    def scan_all_images(self, folder_path):
         extensions = [
-            ".%s" % fmt.data().decode().lower()
+            f".{fmt.data().decode().lower()}"
             for fmt in QtGui.QImageReader.supportedImageFormats()
         ]
 
         images = []
-        for root, dirs, files in os.walk(folderPath):
+        for root, _, files in os.walk(folder_path):
             for file in files:
                 if file.lower().endswith(tuple(extensions)):
                     relative_path = osp.join(root, file)
@@ -2156,7 +2173,6 @@ class LabelmeWidget(LabelDialog):
 
     def track(self):
         QMessageBox.warning(self, "Warning", "Tracking is not supported now.")
-        return
         # predicted_shapes = self.tracker.get(self.image)
         # self.load_shapes(predicted_shapes, replace=True)
         # self.set_dirty()
@@ -2174,13 +2190,10 @@ class LabelmeWidget(LabelDialog):
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Failed to load AI model: {e}")
             return
-        self.statusBar().showMessage(
-            "AI Model loaded from {}".format(file_path), 5000
-        )
+        self.statusBar().showMessage(f"AI Model loaded from {file_path}", 5000)
 
     def ai_predict(self):
-        """Predict shapes using AI model
-        """
+        """Predict shapes using AI model"""
         if self.image_path is None:
             QMessageBox.warning(self, "Warning", "Please load images first.")
             return
@@ -2188,7 +2201,8 @@ class LabelmeWidget(LabelDialog):
             QMessageBox.warning(
                 self,
                 "Warning",
-                "No AI model is loaded. Please load a model first.")
+                "No AI model is loaded. Please load a model first.",
+            )
             return
 
         shapes = self.ai_model.predict_shapes(self.image)

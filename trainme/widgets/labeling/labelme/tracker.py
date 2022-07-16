@@ -4,11 +4,11 @@ from PyQt5 import QtCore
 from .utils import opencv as ocvutil
 
 
-class OCVTracker():
-
+class OCVTracker:
     def __init__(self):
         self.shape = None
         self.prev_image = None
+        self.tracker = None
 
     def init_tracker(self, qimg, shape):
         status = False
@@ -24,8 +24,9 @@ class OCVTracker():
 
     def update_tracker(self, qimg):
         shape = self.shape.copy()
-        assert (shape and shape.label ==
-                self.shape.label), "Invalid tracker state!"
+        assert (
+            shape and shape.label == self.shape.label
+        ), "Invalid tracker state!"
         status = False
         if qimg is None:
             print("No image to update tracker")
@@ -45,7 +46,7 @@ class OCVTracker():
         if success:
             shape.points = [
                 QtCore.QPoint(box[0], box[1]),
-                QtCore.QPoint(box[0] + box[2], box[1] + box[3])
+                QtCore.QPoint(box[0] + box[2], box[1] + box[3]),
             ]
             status = True
         else:
@@ -60,9 +61,9 @@ class Tracker:
         self.prev_shapes = None
         self.ocv_tracker = OCVTracker()
 
-    def update(self, prevShapes, prevImage):
-        self.prev_shapes = prevShapes
-        self.prev_image = prevImage
+    def update(self, prev_shapes, prev_image):
+        self.prev_shapes = prev_shapes
+        self.prev_image = prev_image
 
     def get(self, img):
         if self.prev_image is None:

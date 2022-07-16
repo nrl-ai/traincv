@@ -96,12 +96,10 @@ def labelme_shapes_to_label(img_shape, shapes):
 
 def masks_to_bboxes(masks):
     if masks.ndim != 3:
-        raise ValueError(
-            "masks.ndim must be 3, but it is {}".format(masks.ndim)
-        )
+        raise ValueError(f"masks.ndim must be 3, but it is {masks.ndim}")
     if masks.dtype != bool:
         raise ValueError(
-            "masks.dtype must be bool type, but it is {}".format(masks.dtype)
+            f"masks.dtype must be bool type, but it is {masks.dtype}"
         )
     bboxes = []
     for mask in masks:

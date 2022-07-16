@@ -14,17 +14,18 @@ def qt_img_to_cv_img(in_image):
     mat = np.array(ptr).reshape(height, width, 3)  # Shape the data
 
     rgb = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)
-    #cv2.imwrite('tmp.png', rgb)
+    # cv2.imwrite('tmp.png', rgb)
     return rgb
 
 
-def cv_img_to_qt_img(inMat):
-    assert len(inMat.shape) == 2 and inMat.dtype == np.uint8
-    arr2 = np.require(inMat, np.uint8, 'C')
+def cv_img_to_qt_img(in_mat):
+    assert len(in_mat.shape) == 2 and in_mat.dtype == np.uint8
+    arr2 = np.require(in_mat, np.uint8, "C")
     qimg = QtGui.QImage(
         arr2,
-        inMat.shape[1],
-        inMat.shape[0],
-        inMat.shape[1],
-        QtGui.QImage.Format_Indexed8)
+        in_mat.shape[1],
+        in_mat.shape[0],
+        in_mat.shape[1],
+        QtGui.QImage.Format_Indexed8,
+    )
     return qimg

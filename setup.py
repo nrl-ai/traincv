@@ -103,13 +103,13 @@ def main():
 
         commands = [
             "git push origin main",
-            "git tag v{:s}".format(version),
+            f"git tag v{version}",
             "git push origin --tags",
             "python setup.py sdist",
-            "twine upload dist/trainme-{:s}.tar.gz".format(version),
+            f"twine upload dist/trainme-{version}.tar.gz",
         ]
         for cmd in commands:
-            print("+ {:s}".format(cmd))
+            print(f"+ {cmd}")
             subprocess.check_call(shlex.split(cmd))
         sys.exit(0)
 
@@ -142,7 +142,9 @@ def main():
         package_data={
             "trainme": [
                 "trainme/widgets/labeling/labelme/icons/*",
-                "trainme/widgets/labeling/labelme/config/*.yaml"]},
+                "trainme/widgets/labeling/labelme/config/*.yaml",
+            ]
+        },
     )
 
 

@@ -1,8 +1,4 @@
-autopep8 --in-place --aggressive --aggressive \
-         --max-line-length=100 --recursive \
-         --ignore="E402" \
-         --exclude="./trainme/models/yolov5/*,./trainme/app.py" \
-         .
+black -l 79 --exclude="trainme/models/yolov5" .
 
 find . -type f -name "*.py" \
     -not -name "resources.py" \

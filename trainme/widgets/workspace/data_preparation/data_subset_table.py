@@ -34,8 +34,7 @@ class DataSubsetTable(QWidget):
         header.setSectionResizeMode(0, QHeaderView.Stretch)
 
         self.data_sources_table.set_drop_callback(self.add_items)
-        self.data_sources_table.set_data_validator(
-            self.verify_data_folder)
+        self.data_sources_table.set_data_validator(self.verify_data_folder)
 
         self.delete_folder_button.clicked.connect(self.delete_selected_rows)
         self.add_folder_button.clicked.connect(self.add_image_folder)
@@ -54,14 +53,16 @@ class DataSubsetTable(QWidget):
                     "",
                     corner=corner,
                     timeout=3000,
-                    closable=True)
+                    closable=True,
+                )
 
     def set_data(self, data):
         data_sources = []
         for i in range(len(data)):
             data_sources.append(data[i][DataSubsetTable.DATA_FOLDER_TITLE])
         pd_frame = pd.DataFrame(
-            {DataSubsetTable.DATA_FOLDER_TITLE: data_sources})
+            {DataSubsetTable.DATA_FOLDER_TITLE: data_sources}
+        )
         self.model = TableModel(pd_frame, self.commit_pandas_data)
         self.data_sources_table.setModel(self.model)
 
@@ -70,9 +71,11 @@ class DataSubsetTable(QWidget):
             self.model.addRow({DataSubsetTable.DATA_FOLDER_TITLE: link})
         self.data_sources_table.clearSelection()
         self.data_sources_table.dataChanged(
+            self.model.index(0, 0),
             self.model.index(
-                0, 0), self.model.index(
-                self.model.rowCount(None), self.model.columnCount(None)))
+                self.model.rowCount(None), self.model.columnCount(None)
+            ),
+        )
 
     def delete_selected_rows(self):
         selected = self.data_sources_table.selectedIndexes()
@@ -84,9 +87,11 @@ class DataSubsetTable(QWidget):
             self.model.removeRow(row)
         self.data_sources_table.clearSelection()
         self.data_sources_table.dataChanged(
+            self.model.index(0, 0),
             self.model.index(
-                0, 0), self.model.index(
-                self.model.rowCount(None), self.model.columnCount(None)))
+                self.model.rowCount(None), self.model.columnCount(None)
+            ),
+        )
 
     def commit_pandas_data(self, data: pd.DataFrame):
         data_dict = list(data.T.to_dict().values())
@@ -103,7 +108,8 @@ class DataSubsetTable(QWidget):
             "",
             corner=corner,
             timeout=3000,
-            closable=True)
+            closable=True,
+        )
         return False
 
     def on_close(self):

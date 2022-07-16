@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QStyle
 # https://stackoverflow.com/a/2039745/4158863
 class HTMLDelegate(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent=None):
+        self.parent = parent
         super(HTMLDelegate, self).__init__()
         self.doc = QtGui.QTextDocument(self)
 
@@ -57,6 +58,7 @@ class HTMLDelegate(QtWidgets.QStyledItemDelegate):
 
         painter.restore()
 
+    # QT Overload
     def sizeHint(self, option, index):
         margin_constant = 4
         return QtCore.QSize(
@@ -89,13 +91,14 @@ class LabelListWidgetItem(QtGui.QStandardItem):
         return id(self)
 
     def __repr__(self):
-        return '{}("{}")'.format(self.__class__.__name__, self.text())
+        return f'{self.__class__.__name__}("{self.text()}")'
 
 
 class StandardItemModel(QtGui.QStandardItemModel):
 
     itemDropped = QtCore.pyqtSignal()
 
+    # QT Overload
     def removeRows(self, *args, **kwargs):
         ret = super().removeRows(*args, **kwargs)
         self.itemDropped.emit()
@@ -177,7 +180,7 @@ class LabelListWidget(QtWidgets.QListView):
             item = self.model().item(row, 0)
             if item.shape() == shape:
                 return item
-        raise ValueError("cannot find shape: {}".format(shape))
+        raise ValueError(f"cannot find shape: {shape}")
 
     def clear(self):
         self.model().clear()

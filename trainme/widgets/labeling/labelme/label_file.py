@@ -17,14 +17,13 @@ def open(name, mode):
     assert mode in ["r", "w"]
     encoding = "utf-8"
     yield io.open(name, mode, encoding=encoding)
-    return
 
 
 class LabelFileError(Exception):
     pass
 
 
-class LabelFile(object):
+class LabelFile:
 
     suffix = ".json"
 
@@ -41,8 +40,8 @@ class LabelFile(object):
         try:
             image_pil = PIL.Image.open(filename)
         except IOError:
-            logger.error("Failed opening image file: {}".format(filename))
-            return
+            logger.error("Failed opening image file: %s", filename)
+            return None
 
         # apply orientation to image according to exif
         image_pil = utils.apply_exif_orientation(image_pil)
@@ -50,10 +49,10 @@ class LabelFile(object):
         with io.BytesIO() as f:
             ext = osp.splitext(filename)[1].lower()
             if ext in [".jpg", ".jpeg"]:
-                format = "JPEG"
+                img_format = "JPEG"
             else:
-                format = "PNG"
-            image_pil.save(f, format=format)
+                img_format = "PNG"
+            image_pil.save(f, format=img_format)
             f.seek(0)
             return f.read()
 
@@ -80,17 +79,18 @@ class LabelFile(object):
             version = data.get("version")
             if version is None:
                 logger.warning(
-                    "Loading JSON file ({}) of unknown version".format(
-                        filename
-                    )
+                    "Loading JSON file (%s) of unknown version", filename
                 )
-            elif version.split(".")[0] != __version__.split(".")[0]:
+            elif (
+                version.split(".")[0] != __version__.split(".", maxsplit=1)[0]
+            ):
                 logger.warning(
-                    "This JSON file ({}) may be incompatible with "
-                    "current labelme. version in file: {}, "
-                    "current version: {}".format(
-                        filename, version, __version__
-                    )
+                    "This JSON file (%s) may be incompatible with "
+                    "current labelme. version in file: %s, "
+                    "current version: %s",
+                    filename,
+                    version,
+                    __version__,
                 )
 
             # Upgrade old data format

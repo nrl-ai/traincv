@@ -76,26 +76,25 @@ def apply_exif_orientation(image):
     if orientation == 1:
         # do nothing
         return image
-    elif orientation == 2:
+    if orientation == 2:
         # left-to-right mirror
         return PIL.ImageOps.mirror(image)
-    elif orientation == 3:
+    if orientation == 3:
         # rotate 180
         return image.transpose(PIL.Image.ROTATE_180)
-    elif orientation == 4:
+    if orientation == 4:
         # top-to-bottom mirror
         return PIL.ImageOps.flip(image)
-    elif orientation == 5:
+    if orientation == 5:
         # top-to-left mirror
         return PIL.ImageOps.mirror(image.transpose(PIL.Image.ROTATE_270))
-    elif orientation == 6:
+    if orientation == 6:
         # rotate 270
         return image.transpose(PIL.Image.ROTATE_270)
-    elif orientation == 7:
+    if orientation == 7:
         # top-to-right mirror
         return PIL.ImageOps.mirror(image.transpose(PIL.Image.ROTATE_90))
-    elif orientation == 8:
+    if orientation == 8:
         # rotate 90
         return image.transpose(PIL.Image.ROTATE_90)
-    else:
-        return image
+    return image

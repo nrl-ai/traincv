@@ -4,15 +4,14 @@ import os
 import pathlib
 import random
 import shutil
+import sys
 
 import cv2
 from imutils import paths
 
 logging.getLogger().setLevel(logging.DEBUG)
 
-label_id_map = {
-    "object": 0
-}
+label_id_map = {"object": 0}
 
 
 def str2bool(v):
@@ -20,8 +19,7 @@ def str2bool(v):
 
 
 def scan_labelme_labels(root_path):
-    """Scan a root path and return list of (image_file, label_file)
-    """
+    """Scan a root path and return list of (image_file, label_file)"""
     dataset = []
     image_paths = list(paths.list_images(root_path))
     for image_path in image_paths:
@@ -33,10 +31,9 @@ def scan_labelme_labels(root_path):
 
 
 def convert_box(size, box):
-    """Convert labelme bounding box to YOLO bounding box
-    """
-    dw = 1. / size[0]
-    dh = 1. / size[1]
+    """Convert labelme bounding box to YOLO bounding box"""
+    dw = 1.0 / size[0]
+    dh = 1.0 / size[1]
     x = (box[0] + box[1]) / 2.0
     y = (box[2] + box[3]) / 2.0
     w = box[1] - box[0]
@@ -49,8 +46,7 @@ def convert_box(size, box):
 
 
 def labelme_to_yolo(img_label_sets, output_path):
-    """Convert a labelme folder to a YOLO folder
-    """
+    """Convert a labelme folder to a YOLO folder"""
     pathlib.Path(output_path).mkdir(exist_ok=True, parents=True)
 
     len_labels = len(img_label_sets)
@@ -68,13 +64,14 @@ def labelme_to_yolo(img_label_sets, output_path):
                 label = shape["label"]
 
                 if label not in label_id_map:
-                    logging.warning(
-                        f"Skip label: {label}")
+                    logging.warning("Skip label: %s", label)
                     continue
 
                 if shape["shape_type"] != "rectangle":
                     logging.warning(
-                        f"Shape type is not `rectangle`: {shape['shape_type']}")
+                        "Shape type is not `rectangle`: %s",
+                        shape["shape_type"],
+                    )
                     continue
 
                 label_id = label_id_map[label]
@@ -94,11 +91,11 @@ def labelme_to_yolo(img_label_sets, output_path):
 
                 yolo_bbox = convert_box((img_width, img_height), bbox)
                 f.write(
-                    f"{label_id} {yolo_bbox[0]} {yolo_bbox[1]} {yolo_bbox[2]} {yolo_bbox[3]}\n")
+                    f"{label_id} {yolo_bbox[0]} {yolo_bbox[1]} {yolo_bbox[2]} {yolo_bbox[3]}\n"
+                )
 
         output_image_path = os.path.join(
-            output_path,
-            os.path.basename(image_path)
+            output_path, os.path.basename(image_path)
         )
         shutil.copy(image_path, output_image_path)
 
@@ -125,7 +122,8 @@ def main(args):
     # Scan validation
     if args.val_path is not None and args.split_val_from_train:
         raise Exception(
-            "`val_path` and `split_val_from_train` cannot exist together")
+            "`val_path` and `split_val_from_train` cannot exist together"
+        )
     if args.val_path is not None:
         for path in args.val_path:
             val_sets += scan_labelme_labels(path)
@@ -133,13 +131,14 @@ def main(args):
         if args.split_val_ratio <= 0 or args.split_val_ratio >= 1:
             raise Exception("Validation ratio must be from 0 to 1")
         val_size = int(original_train_sets_size * args.split_val_ratio)
-        val_sets = train_sets[:val_size + 1]
-        train_sets = train_sets[val_size + 1:]
+        val_sets = train_sets[: val_size + 1]
+        train_sets = train_sets[val_size + 1 :]
 
     # Scan test
     if args.test_path is not None and args.split_test_from_train:
         raise Exception(
-            "`test_path` and `split_test_from_train` cannot exist together")
+            "`test_path` and `split_test_from_train` cannot exist together"
+        )
     if args.test_path is not None:
         for path in args.test_path:
             test_sets += scan_labelme_labels(path)
@@ -149,9 +148,10 @@ def main(args):
         test_size = int(original_train_sets_size * args.split_test_ratio)
         if test_size > len(train_sets):
             raise Exception(
-                f"Not enough training data to split for both validation and test set. Training size: {original_train_sets_size}, expected: > {test_size + len(train_sets)}")
-        test_sets = train_sets[:test_size + 1]
-        train_sets = train_sets[test_size + 1:]
+                f"Not enough training data to split for both validation and test set. Training size: {original_train_sets_size}, expected: > {test_size + len(train_sets)}"
+            )
+        test_sets = train_sets[: test_size + 1]
+        train_sets = train_sets[test_size + 1 :]
 
     logging.info("Converting training set")
     labelme_to_yolo(train_sets, args.output_train_path)
@@ -168,9 +168,9 @@ def main(args):
         logging.info("Converting test set")
         labelme_to_yolo(test_sets, args.output_test_path)
 
-    logging.info(f"Training size: %d" % len(train_sets))
-    logging.info(f"Validation size: %d" % len(val_sets))
-    logging.info(f"Test size: %d" % len(test_sets))
+    logging.info("Training size: %d", len(train_sets))
+    logging.info("Validation size: %d", len(val_sets))
+    logging.info("Test size: %d", len(test_sets))
 
     return 0
 
@@ -178,32 +178,73 @@ def main(args):
 if __name__ == "__main__":
 
     import argparse
+
     parser = argparse.ArgumentParser(
-        "Collect and convert data from labelme for object detection")
-    parser.add_argument("--train_path", action="append",
-                        help="Path to training data")
-    parser.add_argument("--val_path", action="append",
-                        help="Path to validation data")
-    parser.add_argument("--test_path", action="append",
-                        help="Path to test data")
-    parser.add_argument("--split_val_from_train", type=str2bool,
-                        default=False, help="Split validation set from training set")
-    parser.add_argument("--split_val_ratio", type=float, required=False,
-                        help="Ratio to split validation set from training")
-    parser.add_argument("--split_test_from_train", type=str2bool,
-                        default=False, help="Split test set from training set")
-    parser.add_argument("--split_test_ratio", type=float,
-                        required=False, help="Ratio to split test set from training")
-    parser.add_argument("--output_train_path", type=str,
-                        required=False, help="Output training folder")
-    parser.add_argument("--output_val_path", type=str,
-                        required=False, help="Output validation folder")
-    parser.add_argument("--output_test_path", type=str,
-                        required=False, help="Output test folder")
-    parser.add_argument("--output_format", type=str,
-                        default="YOLO", help="Output format for training data")
-    parser.add_argument("--report_file", type=str,
-                        required=False, help="Report file of data preparation")
+        "Collect and convert data from labelme for object detection"
+    )
+    parser.add_argument(
+        "--train_path", action="append", help="Path to training data"
+    )
+    parser.add_argument(
+        "--val_path", action="append", help="Path to validation data"
+    )
+    parser.add_argument(
+        "--test_path", action="append", help="Path to test data"
+    )
+    parser.add_argument(
+        "--split_val_from_train",
+        type=str2bool,
+        default=False,
+        help="Split validation set from training set",
+    )
+    parser.add_argument(
+        "--split_val_ratio",
+        type=float,
+        required=False,
+        help="Ratio to split validation set from training",
+    )
+    parser.add_argument(
+        "--split_test_from_train",
+        type=str2bool,
+        default=False,
+        help="Split test set from training set",
+    )
+    parser.add_argument(
+        "--split_test_ratio",
+        type=float,
+        required=False,
+        help="Ratio to split test set from training",
+    )
+    parser.add_argument(
+        "--output_train_path",
+        type=str,
+        required=False,
+        help="Output training folder",
+    )
+    parser.add_argument(
+        "--output_val_path",
+        type=str,
+        required=False,
+        help="Output validation folder",
+    )
+    parser.add_argument(
+        "--output_test_path",
+        type=str,
+        required=False,
+        help="Output test folder",
+    )
+    parser.add_argument(
+        "--output_format",
+        type=str,
+        default="YOLO",
+        help="Output format for training data",
+    )
+    parser.add_argument(
+        "--report_file",
+        type=str,
+        required=False,
+        help="Report file of data preparation",
+    )
 
     args = parser.parse_args()
-    exit(main(args))
+    sys.exit(main(args))

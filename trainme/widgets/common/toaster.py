@@ -10,17 +10,20 @@ class QToaster(QtWidgets.QFrame):
         super(QToaster, self).__init__(*args, **kwargs)
         QtWidgets.QHBoxLayout(self)
 
-        self.setSizePolicy(QtWidgets.QSizePolicy.Maximum,
-                           QtWidgets.QSizePolicy.Maximum)
+        self.setSizePolicy(
+            QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum
+        )
 
-        self.setStyleSheet('''
+        self.setStyleSheet(
+            """
             QToaster {
                 border: 1px solid black;
                 border-radius: 0px;
                 color: rgb(30, 30, 30);
                 background-color: rgb(255, 255, 255);
             }
-        ''')
+        """
+        )
         # alternatively:
         self.setAutoFillBackground(True)
         self.setFrameShape(self.Box)
@@ -31,7 +34,8 @@ class QToaster(QtWidgets.QFrame):
             self.opacity_effect = QtWidgets.QGraphicsOpacityEffect(opacity=0)
             self.setGraphicsEffect(self.opacity_effect)
             self.opacity_ani = QtCore.QPropertyAnimation(
-                self.opacity_effect, b'opacity')
+                self.opacity_effect, b"opacity"
+            )
             # we have a parent, install an eventFilter so that when it's resized
             # the notification will be correctly moved to the right corner
             self.parent().installEventFilter(self)
@@ -41,9 +45,10 @@ class QToaster(QtWidgets.QFrame):
             # anything (besides making the hiding a bit longer by half a
             # second)
             self.opacity_ani = QtCore.QPropertyAnimation(
-                self, b'windowOpacity')
-        self.opacity_ani.setStartValue(0.)
-        self.opacity_ani.setEndValue(1.)
+                self, b"windowOpacity"
+            )
+        self.opacity_ani.setStartValue(0.0)
+        self.opacity_ani.setEndValue(1.0)
         self.opacity_ani.setDuration(100)
         self.opacity_ani.finished.connect(self.check_closed)
 
@@ -81,19 +86,24 @@ class QToaster(QtWidgets.QFrame):
             geo = self.geometry()
             if self.corner == QtCore.Qt.TopLeftCorner:
                 geo.moveTopLeft(
-                    parent_rect.topLeft() +
-                    QtCore.QPoint(
-                        self.margin,
-                        self.margin))
+                    parent_rect.topLeft()
+                    + QtCore.QPoint(self.margin, self.margin)
+                )
             elif self.corner == QtCore.Qt.TopRightCorner:
-                geo.moveTopRight(parent_rect.topRight() +
-                                 QtCore.QPoint(-self.margin, self.margin))
+                geo.moveTopRight(
+                    parent_rect.topRight()
+                    + QtCore.QPoint(-self.margin, self.margin)
+                )
             elif self.corner == QtCore.Qt.BottomRightCorner:
-                geo.moveBottomRight(parent_rect.bottomRight(
-                ) + QtCore.QPoint(-self.margin, -self.margin))
+                geo.moveBottomRight(
+                    parent_rect.bottomRight()
+                    + QtCore.QPoint(-self.margin, -self.margin)
+                )
             else:
-                geo.moveBottomLeft(parent_rect.bottomLeft(
-                ) + QtCore.QPoint(self.margin, -self.margin))
+                geo.moveBottomLeft(
+                    parent_rect.bottomLeft()
+                    + QtCore.QPoint(self.margin, -self.margin)
+                )
             self.setGeometry(geo)
             self.restore()
             self.timer.start()
@@ -115,26 +125,42 @@ class QToaster(QtWidgets.QFrame):
         if not self.parent():
             # there's no parent, so we need to update the mask
             path = QtGui.QPainterPath()
-            path.addRoundedRect(QtCore.QRectF(
-                self.rect()).translated(-.5, -.5), 4, 4)
-            self.setMask(QtGui.QRegion(
-                path.toFillPolygon(QtGui.QTransform()).toPolygon()))
+            path.addRoundedRect(
+                QtCore.QRectF(self.rect()).translated(-0.5, -0.5), 4, 4
+            )
+            self.setMask(
+                QtGui.QRegion(
+                    path.toFillPolygon(QtGui.QTransform()).toPolygon()
+                )
+            )
         else:
             self.clearMask()
 
     @staticmethod
-    def show_message(parent, message,
-                     icon=QtWidgets.QStyle.SP_MessageBoxInformation,
-                     corner=QtCore.Qt.TopLeftCorner, margin=10, closable=True,
-                     timeout=5000, desktop=False, parent_window=True):
+    def show_message(
+        parent,
+        message,
+        icon=QtWidgets.QStyle.SP_MessageBoxInformation,
+        corner=QtCore.Qt.TopLeftCorner,
+        margin=10,
+        closable=True,
+        timeout=5000,
+        desktop=False,
+        parent_window=True,
+    ):
 
         if parent and parent_window:
             parent = parent.window()
 
+        self.close_button = None
+
         if not parent or desktop:
             self = QToaster(None)
-            self.setWindowFlags(self.windowFlags(
-            ) | QtCore.Qt.FramelessWindowHint | QtCore.Qt.BypassWindowManagerHint)
+            self.setWindowFlags(
+                self.windowFlags()
+                | QtCore.Qt.FramelessWindowHint
+                | QtCore.Qt.BypassWindowManagerHint
+            )
             # This is a dirty hack!
             # parentless objects are garbage collected, so the widget will be
             # deleted as soon as the function that calls it returns, but if an
@@ -155,7 +181,8 @@ class QToaster(QtWidgets.QFrame):
                 # reference for the screen
                 reference = QtCore.QRect(
                     QtGui.QCursor.pos() - QtCore.QPoint(1, 1),
-                    QtCore.QSize(3, 3))
+                    QtCore.QSize(3, 3),
+                )
             max_area = 0
             for screen in QtWidgets.QApplication.screens():
                 intersected = screen.geometry().intersected(reference)
@@ -183,7 +210,8 @@ class QToaster(QtWidgets.QFrame):
             self.close_button = QtWidgets.QToolButton()
             self.layout().addWidget(self.close_button)
             close_icon = self.style().standardIcon(
-                QtWidgets.QStyle.SP_TitleBarCloseButton)
+                QtWidgets.QStyle.SP_TitleBarCloseButton
+            )
             self.close_button.setIcon(close_icon)
             self.close_button.setAutoRaise(True)
             self.close_button.clicked.connect(self.close)
@@ -202,16 +230,20 @@ class QToaster(QtWidgets.QFrame):
         # right place
         if corner == QtCore.Qt.TopLeftCorner:
             geo.moveTopLeft(
-                parent_rect.topLeft() + QtCore.QPoint(margin, margin))
+                parent_rect.topLeft() + QtCore.QPoint(margin, margin)
+            )
         elif corner == QtCore.Qt.TopRightCorner:
             geo.moveTopRight(
-                parent_rect.topRight() + QtCore.QPoint(-margin, margin))
+                parent_rect.topRight() + QtCore.QPoint(-margin, margin)
+            )
         elif corner == QtCore.Qt.BottomRightCorner:
             geo.moveBottomRight(
-                parent_rect.bottomRight() + QtCore.QPoint(-margin, -margin))
+                parent_rect.bottomRight() + QtCore.QPoint(-margin, -margin)
+            )
         else:
             geo.moveBottomLeft(
-                parent_rect.bottomLeft() + QtCore.QPoint(margin, -margin))
+                parent_rect.bottomLeft() + QtCore.QPoint(margin, -margin)
+            )
 
         self.setGeometry(geo)
         self.show()
@@ -226,20 +258,20 @@ class W(QtWidgets.QWidget):
         toaster_layout = QtWidgets.QHBoxLayout()
         layout.addLayout(toaster_layout)
 
-        self.text_edit = QtWidgets.QLineEdit('Ciao!')
+        self.text_edit = QtWidgets.QLineEdit("Ciao!")
         toaster_layout.addWidget(self.text_edit)
 
         self.corner_combo = QtWidgets.QComboBox()
         toaster_layout.addWidget(self.corner_combo)
-        for pos in ('TopLeft', 'TopRight', 'BottomRight', 'BottomLeft'):
-            corner = getattr(QtCore.Qt, '{}Corner'.format(pos))
+        for pos in ("TopLeft", "TopRight", "BottomRight", "BottomLeft"):
+            corner = getattr(QtCore.Qt, f"{pos}Corner")
             self.corner_combo.addItem(pos, corner)
 
-        self.window_button = QtWidgets.QPushButton('Show window toaster')
+        self.window_button = QtWidgets.QPushButton("Show window toaster")
         toaster_layout.addWidget(self.window_button)
         self.window_button.clicked.connect(self.show_toaster)
 
-        self.screen_button = QtWidgets.QPushButton('Show desktop toaster')
+        self.screen_button = QtWidgets.QPushButton("Show desktop toaster")
         toaster_layout.addWidget(self.screen_button)
         self.screen_button.clicked.connect(self.show_toaster)
 
@@ -261,10 +293,11 @@ class W(QtWidgets.QWidget):
             corner=corner,
             desktop=desktop,
             timeout=5000,
-            closable=True)
+            closable=True,
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = W()
     w.show()

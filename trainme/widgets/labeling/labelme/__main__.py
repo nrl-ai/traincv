@@ -12,7 +12,7 @@ from . import __appname__, __version__
 from .config import get_config
 from .labelme_widget import MainWindow
 from .logger import logger
-from .utils import newIcon
+from .utils import new_icon
 
 
 def main():
@@ -41,9 +41,7 @@ def main():
     parser.add_argument(
         "--config",
         dest="config",
-        help="config file or yaml-format string (default: {})".format(
-            default_config_file
-        ),
+        help=f"config file or yaml-format string (default: {default_config_file})",
         default=default_config_file,
     )
     # config for the gui
@@ -108,7 +106,7 @@ def main():
     args = parser.parse_args()
 
     if args.version:
-        print("{0} {1}".format(__appname__, __version__))
+        print(f"{__appname__} {__version__}")
         sys.exit(0)
 
     logger.setLevel(getattr(logging, args.logger_level.upper()))
@@ -165,7 +163,7 @@ def main():
     )
     app = QtWidgets.QApplication(sys.argv)
     app.setApplicationName(__appname__)
-    app.setWindowIcon(newIcon("icon"))
+    app.setWindowIcon(new_icon("icon"))
     app.installTranslator(translator)
     win = MainWindow(
         config=config,
@@ -175,7 +173,7 @@ def main():
     )
 
     if reset_config:
-        logger.info("Resetting Qt config: %s" % win.settings.fileName())
+        logger.info("Resetting Qt config: %s", win.settings.fileName())
         win.settings.clear()
         sys.exit(0)
 

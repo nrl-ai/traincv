@@ -18,8 +18,7 @@ class SystemMonitor(QObject):
         self.moveToThread(self.system_monitor_thread)
         self.system_monitor_thread.started.connect(self.run)
         self.finished.connect(self.system_monitor_thread.quit)
-        self.new_system_status.connect(
-            self.system_monitor_edit.setText)
+        self.new_system_status.connect(self.system_monitor_edit.setText)
         self.system_monitor_thread.start()
 
     def run(self):

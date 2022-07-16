@@ -25,11 +25,18 @@ class YOLOv5Predictor:
         with open(config_path, "r") as f:
             self.config = yaml.safe_load(f)
 
-        self.check_missing_config(config_names=[
-            "model_path", "input_width", "input_height",
-            "score_threshold", "nms_threshold", "confidence_threshold",
-            "classes"
-        ], config=self.config)
+        self.check_missing_config(
+            config_names=[
+                "model_path",
+                "input_width",
+                "input_height",
+                "score_threshold",
+                "nms_threshold",
+                "confidence_threshold",
+                "classes",
+            ],
+            config=self.config,
+        )
 
         config_folder = pathlib.Path(config_path).parent.absolute()
         model_path = self.config["model_path"]
@@ -52,15 +59,14 @@ class YOLOv5Predictor:
 
     def pre_process(self, input_image, net):
         # Create a 4D blob from a frame.
-        blob = cv2.dnn.blobFromImage(input_image,
-                                     1 / 255,
-                                     (self.config["input_width"],
-                                      self.config["input_height"]),
-                                     [0,
-                                         0,
-                                         0],
-                                     1,
-                                     crop=False)
+        blob = cv2.dnn.blobFromImage(
+            input_image,
+            1 / 255,
+            (self.config["input_width"], self.config["input_height"]),
+            [0, 0, 0],
+            1,
+            crop=False,
+        )
 
         # Sets the input to the network.
         net.setInput(blob)
@@ -116,7 +122,11 @@ class YOLOv5Predictor:
         # Perform non maximum suppression to eliminate redundant overlapping boxes with
         # lower confidences.
         indices = cv2.dnn.NMSBoxes(
-            boxes, confidences, self.config["confidence_threshold"], self.config["nms_threshold"])
+            boxes,
+            confidences,
+            self.config["confidence_threshold"],
+            self.config["nms_threshold"],
+        )
 
         output_boxes = []
         for i in indices:
@@ -134,7 +144,7 @@ class YOLOv5Predictor:
                 "x2": left + width,
                 "y2": top + height,
                 "label": label,
-                "score": score
+                "score": score,
             }
 
             output_boxes.append(output_box)
@@ -156,11 +166,7 @@ class YOLOv5Predictor:
         shapes = []
 
         for box in boxes:
-            shape = Shape(
-                label=box["label"],
-                shape_type="rectangle",
-                flags={}
-            )
+            shape = Shape(label=box["label"], shape_type="rectangle", flags={})
             shape.add_point(QtCore.QPointF(box["x1"], box["y1"]))
             shape.add_point(QtCore.QPointF(box["x2"], box["y2"]))
             shapes.append(shape)
