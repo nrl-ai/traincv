@@ -19,7 +19,7 @@ class ToolBar(QtWidgets.QToolBar):
         btn.setToolButtonStyle(self.toolButtonStyle())
         self.addWidget(btn)
 
-        # center align
+        # Center alignment
         for i in range(self.layout().count()):
             if isinstance(
                 self.layout().itemAt(i).widget(), QtWidgets.QToolButton

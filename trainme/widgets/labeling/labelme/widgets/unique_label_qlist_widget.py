@@ -40,7 +40,5 @@ class UniqueLabelQListWidget(EscapableQListWidget):
                 )
             )
         qlabel.setAlignment(Qt.AlignBottom)
-
         item.setSizeHint(qlabel.sizeHint())
-
         self.setItemWidget(item, qlabel)

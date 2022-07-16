@@ -107,7 +107,7 @@ class QToaster(QtWidgets.QFrame):
             self.setGeometry(geo)
             self.restore()
             self.timer.start()
-        return super(QToaster, self).event_filter(source, event)
+        return super(QToaster, self).eventFilter(source, event)
 
     def enterEvent(self, _):
         self.restore()
@@ -151,8 +151,6 @@ class QToaster(QtWidgets.QFrame):
 
         if parent and parent_window:
             parent = parent.window()
-
-        self.close_button = None
 
         if not parent or desktop:
             self = QToaster(None)

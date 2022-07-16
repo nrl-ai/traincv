@@ -16,10 +16,18 @@ class DataPreparationTab(QWidget):
         uic.loadUi(os.path.join(current_dir, "data_preparation.ui"), self)
 
         self.training_set_table = DataSubsetTable(
-            "Training", self, split_from_train=False
+            "Training", self, show_split_from_train=False
         )
-        self.validation_set_table = DataSubsetTable("Validation", self)
-        self.test_set_table = DataSubsetTable("Test", self)
+        train_data_preparator = self.training_set_table.data_preparator
+        self.validation_set_table = DataSubsetTable(
+            "Validation", self, train_data_preparator=train_data_preparator
+        )
+        self.validation_set_table.split_ratio_spin.valueChanged.connect(
+            self.training_set_table.update_statistics
+        )
+        self.test_set_table = DataSubsetTable(
+            "Test", self, show_split_from_train=False
+        )
 
         self.data_source_layout.addWidget(self.training_set_table)
         self.data_source_layout.addWidget(self.validation_set_table)

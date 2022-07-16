@@ -38,7 +38,7 @@ def get_install_requires():
     QT_BINDING = None
 
     try:
-        import PyQt5  # NOQA
+        import PyQt5  # noqa # pylint: disable=unused-import
 
         QT_BINDING = "pyqt5"
     except ImportError:
@@ -46,7 +46,7 @@ def get_install_requires():
 
     if QT_BINDING is None:
         try:
-            import PySide2  # NOQA
+            import PySide2  # noqa # pylint: disable=unused-import
 
             QT_BINDING = "pyside2"
         except ImportError:
@@ -86,7 +86,7 @@ def main():
 
     if sys.argv[1] == "release":
         try:
-            import github2pypi  # NOQA
+            import github2pypi  # noqa # pylint: disable=unused-import
         except ImportError:
             print(
                 "Please install github2pypi\n\n\tpip install github2pypi\n",
@@ -142,7 +142,7 @@ def main():
         package_data={
             "trainme": [
                 "trainme/widgets/labeling/labelme/icons/*",
-                "trainme/widgets/labeling/labelme/config/*.yaml",
+                "trainme/configs/*.yaml",
             ]
         },
     )

@@ -19,6 +19,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="toolTipDuration">
+   <number>-1</number>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="leftMargin">
     <number>0</number>
@@ -78,7 +81,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>1000 images / xxx objects</string>
+         <string>0 labeled images</string>
         </property>
        </widget>
       </item>
@@ -168,6 +171,15 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>800</number>
+          </property>
+          <property name="pageStep">
+           <number>1</number>
+          </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -185,10 +197,10 @@
            <number>3</number>
           </property>
           <property name="minimum">
-           <double>0.010000000000000</double>
+           <double>0.001000000000000</double>
           </property>
           <property name="maximum">
-           <double>0.500000000000000</double>
+           <double>0.800000000000000</double>
           </property>
           <property name="singleStep">
            <double>0.001000000000000</double>

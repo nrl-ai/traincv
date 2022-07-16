@@ -1,12 +1,14 @@
-from PyQt5.QtCore import QAbstractTableModel, Qt
+import pandas as pd
+from PyQt5.QtCore import QAbstractTableModel, Qt, pyqtSignal
 
 
 class TableModel(QAbstractTableModel):
-    def __init__(self, data, on_changed_cb=None):
+    table_changed = pyqtSignal(pd.DataFrame)
+
+    def __init__(self, data):
         QAbstractTableModel.__init__(self)
         self.data = data
         self.editable_cols = []
-        self.on_changed_cb = on_changed_cb
 
     def setEditableCols(self, cols):
         self.editable_cols = cols
@@ -34,15 +36,18 @@ class TableModel(QAbstractTableModel):
 
     def addRow(self, row: dict) -> bool:
         self.data = self.data.append(row, ignore_index=True)
-        if self.on_changed_cb is not None:
-            self.on_changed_cb(self.data)
+        self.table_changed.emit(self.data)
         self.modelReset.emit()
 
     def removeRow(self, row: int) -> bool:
         self.data.drop(self.data.index[row], inplace=True)
-        if self.on_changed_cb is not None:
-            self.on_changed_cb(self.data)
+        self.table_changed.emit(self.data)
         self.modelReset.emit()
+
+    def removeRows(self, rows: list):
+        rows = sorted(set(rows), reverse=True)
+        for row in rows:
+            self.removeRow(row)
 
     def setData(self, index, value, role=Qt.EditRole):
 
