@@ -1,11 +1,11 @@
 import os.path as osp
 
+import imgviz
 import numpy as np
 import PIL.Image
 
 
 def lblsave(filename, lbl):
-    import imgviz
 
     if osp.splitext(filename)[1] != ".png":
         filename += ".png"
@@ -18,6 +18,6 @@ def lblsave(filename, lbl):
         lbl_pil.save(filename)
     else:
         raise ValueError(
-            "[%s] Cannot save the pixel-wise class label as PNG. "
-            "Please consider using the .npy format." % filename
+            f"[{filename}] Cannot save the pixel-wise class label as PNG. "
+            "Please consider using the .npy format."
         )

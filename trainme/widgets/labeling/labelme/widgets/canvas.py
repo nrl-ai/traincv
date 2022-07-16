@@ -37,9 +37,7 @@ class Canvas(QtWidgets.QWidget):
         self.double_click = kwargs.pop("double_click", "close")
         if self.double_click not in [None, "close"]:
             raise ValueError(
-                "Unexpected value for double_click event: {}".format(
-                    self.double_click
-                )
+                f"Unexpected value for double_click event: {self.double_click}"
             )
         self.num_backups = kwargs.pop("num_backups", 10)
         super(Canvas, self).__init__(*args, **kwargs)
@@ -104,7 +102,7 @@ class Canvas(QtWidgets.QWidget):
             "point",
             "linestrip",
         ]:
-            raise ValueError("Unsupported create_mode: %s" % value)
+            raise ValueError(f"Unsupported create_mode: {value}")
         self._create_mode = value
 
     def store_shapes(self):
@@ -112,7 +110,7 @@ class Canvas(QtWidgets.QWidget):
         for shape in self.shapes:
             shapes_backup.append(shape.copy())
         if len(self.shapes_backups) > self.num_backups:
-            self.shapes_backups = self.shapes_backups[-self.num_backups - 1:]
+            self.shapes_backups = self.shapes_backups[-self.num_backups - 1 :]
         self.shapes_backups.append(shapes_backup)
 
     @property
@@ -141,14 +139,14 @@ class Canvas(QtWidgets.QWidget):
             shape.selected = False
         self.update()
 
-    def enterEvent(self, ev):
+    def enterEvent(self, _):
         self.override_cursor(self._cursor)
 
-    def leaveEvent(self, ev):
+    def leaveEvent(self, _):
         self.un_highlight()
         self.restore_cursor()
 
-    def focusOutEvent(self, ev):
+    def focusOutEvent(self, _):
         self.restore_cursor()
 
     def is_visible(self, shape):
@@ -284,7 +282,7 @@ class Canvas(QtWidgets.QWidget):
                 self.setStatusTip(self.toolTip())
                 self.update()
                 break
-            elif index_edge is not None and shape.can_add_point():
+            if index_edge is not None and shape.can_add_point():
                 if self.selected_vertex():
                     self.h_hape.highlight_clear()
                 self.prev_h_vertex = self.h_vertex
@@ -296,7 +294,7 @@ class Canvas(QtWidgets.QWidget):
                 self.setStatusTip(self.toolTip())
                 self.update()
                 break
-            elif shape.contains_point(pos):
+            if shape.contains_point(pos):
                 if self.selected_vertex():
                     self.h_hape.highlight_clear()
                 self.prev_h_vertex = self.h_vertex
@@ -384,7 +382,9 @@ class Canvas(QtWidgets.QWidget):
                     self.remove_selected_point()
 
                 group_mode = int(ev.modifiers()) == QtCore.Qt.ControlModifier
-                self.select_shape_point(pos, multiple_selection_mode=group_mode)
+                self.select_shape_point(
+                    pos, multiple_selection_mode=group_mode
+                )
                 self.prev_point = pos
                 self.repaint()
         elif ev.button() == QtCore.Qt.RightButton and self.editing():
@@ -393,7 +393,9 @@ class Canvas(QtWidgets.QWidget):
                 self.h_hape is not None
                 and self.h_hape not in self.selected_shapes
             ):
-                self.select_shape_point(pos, multiple_selection_mode=group_mode)
+                self.select_shape_point(
+                    pos, multiple_selection_mode=group_mode
+                )
                 self.repaint()
             self.prev_point = pos
 
@@ -462,7 +464,7 @@ class Canvas(QtWidgets.QWidget):
         return self.drawing() and self.current and len(self.current) > 2
 
     # QT Overload
-    def mouseDoubleClickEvent(self, ev):
+    def mouseDoubleClickEvent(self, _):
         # We need at least 4 points here, since the mousePress handler
         # adds an extra one before this handler is called.
         if (
@@ -583,7 +585,9 @@ class Canvas(QtWidgets.QWidget):
 
     def duplicate_selected_shapes(self):
         if self.selected_shapes:
-            self.selected_shapes_copy = [s.copy() for s in self.selected_shapes]
+            self.selected_shapes_copy = [
+                s.copy() for s in self.selected_shapes
+            ]
             self.bounded_shift_shapes(self.selected_shapes_copy)
             self.end_move(copy=True)
         return self.selected_shapes
@@ -600,8 +604,12 @@ class Canvas(QtWidgets.QWidget):
 
     # QT Overload
     def paintEvent(self, event):
-        if not self.pixmap or self.pixmap.width() == 0 or self.pixmap.height() == 0:
-            return super(Canvas, self).paintEvent(event)
+        if (
+            not self.pixmap
+            or self.pixmap.width() == 0
+            or self.pixmap.height() == 0
+        ):
+            super(Canvas, self).paintEvent(event)
 
         p = self._painter
         p.begin(self)
@@ -614,9 +622,9 @@ class Canvas(QtWidgets.QWidget):
         p.drawPixmap(0, 0, self.pixmap)
         Shape.scale = self.scale
         for shape in self.shapes:
-            if (shape.selected or not self._hide_backround) and self.is_visible(
-                shape
-            ):
+            if (
+                shape.selected or not self._hide_backround
+            ) and self.is_visible(shape):
                 shape.fill = shape.selected or shape == self.h_hape
                 shape.paint(p)
         if self.current:
@@ -642,17 +650,33 @@ class Canvas(QtWidgets.QWidget):
             pen = QtGui.QPen(QtGui.QColor("#000000"), 2, Qt.SolidLine)
             p.setPen(pen)
             p.setOpacity(1.0)
-            p.drawLine(QtCore.QPoint(self.prev_move_point.x() - 1, 0),
-                       QtCore.QPoint(self.prev_move_point.x() - 1, self.pixmap.height()))
-            p.drawLine(QtCore.QPoint(0, self.prev_move_point.y() - 1),
-                       QtCore.QPoint(self.pixmap.width(), self.prev_move_point.y() - 1))
+            p.drawLine(
+                QtCore.QPoint(self.prev_move_point.x() - 1, 0),
+                QtCore.QPoint(
+                    self.prev_move_point.x() - 1, self.pixmap.height()
+                ),
+            )
+            p.drawLine(
+                QtCore.QPoint(0, self.prev_move_point.y() - 1),
+                QtCore.QPoint(
+                    self.pixmap.width(), self.prev_move_point.y() - 1
+                ),
+            )
             pen = QtGui.QPen(QtGui.QColor("#FFFFFF"), 2, Qt.SolidLine)
             p.setPen(pen)
             p.setOpacity(1.0)
-            p.drawLine(QtCore.QPoint(self.prev_move_point.x() + 1, 0),
-                       QtCore.QPoint(self.prev_move_point.x() + 1, self.pixmap.height()))
-            p.drawLine(QtCore.QPoint(0, self.prev_move_point.y() + 1),
-                       QtCore.QPoint(self.pixmap.width(), self.prev_move_point.y() + 1))
+            p.drawLine(
+                QtCore.QPoint(self.prev_move_point.x() + 1, 0),
+                QtCore.QPoint(
+                    self.prev_move_point.x() + 1, self.pixmap.height()
+                ),
+            )
+            p.drawLine(
+                QtCore.QPoint(0, self.prev_move_point.y() + 1),
+                QtCore.QPoint(
+                    self.pixmap.width(), self.prev_move_point.y() + 1
+                ),
+            )
 
         p.end()
 
@@ -664,9 +688,9 @@ class Canvas(QtWidgets.QWidget):
         s = self.scale
         area = super(Canvas, self).size()
         w, h = self.pixmap.width() * s, self.pixmap.height() * s
-        aw, ah = area.width(), area.height()
-        x = (aw - w) / (2 * s) if aw > w else 0
-        y = (ah - h) / (2 * s) if ah > h else 0
+        area_width, area_height = area.width(), area.height()
+        x = (area_width - w) / (2 * s) if area_width > w else 0
+        y = (area_height - h) / (2 * s) if area_height > h else 0
         return QtCore.QPoint(x, y)
 
     def out_off_pixmap(self, p):
@@ -705,15 +729,15 @@ class Canvas(QtWidgets.QWidget):
         x1 = min(max(p1.x(), 0), size.width() - 1)
         y1 = min(max(p1.y(), 0), size.height() - 1)
         x2, y2 = p2.x(), p2.y()
-        d, i, (x, y) = min(self.intersecting_edges((x1, y1), (x2, y2), points))
+        _, i, (x, y) = min(self.intersecting_edges((x1, y1), (x2, y2), points))
         x3, y3 = points[i]
         x4, y4 = points[(i + 1) % 4]
         if (x, y) == (x1, y1):
             # Handle cases where previous point is on one of the edges.
             if x3 == x4:
                 return QtCore.QPoint(x3, min(max(0, y2), max(y3, y4)))
-            else:  # y3 == y4
-                return QtCore.QPoint(min(max(0, x2), max(x3, x4)), y3)
+            # y3 == y4
+            return QtCore.QPoint(min(max(0, x2), max(x3, x4)), y3)
         return QtCore.QPoint(x, y)
 
     def intersecting_edges(self, point1, point2, points):

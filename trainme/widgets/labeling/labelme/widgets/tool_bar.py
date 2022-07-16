@@ -25,3 +25,5 @@ class ToolBar(QtWidgets.QToolBar):
                 self.layout().itemAt(i).widget(), QtWidgets.QToolButton
             ):
                 self.layout().itemAt(i).setAlignment(QtCore.Qt.AlignCenter)
+
+        return True

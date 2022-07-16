@@ -7,21 +7,21 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 here = osp.dirname(osp.abspath(__file__))
 
 
-def newIcon(icon):
+def new_icon(icon):
     icons_dir = osp.join(here, "../icons")
-    return QtGui.QIcon(osp.join(":/", icons_dir, "%s.png" % icon))
+    return QtGui.QIcon(osp.join(":/", icons_dir, f"{icon}.png"))
 
 
-def newButton(text, icon=None, slot=None):
+def new_button(text, icon=None, slot=None):
     b = QtWidgets.QPushButton(text)
     if icon is not None:
-        b.setIcon(newIcon(icon))
+        b.setIcon(new_icon(icon))
     if slot is not None:
         b.clicked.connect(slot)
     return b
 
 
-def newAction(
+def new_action(
     parent,
     text,
     slot=None,
@@ -33,25 +33,25 @@ def newAction(
     checked=False,
 ):
     """Create a new action and assign callbacks, shortcuts, etc."""
-    a = QtWidgets.QAction(text, parent)
+    action = QtWidgets.QAction(text, parent)
     if icon is not None:
-        a.setIconText(text.replace(" ", "\n"))
-        a.setIcon(newIcon(icon))
+        action.setIconText(text.replace(" ", "\n"))
+        action.setIcon(new_icon(icon))
     if shortcut is not None:
         if isinstance(shortcut, (list, tuple)):
-            a.setShortcuts(shortcut)
+            action.setShortcuts(shortcut)
         else:
-            a.setShortcut(shortcut)
+            action.setShortcut(shortcut)
     if tip is not None:
-        a.setToolTip(tip)
-        a.setStatusTip(tip)
+        action.setToolTip(tip)
+        action.setStatusTip(tip)
     if slot is not None:
-        a.triggered.connect(slot)
+        action.triggered.connect(slot)
     if checkable:
-        a.setCheckable(True)
-    a.setEnabled(enabled)
-    a.setChecked(checked)
-    return a
+        action.setCheckable(True)
+    action.setEnabled(enabled)
+    action.setChecked(checked)
+    return action
 
 
 def add_actions(widget, actions):
@@ -64,12 +64,13 @@ def add_actions(widget, actions):
             widget.addAction(action)
 
 
-def labelValidator():
+def label_validator():
     return QtGui.QRegularExpressionValidator(
-        QtCore.QRegularExpression(r"^[^ \t].+"), None)
+        QtCore.QRegularExpression(r"^[^ \t].+"), None
+    )
 
 
-class struct(object):
+class Struct:
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
@@ -78,7 +79,7 @@ def distance(p):
     return sqrt(p.x() * p.x() + p.y() * p.y())
 
 
-def distancetoline(point, line):
+def distance_to_line(point, line):
     p1, p2 = line
     p1 = np.array([p1.x(), p1.y()])
     p2 = np.array([p2.x(), p2.y()])
@@ -92,6 +93,6 @@ def distancetoline(point, line):
     return np.linalg.norm(np.cross(p2 - p1, p1 - p3)) / np.linalg.norm(p2 - p1)
 
 
-def fmtShortcut(text):
+def fmt_shortcut(text):
     mod, key = text.split("+", 1)
-    return "<b>%s</b>+<b>%s</b>" % (mod, key)
+    return f"<b>{mod}</b>+<b>{key}</b>"

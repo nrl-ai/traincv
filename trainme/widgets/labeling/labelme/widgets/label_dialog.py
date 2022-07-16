@@ -40,7 +40,7 @@ class LabelDialog(QtWidgets.QDialog):
         super(LabelDialog, self).__init__(parent)
         self.edit = LabelQLineEdit()
         self.edit.setPlaceholderText(text)
-        self.edit.setValidator(utils.labelValidator())
+        self.edit.setValidator(utils.label_validator())
         self.edit.editingFinished.connect(self.postprocess)
         if flags:
             self.edit.textChanged.connect(self.update_flags)
@@ -48,7 +48,9 @@ class LabelDialog(QtWidgets.QDialog):
         self.edit_group_id.setPlaceholderText("Group ID")
         self.edit_group_id.setValidator(
             QtGui.QRegularExpressionValidator(
-                QtCore.QRegularExpression(r"\d*"), None))
+                QtCore.QRegularExpression(r"\d*"), None
+            )
+        )
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         if show_text_field:
@@ -62,8 +64,8 @@ class LabelDialog(QtWidgets.QDialog):
             QtCore.Qt.Horizontal,
             self,
         )
-        bb.button(bb.Ok).setIcon(utils.newIcon("done"))
-        bb.button(bb.Cancel).setIcon(utils.newIcon("undo"))
+        bb.button(bb.Ok).setIcon(utils.new_icon("done"))
+        bb.button(bb.Cancel).setIcon(utils.new_icon("undo"))
         bb.accepted.connect(self.validate)
         bb.rejected.connect(self.reject)
         layout.addWidget(bb)
@@ -109,7 +111,7 @@ class LabelDialog(QtWidgets.QDialog):
             completer.setCompletionMode(QtWidgets.QCompleter.PopupCompletion)
             completer.setFilterMode(QtCore.Qt.MatchContains)
         else:
-            raise ValueError("Unsupported completion: {}".format(completion))
+            raise ValueError(f"Unsupported completion: {completion}")
         completer.setModel(self.label_list.model())
         self.edit.setCompleter(completer)
 
@@ -132,7 +134,7 @@ class LabelDialog(QtWidgets.QDialog):
         if text:
             self.accept()
 
-    def label_double_clicked(self, item):
+    def label_double_clicked(self, _):
         self.validate()
 
     def postprocess(self):
@@ -214,7 +216,7 @@ class LabelDialog(QtWidgets.QDialog):
         items = self.label_list.findItems(text, QtCore.Qt.MatchFixedString)
         if items:
             if len(items) != 1:
-                logger.warning("Label list has duplicate '{}'".format(text))
+                logger.warning("Label list has duplicate '%s'", text)
             self.label_list.setCurrentItem(items[0])
             row = self.label_list.row(items[0])
             self.edit.completer().setCurrentRow(row)

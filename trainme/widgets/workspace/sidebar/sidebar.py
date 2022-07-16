@@ -16,18 +16,22 @@ class SideBar(QWidget):
         self.new_project_button.clicked.connect(self.browse_and_create_project)
 
     def browse_and_create_project(self):
-        folder = str(QFileDialog.getExistingDirectory(
-            self, "Select folder to save new project"))
+        folder = str(
+            QFileDialog.getExistingDirectory(
+                self, "Select folder to save new project"
+            )
+        )
         if folder:
             folder = os.path.normpath(folder)
 
     def browse_and_open_project(self):
         folder = str(
-            QFileDialog.getExistingDirectory(
-                self, "Select project to open"))
+            QFileDialog.getExistingDirectory(self, "Select project to open")
+        )
         if folder:
             folder = os.path.normpath(folder)
             if not os.path.isfile(os.path.join(folder, "trainme.xml")):
                 QMessageBox.warning(
-                    self, "Error", f"Invalid project folder: {folder}")
+                    self, "Error", f"Invalid project folder: {folder}"
+                )
                 return

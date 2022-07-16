@@ -16,7 +16,8 @@ class DataPreparationTab(QWidget):
         uic.loadUi(os.path.join(current_dir, "data_preparation.ui"), self)
 
         self.training_set_table = DataSubsetTable(
-            "Training", self, split_from_train=False)
+            "Training", self, split_from_train=False
+        )
         self.validation_set_table = DataSubsetTable("Validation", self)
         self.test_set_table = DataSubsetTable("Test", self)
 

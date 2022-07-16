@@ -60,22 +60,29 @@ class EvaluationTab(QWidget):
 
     def threshold_changed(self):
         self.threshold = self.threshold_slider.value() / 10000.0
-        self.threshold_label.setText("{:.2f}%".format(self.threshold * 100))
+        self.threshold_label.setText(f"{self.threshold * 100:.2f}%")
         self.infer_current_image()
 
     def on_open(self):
         pass
 
     def test_image(self):
-        path = str(QFileDialog.getOpenFileName(self, "Open image",
-                   "", "Image files (*.png *.jpg *.jpeg *.bmp)")[0])
+        path = str(
+            QFileDialog.getOpenFileName(
+                self,
+                "Open image",
+                "",
+                "Image files (*.png *.jpg *.jpeg *.bmp)",
+            )[0]
+        )
         if path:
             path = os.path.normpath(path)
             if os.path.isfile(path):
                 img = cv2.imread(path)
                 if img is None:
                     self.image_view.setText(
-                        "Could not read image file: {}".format(path))
+                        f"Could not read image file: {path}"
+                    )
                     return
                 self.image_list = [path]
                 self.current_image_id = 0
@@ -95,12 +102,12 @@ class EvaluationTab(QWidget):
                     self.infer_current_image()
 
     def run_infer(self, image):
-        pass
         return True, image
 
     def infer_current_image(self):
-        if self.current_image_id < 0 or \
-                self.current_image_id >= len(self.image_list):
+        if self.current_image_id < 0 or self.current_image_id >= len(
+            self.image_list
+        ):
             self.image_view.setText("No Image")
         else:
             self.image_view.setText("Running Inference...")
@@ -108,19 +115,22 @@ class EvaluationTab(QWidget):
             ret, result_frame = self.run_infer(frame)
             if not ret:
                 self.image_view.setText(
-                    f"Failed to run inference on image: {self.image_list[self.current_image_id]}")
+                    f"Failed to run inference on image: {self.image_list[self.current_image_id]}"
+                )
             rgb_image = cv2.cvtColor(result_frame, cv2.COLOR_BGR2RGB)
             h, w, ch = rgb_image.shape
             bytes_per_line = ch * w
             convert_to_qt_format = QImage(
-                rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888)
+                rgb_image.data, w, h, bytes_per_line, QImage.Format_RGB888
+            )
             p = convert_to_qt_format.scaled(640, 480, Qt.KeepAspectRatio)
             self.change_pixmap.emit(p)
 
         # Update button status
         self.prev_image_button.setEnabled(self.current_image_id > 0)
         self.next_image_button.setEnabled(
-            self.current_image_id < len(self.image_list) - 1)
+            self.current_image_id < len(self.image_list) - 1
+        )
 
     def next_image(self):
         if self.current_image_id < len(self.image_list) - 1:

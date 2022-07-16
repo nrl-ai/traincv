@@ -34,12 +34,12 @@ class FileDialogPreview(QtWidgets.QFileDialog):
         super(FileDialogPreview, self).__init__(*args, **kwargs)
         self.setOption(self.DontUseNativeDialog, True)
 
-        self.labelPreview = ScrollAreaPreview(self)
-        self.labelPreview.setFixedSize(300, 300)
-        self.labelPreview.setHidden(True)
+        self.label_preview = ScrollAreaPreview(self)
+        self.label_preview.setFixedSize(300, 300)
+        self.label_preview.setHidden(True)
 
         box = QtWidgets.QVBoxLayout()
-        box.addWidget(self.labelPreview)
+        box.addWidget(self.label_preview)
         box.addStretch()
 
         self.setFixedSize(self.width() + 300, self.height())
@@ -50,26 +50,26 @@ class FileDialogPreview(QtWidgets.QFileDialog):
         if path.lower().endswith(".json"):
             with open(path, "r") as f:
                 data = json.load(f)
-                self.labelPreview.set_text(
+                self.label_preview.set_text(
                     json.dumps(data, indent=4, sort_keys=False)
                 )
-            self.labelPreview.label.setAlignment(
+            self.label_preview.label.setAlignment(
                 QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
             )
-            self.labelPreview.setHidden(False)
+            self.label_preview.setHidden(False)
         else:
             pixmap = QtGui.QPixmap(path)
             if pixmap.isNull():
-                self.labelPreview.clear()
-                self.labelPreview.setHidden(True)
+                self.label_preview.clear()
+                self.label_preview.setHidden(True)
             else:
-                self.labelPreview.set_pixmap(
+                self.label_preview.set_pixmap(
                     pixmap.scaled(
-                        self.labelPreview.width() - 30,
-                        self.labelPreview.height() - 30,
+                        self.label_preview.width() - 30,
+                        self.label_preview.height() - 30,
                         QtCore.Qt.KeepAspectRatio,
                         QtCore.Qt.SmoothTransformation,
                     )
                 )
-                self.labelPreview.label.setAlignment(QtCore.Qt.AlignCenter)
-                self.labelPreview.setHidden(False)
+                self.label_preview.label.setAlignment(QtCore.Qt.AlignCenter)
+                self.label_preview.setHidden(False)

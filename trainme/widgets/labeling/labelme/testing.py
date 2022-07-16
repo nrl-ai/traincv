@@ -2,13 +2,15 @@ import json
 import os.path as osp
 
 import imgviz
-import labelme.utils
+
+from . import utils
 
 
 def assert_labelfile_sanity(filename):
     assert osp.exists(filename)
 
-    data = json.load(open(filename))
+    with open(filename) as f:
+        data = json.load(f)
 
     assert "image_path" in data
     image_data = data.get("image_data", None)
@@ -18,7 +20,7 @@ def assert_labelfile_sanity(filename):
         assert osp.exists(img_file)
         img = imgviz.io.imread(img_file)
     else:
-        img = labelme.utils.img_b64_to_arr(image_data)
+        img = utils.img_b64_to_arr(image_data)
 
     H, W = img.shape[:2]
     assert H == data["image_height"]
