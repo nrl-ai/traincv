@@ -605,11 +605,12 @@ class Canvas(QtWidgets.QWidget):
     # QT Overload
     def paintEvent(self, event):
         if (
-            not self.pixmap
+            self.pixmap is None
             or self.pixmap.width() == 0
             or self.pixmap.height() == 0
         ):
             super(Canvas, self).paintEvent(event)
+            return
 
         p = self._painter
         p.begin(self)
@@ -685,6 +686,8 @@ class Canvas(QtWidgets.QWidget):
         return point / self.scale - self.offset_to_center()
 
     def offset_to_center(self):
+        if self.pixmap is None:
+            return QtCore.QPoint()
         s = self.scale
         area = super(Canvas, self).size()
         w, h = self.pixmap.width() * s, self.pixmap.height() * s
@@ -694,6 +697,8 @@ class Canvas(QtWidgets.QWidget):
         return QtCore.QPoint(x, y)
 
     def out_off_pixmap(self, p):
+        if self.pixmap is None:
+            return True
         w, h = self.pixmap.width(), self.pixmap.height()
         return not (0 <= p.x() <= w - 1 and 0 <= p.y() <= h - 1)
 
