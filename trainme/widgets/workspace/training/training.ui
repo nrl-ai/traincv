@@ -226,7 +226,7 @@
             <enum>Qt::LeftToRight</enum>
            </property>
            <property name="styleSheet">
-            <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;;
+            <string notr="true">font-size: 12pt;
 padding-left: 20;</string>
            </property>
            <property name="text">

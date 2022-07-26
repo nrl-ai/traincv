@@ -13,7 +13,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QDockWidget, QHBoxLayout, QLabel, QMessageBox,
                              QVBoxLayout, QWhatsThis)
 
-from trainme.core.inference_services.yolov5 import YOLOv5Predictor
+from trainme.inference_services.yolov5 import YOLOv5Predictor
 
 from . import __appname__, utils
 from .config import get_config
