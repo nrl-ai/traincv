@@ -107,7 +107,6 @@ class DataSubsetTable(QWidget):
                 QToaster.show_message(
                     self,
                     f"{message}: {link}",
-                    "",
                     corner=corner,
                     timeout=3000,
                     closable=True,

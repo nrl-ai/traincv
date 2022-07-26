@@ -32,11 +32,18 @@ class SystemMonitor(QObject):
             report += f"• <b>RAM:</b> {ram.percent}%<br>"
             report += "• <b>GPUs:</b> "
             if len(gpus) == 0:
-                report += "There is no GPU in your system, or CUDA has not been setup correctly.<br>"
+                report += (
+                    "There is no GPU in your system, or CUDA has not been"
+                    " setup correctly.<br>"
+                )
             elif len(gpus) == 1:
                 report += "There is 1 GPU<br>"
             else:
                 report += f"There are {len(gpus)} GPUs<br>"
             for gpu in gpus:
-                report += f"<b>⋗ ID {gpu.id} - {gpu.name}</b><br><b>VRam:</b> {gpu.memory_used}/{gpu.memory_total} MB, <b>Temp:</b> {gpu.temperature}°<br>"
+                report += (
+                    f"<b>⋗ ID {gpu.id} - {gpu.name}</b><br><b>VRam:</b>"
+                    f" {gpu.memory_used}/{gpu.memory_total} MB, <b>Temp:</b>"
+                    f" {gpu.temperature}°<br>"
+                )
             self.new_system_status.emit(report)

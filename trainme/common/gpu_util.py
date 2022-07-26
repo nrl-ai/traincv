@@ -323,14 +323,18 @@ def show_utilization(show_all=False, attr_list=None, use_old_code=False):
     if show_all:
         if use_old_code:
             print(
-                " ID | Name | Serial | UUID || GPU util. | Memory util. || Memory total | Memory used | Memory free || Display mode | Display active |"
+                " ID | Name | Serial | UUID || GPU util. | Memory util. ||"
+                " Memory total | Memory used | Memory free || Display mode |"
+                " Display active |"
             )
             print(
                 "------------------------------------------------------------------------------------------------------------------------------"
             )
             for gpu in gp_us:
                 print(
-                    " {0:2d} | {1:s}  | {2:s} | {3:s} || {4:3.0f}% | {5:3.0f}% || {6:.0f}MB | {7:.0f}MB | {8:.0f}MB || {9:s} | {10:s}".format(
+                    " {0:2d} | {1:s}  | {2:s} | {3:s} || {4:3.0f}% | {5:3.0f}%"
+                    " || {6:.0f}MB | {7:.0f}MB | {8:.0f}MB || {9:s} | {10:s}"
+                    .format(
                         gpu.id,
                         gpu.name,
                         gpu.serial,

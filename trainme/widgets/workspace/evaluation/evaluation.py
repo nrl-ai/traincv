@@ -115,7 +115,8 @@ class EvaluationTab(QWidget):
             ret, result_frame = self.run_infer(frame)
             if not ret:
                 self.image_view.setText(
-                    f"Failed to run inference on image: {self.image_list[self.current_image_id]}"
+                    "Failed to run inference on image:"
+                    f" {self.image_list[self.current_image_id]}"
                 )
             rgb_image = cv2.cvtColor(result_frame, cv2.COLOR_BGR2RGB)
             h, w, ch = rgb_image.shape

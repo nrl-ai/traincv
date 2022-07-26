@@ -1,3 +1,5 @@
+"""Main tab widget for trainme app"""
+
 from PyQt5.QtWidgets import QTabWidget
 
 from .labeling.labeling_wrapper import LabelingWrapper
@@ -5,6 +7,8 @@ from .workspace.workspace_wrapper import WorkspaceWrapper
 
 
 class MainTabsWidget(QTabWidget):
+    """Main tab widget for trainme app"""
+
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
@@ -21,7 +25,7 @@ class MainTabsWidget(QTabWidget):
         self.currentChanged.connect(self.on_change)
 
     def on_change(self, i):
-        # Show/hide menu
+        """Handle event when the current tab changes"""
         if isinstance(self.tabs[i], LabelingWrapper):
             self.parent.menuBar().show()
         else:

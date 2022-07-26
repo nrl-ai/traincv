@@ -791,7 +791,8 @@ class LabelmeWidget(LabelDialog):
         central_layout = QVBoxLayout()
         central_layout.setContentsMargins(0, 0, 0, 0)
         label_instruction = QLabel(
-            "<b>Shortcuts:</b> Previous: <b>A</b>, Next: <b>D</b>, Rectangle: <b>R</b>, Polygon: <b>P</b>"
+            "<b>Shortcuts:</b> Previous: <b>A</b>, Next: <b>D</b>, Rectangle:"
+            " <b>R</b>, Polygon: <b>P</b>"
         )
         label_instruction.setContentsMargins(0, 10, 0, 10)
         central_layout.addWidget(label_instruction)
@@ -2042,8 +2043,7 @@ class LabelmeWidget(LabelDialog):
     def delete_selected_shape(self):
         yes, no = QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No
         msg = self.tr(
-            "You are about to permanently delete {} polygons, "
-            "proceed anyway?"
+            "You are about to permanently delete {} polygons, proceed anyway?"
         ).format(len(self.canvas.selected_shapes))
         if yes == QtWidgets.QMessageBox.warning(
             self, self.tr("Attention"), msg, yes | no, yes

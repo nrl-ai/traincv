@@ -1,13 +1,17 @@
-import sys
+"""Defines Toaster widget"""
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class QToaster(QtWidgets.QFrame):
+    """Toaster widget
+    For displaying a short notification which can be hide after a duration
+    """
+
     closed = QtCore.pyqtSignal()
 
     def __init__(self, *args, **kwargs):
-        super(QToaster, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         QtWidgets.QHBoxLayout(self)
 
         self.setSizePolicy(
@@ -56,11 +60,13 @@ class QToaster(QtWidgets.QFrame):
         self.margin = 10
 
     def check_closed(self):
+        """Close the toaster after fading out"""
         # if we have been fading out, we're closing the notification
         if self.opacity_ani.direction() == self.opacity_ani.Backward:
             self.close()
 
     def restore(self):
+        """Restore toaster (timer + opacity)"""
         # this is a "helper function", that can be called from mouseEnterEvent
         # and when the parent widget is resized. We will not close the
         # notification if the mouse is in or the parent is resized
@@ -74,12 +80,13 @@ class QToaster(QtWidgets.QFrame):
             self.setWindowOpacity(1)
 
     def hide(self):
-        # start hiding
+        """Hide toaster by opacity effect"""
         self.opacity_ani.setDirection(self.opacity_ani.Backward)
         self.opacity_ani.setDuration(500)
         self.opacity_ani.start()
 
     def eventFilter(self, source, event):
+        """Event filter"""
         if source == self.parent() and event.type() == QtCore.QEvent.Resize:
             self.opacity_ani.stop()
             parent_rect = self.parent().rect()
@@ -107,20 +114,26 @@ class QToaster(QtWidgets.QFrame):
             self.setGeometry(geo)
             self.restore()
             self.timer.start()
-        return super(QToaster, self).eventFilter(source, event)
+        return super().eventFilter(source, event)
 
     def enterEvent(self, _):
+        """Restore toaster (opacity) when move mouse into it
+        Keep it open as long as the mouse does not leave
+        """
         self.restore()
 
     def leaveEvent(self, _):
+        """When mouse leaves the toaster, start the timer again to count down to close event"""
         self.timer.start()
 
     def closeEvent(self, _):
+        """Handle close event"""
         # we don't need the notification anymore, delete it!
         self.deleteLater()
 
     def resizeEvent(self, event):
-        super(QToaster, self).resizeEvent(event)
+        """Handles request event"""
+        super().resizeEvent(event)
         # if you don't set a stylesheet, you don't need any of the following!
         if not self.parent():
             # there's no parent, so we need to update the mask
@@ -140,14 +153,14 @@ class QToaster(QtWidgets.QFrame):
     def show_message(
         parent,
         message,
-        icon=QtWidgets.QStyle.SP_MessageBoxInformation,
         corner=QtCore.Qt.TopLeftCorner,
         margin=10,
         closable=True,
         timeout=5000,
         desktop=False,
         parent_window=True,
-    ):
+    ):  # pylint: disable=too-many-statements,too-many-locals,too-many-arguments
+        """Show message as a toaster"""
 
         if parent and parent_window:
             parent = parent.window()
@@ -164,7 +177,7 @@ class QToaster(QtWidgets.QFrame):
             # deleted as soon as the function that calls it returns, but if an
             # object is referenced to *any* other object it will not, at least
             # for PyQt (I didn't test it to a deeper level)
-            self.__self = self
+            self.__self = self  # pylint: disable=attribute-defined-outside-init,unused-private-member,protected-access
 
             current_screen = QtWidgets.QApplication.primaryScreen()
             if parent and parent.window().geometry().size().isValid():
@@ -195,24 +208,23 @@ class QToaster(QtWidgets.QFrame):
 
         self.timer.setInterval(timeout)
 
-        self.label = QtWidgets.QLabel(message)
-        self.label.setStyleSheet("color: rgb(33, 33, 33);")
+        label = QtWidgets.QLabel(message)
+        label.setStyleSheet("color: rgb(33, 33, 33);")
         font = QtGui.QFont()
-        font.setFamily("IRANYekanWeb")
         font.setPointSize(10)
         font.setWeight(100)
-        self.label.setFont(font)
-        self.layout().addWidget(self.label)
+        label.setFont(font)
+        self.layout().addWidget(label)
 
         if closable:
-            self.close_button = QtWidgets.QToolButton()
-            self.layout().addWidget(self.close_button)
+            close_button = QtWidgets.QToolButton()
+            self.layout().addWidget(close_button)
             close_icon = self.style().standardIcon(
                 QtWidgets.QStyle.SP_TitleBarCloseButton
             )
-            self.close_button.setIcon(close_icon)
-            self.close_button.setAutoRaise(True)
-            self.close_button.clicked.connect(self.close)
+            close_button.setIcon(close_icon)
+            close_button.setAutoRaise(True)
+            close_button.clicked.connect(self.close)
 
         self.timer.start()
 
@@ -246,57 +258,3 @@ class QToaster(QtWidgets.QFrame):
         self.setGeometry(geo)
         self.show()
         self.opacity_ani.start()
-
-
-class W(QtWidgets.QWidget):
-    def __init__(self):
-        QtWidgets.QWidget.__init__(self)
-        layout = QtWidgets.QVBoxLayout(self)
-
-        toaster_layout = QtWidgets.QHBoxLayout()
-        layout.addLayout(toaster_layout)
-
-        self.text_edit = QtWidgets.QLineEdit("Ciao!")
-        toaster_layout.addWidget(self.text_edit)
-
-        self.corner_combo = QtWidgets.QComboBox()
-        toaster_layout.addWidget(self.corner_combo)
-        for pos in ("TopLeft", "TopRight", "BottomRight", "BottomLeft"):
-            corner = getattr(QtCore.Qt, f"{pos}Corner")
-            self.corner_combo.addItem(pos, corner)
-
-        self.window_button = QtWidgets.QPushButton("Show window toaster")
-        toaster_layout.addWidget(self.window_button)
-        self.window_button.clicked.connect(self.show_toaster)
-
-        self.screen_button = QtWidgets.QPushButton("Show desktop toaster")
-        toaster_layout.addWidget(self.screen_button)
-        self.screen_button.clicked.connect(self.show_toaster)
-
-        # a random widget for the window
-        layout.addWidget(QtWidgets.QTableView())
-
-    def show_toaster(self):
-        if self.sender() == self.window_button:
-            parent = self
-            desktop = False
-        else:
-            parent = None
-            desktop = True
-        corner = QtCore.Qt.Corner(self.corner_combo.currentData())
-        QToaster.show_message(
-            parent,
-            self.text_edit.text(),
-            QtWidgets.QStyle.SP_MessageBoxCritical,
-            corner=corner,
-            desktop=desktop,
-            timeout=5000,
-            closable=True,
-        )
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    w = W()
-    w.show()
-    sys.exit(app.exec())

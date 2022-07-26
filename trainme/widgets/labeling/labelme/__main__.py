@@ -34,14 +34,19 @@ def main():
         "--output",
         "-O",
         "-o",
-        help="output file or directory (if it ends with .json it is "
-        "recognized as file, else as directory)",
+        help=(
+            "output file or directory (if it ends with .json it is "
+            "recognized as file, else as directory)"
+        ),
     )
     default_config_file = os.path.join(os.path.expanduser("~"), ".labelmerc")
     parser.add_argument(
         "--config",
         dest="config",
-        help=f"config file or yaml-format string (default: {default_config_file})",
+        help=(
+            "config file or yaml-format string (default:"
+            f" {default_config_file})"
+        ),
         default=default_config_file,
     )
     # config for the gui
