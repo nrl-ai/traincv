@@ -1,3 +1,5 @@
+"""This module defines "shape" data type, which can be a polygon, rectangle, circles, ..."""
+
 import copy
 import math
 
@@ -10,7 +12,7 @@ from . import utils
 
 
 DEFAULT_LINE_COLOR = QtGui.QColor(0, 255, 0, 128)  # bf hovering
-DEFAULT_FILL_COLOR = QtGui.QColor(0, 255, 0, 128)  # hovering
+DEFAULT_FILL_COLOR = QtGui.QColor(100, 100, 100, 100)  # hovering
 DEFAULT_SELECT_LINE_COLOR = QtGui.QColor(255, 255, 255)  # selected
 DEFAULT_SELECT_FILL_COLOR = QtGui.QColor(0, 255, 0, 155)  # selected
 DEFAULT_VERTEX_FILL_COLOR = QtGui.QColor(0, 255, 0, 255)  # hovering
@@ -18,6 +20,7 @@ DEFAULT_HVERTEX_FILL_COLOR = QtGui.QColor(255, 255, 255, 255)  # hovering
 
 
 class Shape:
+    """Shape data type"""
 
     # Render handles as squares
     P_SQUARE = 0
@@ -80,10 +83,12 @@ class Shape:
 
     @property
     def shape_type(self):
+        """Get shape type (polygon, rectangle, point, line, ...)"""
         return self._shape_type
 
     @shape_type.setter
     def shape_type(self, value):
+        """Set shape type"""
         if value is None:
             value = "polygon"
         if value not in [
@@ -98,40 +103,50 @@ class Shape:
         self._shape_type = value
 
     def close(self):
+        """Close the shape"""
         self._closed = True
 
     def add_point(self, point):
+        """Add a point"""
         if self.points and point == self.points[0]:
             self.close()
         else:
             self.points.append(point)
 
     def can_add_point(self):
+        """Check if shape supports more points"""
         return self.shape_type in ["polygon", "linestrip"]
 
     def pop_point(self):
+        """Remove and return the last point of the shape"""
         if self.points:
             return self.points.pop()
         return None
 
     def insert_point(self, i, point):
+        """Insert a point to a specific index"""
         self.points.insert(i, point)
 
     def remove_point(self, i):
+        """Remove point from a specific index"""
         self.points.pop(i)
 
     def is_closed(self):
+        """Check if the shape is closed"""
         return self._closed
 
     def set_open(self):
+        """Set shape to open - (_close=False)"""
         self._closed = False
 
     def get_rect_from_line(self, pt1, pt2):
+        """Get rectangle from diagonal line"""
         x1, y1 = pt1.x(), pt1.y()
         x2, y2 = pt2.x(), pt2.y()
         return QtCore.QRectF(x1, y1, x2 - x1, y2 - y1)
 
-    def paint(self, painter):
+    def paint(self, painter: QtGui.QPainter):
+        """Paint shape using QPainter"""
         if self.points:
             color = (
                 self.select_line_color if self.selected else self.line_color
@@ -188,6 +203,7 @@ class Shape:
                 painter.fillPath(line_path, color)
 
     def draw_vertex(self, path, i):
+        """Draw a vertex"""
         d = self.point_size / self.scale
         shape = self.point_type
         point = self.points[i]
@@ -206,6 +222,9 @@ class Shape:
             assert False, "unsupported vertex shape"
 
     def nearest_vertex(self, point, epsilon):
+        """Find the index of the nearest vertex to a point
+        Only consider if the distance is smaller than epsilon
+        """
         min_distance = float("inf")
         min_i = None
         for i, p in enumerate(self.points):
@@ -216,6 +235,7 @@ class Shape:
         return min_i
 
     def nearest_edge(self, point, epsilon):
+        """Get nearest edge index"""
         min_distance = float("inf")
         post_i = None
         for i in range(len(self.points)):
@@ -227,6 +247,7 @@ class Shape:
         return post_i
 
     def contains_point(self, point):
+        """Check if shape contains a point"""
         return self.make_path().contains(point)
 
     def get_circle_rect_from_line(self, line):
@@ -240,6 +261,7 @@ class Shape:
         return rectangle
 
     def make_path(self):
+        """Create a path from shape"""
         if self.shape_type == "rectangle":
             path = QtGui.QPainterPath()
             if len(self.points) == 2:
@@ -257,12 +279,15 @@ class Shape:
         return path
 
     def bounding_rect(self):
+        """Return bounding rectangle of the shape"""
         return self.make_path().boundingRect()
 
     def move_by(self, offset):
+        """Move all points by an offset"""
         self.points = [p + offset for p in self.points]
 
     def move_vertex_by(self, i, offset):
+        """Move a specific vertex by an offset"""
         self.points[i] = self.points[i] + offset
 
     def highlight_vertex(self, i, action):
@@ -281,6 +306,7 @@ class Shape:
         self._highlight_index = None
 
     def copy(self):
+        """Copy shape"""
         return copy.deepcopy(self)
 
     def __len__(self):

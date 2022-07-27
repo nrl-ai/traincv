@@ -1,9 +1,13 @@
+"""Defines toolbar for labelme, including """
+
 from PyQt5 import QtCore, QtWidgets
 
 
 class ToolBar(QtWidgets.QToolBar):
+    """Toolbar widget for labeling tool"""
+
     def __init__(self, title):
-        super(ToolBar, self).__init__(title)
+        super().__init__(title)
         layout = self.layout()
         margin = (0, 0, 0, 0)
         layout.setSpacing(0)
@@ -12,8 +16,9 @@ class ToolBar(QtWidgets.QToolBar):
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint)
 
     def add_action(self, action):
+        """Add an action (button) to the toolbar"""
         if isinstance(action, QtWidgets.QWidgetAction):
-            return super(ToolBar, self).addAction(action)
+            return super().addAction(action)
         btn = QtWidgets.QToolButton()
         btn.setDefaultAction(action)
         btn.setToolButtonStyle(self.toolButtonStyle())

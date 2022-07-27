@@ -1,3 +1,5 @@
+"""This module defines Canvas widget - the core component for drawing image labels"""
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QWheelEvent
@@ -15,6 +17,7 @@ MOVE_SPEED = 5.0
 
 
 class Canvas(QtWidgets.QWidget):
+    """Canvas widget to handle label drawing"""
 
     zoom_request = QtCore.pyqtSignal(int, QtCore.QPoint)
     scroll_request = QtCore.pyqtSignal(int, int)
@@ -83,17 +86,21 @@ class Canvas(QtWidgets.QWidget):
         self.show_cross_line = True
 
     def fill_drawing(self):
+        """Get option to fill shapes by color"""
         return self._fill_drawing
 
     def set_fill_drawing(self, value):
+        """Set shape filling option"""
         self._fill_drawing = value
 
     @property
     def create_mode(self):
+        """Create mode for canvas - Modes: polygon, rectangle, circle,..."""
         return self._create_mode
 
     @create_mode.setter
     def create_mode(self, value):
+        """Set create mode for canvas"""
         if value not in [
             "polygon",
             "rectangle",
@@ -106,6 +113,7 @@ class Canvas(QtWidgets.QWidget):
         self._create_mode = value
 
     def store_shapes(self):
+        """Store shapes for restoring later (Undo feature)"""
         shapes_backup = []
         for shape in self.shapes:
             shapes_backup.append(shape.copy())
@@ -115,6 +123,7 @@ class Canvas(QtWidgets.QWidget):
 
     @property
     def is_shape_restorable(self):
+        """Check if shape can be restored from backup"""
         # We save the state AFTER each edit (not before) so for an
         # edit to be undoable, we expect the CURRENT and the PREVIOUS state
         # to be in the undo stack.
@@ -123,6 +132,7 @@ class Canvas(QtWidgets.QWidget):
         return True
 
     def restore_shape(self):
+        """Restore/Undo a shape"""
         # This does _part_ of the job of restoring shapes.
         # The complete process is also done in app.py::undoShapeEdit
         # and app.py::load_shapes and our own Canvas::load_shapes function.
@@ -140,31 +150,39 @@ class Canvas(QtWidgets.QWidget):
         self.update()
 
     def enterEvent(self, _):
+        """Mouse enter event"""
         self.override_cursor(self._cursor)
 
     def leaveEvent(self, _):
+        """Mouse leave event"""
         self.un_highlight()
         self.restore_cursor()
 
     def focusOutEvent(self, _):
+        """Window out of focus event"""
         self.restore_cursor()
 
     def is_visible(self, shape):
+        """Check if a shape is visible"""
         return self.visible.get(shape, True)
 
     def drawing(self):
+        """Check if user is drawing (mode==CREATE)"""
         return self.mode == self.CREATE
 
     def editing(self):
+        """Check if user is editing (mode==EDIT)"""
         return self.mode == self.EDIT
 
     def set_editing(self, value=True):
+        """Set editing mode. Editing is set to False, user is drawing"""
         self.mode = self.EDIT if value else self.CREATE
         if not value:  # Create
             self.un_highlight()
             self.deselect_shape()
 
     def un_highlight(self):
+        """Unhighlight shape/vertex/edge"""
         if self.h_hape:
             self.h_hape.highlight_clear()
             self.update()
@@ -174,14 +192,16 @@ class Canvas(QtWidgets.QWidget):
         self.h_hape = self.h_vertex = self.h_edge = None
 
     def selected_vertex(self):
+        """Check if selected a vertex"""
         return self.h_vertex is not None
 
     def selected_edge(self):
+        """Check if selected an edge"""
         return self.h_edge is not None
 
     # QT Overload
     def mouseMoveEvent(self, ev):
-        """Update line with last point and current coordinates."""
+        """Update line with last point and current coordinates"""
         try:
             pos = self.transform_pos(ev.localPos())
         except AttributeError:
@@ -314,6 +334,7 @@ class Canvas(QtWidgets.QWidget):
         self.vertex_selected.emit(self.h_vertex is not None)
 
     def add_point_to_edge(self):
+        """Add a point to current shape"""
         shape = self.prev_h_shape
         index = self.prev_h_edge
         point = self.prev_move_point
@@ -327,6 +348,7 @@ class Canvas(QtWidgets.QWidget):
         self.moving_shape = True
 
     def remove_selected_point(self):
+        """Remove a point from current shape"""
         shape = self.prev_h_shape
         index = self.prev_h_vertex
         if shape is None or index is None:
@@ -339,6 +361,7 @@ class Canvas(QtWidgets.QWidget):
 
     # QT Overload
     def mousePressEvent(self, ev):
+        """Mouse press event"""
         pos = self.transform_pos(ev.localPos())
         if ev.button() == QtCore.Qt.LeftButton:
             if self.drawing():
@@ -401,6 +424,7 @@ class Canvas(QtWidgets.QWidget):
 
     # QT Overload
     def mouseReleaseEvent(self, ev):
+        """Mouse release event"""
         if ev.button() == QtCore.Qt.RightButton:
             menu = self.menus[len(self.selected_shapes_copy) > 0]
             self.restore_cursor()
@@ -434,6 +458,7 @@ class Canvas(QtWidgets.QWidget):
             self.moving_shape = False
 
     def end_move(self, copy):
+        """End of move"""
         assert self.selected_shapes and self.selected_shapes_copy
         assert len(self.selected_shapes_copy) == len(self.selected_shapes)
         if copy:

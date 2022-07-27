@@ -1,3 +1,5 @@
+"""This module defines the main application window"""
+
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (QHBoxLayout, QLabel, QMainWindow, QStatusBar,
                              QVBoxLayout, QWidget)
@@ -6,6 +8,8 @@ from .maintabs import MainTabsWidget
 
 
 class MainWindow(QMainWindow):
+    """Main application window"""
+
     def __init__(self, app):
         super().__init__()
         self.app = app
