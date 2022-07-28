@@ -10,6 +10,10 @@ from ..logger import logger
 
 
 class LabelQLineEdit(QtWidgets.QLineEdit):
+    def __init__(self) -> None:
+        super().__init__()
+        self.list_widget = None
+
     def set_list_widget(self, list_widget):
         self.list_widget = list_widget
 

@@ -111,7 +111,7 @@ class LabelListWidget(QtWidgets.QListView):
     item_selection_changed = QtCore.pyqtSignal(list, list)
 
     def __init__(self):
-        super(LabelListWidget, self).__init__()
+        super().__init__()
         self._selected_items = []
 
         self.setWindowFlags(Qt.Window)

@@ -16,7 +16,9 @@ CURSOR_GRAB = QtCore.Qt.OpenHandCursor
 MOVE_SPEED = 5.0
 
 
-class Canvas(QtWidgets.QWidget):
+class Canvas(
+    QtWidgets.QWidget
+):  # pylint: disable=too-many-public-methods, too-many-instance-attributes
     """Canvas widget to handle label drawing"""
 
     zoom_request = QtCore.pyqtSignal(int, QtCore.QPoint)
@@ -43,7 +45,7 @@ class Canvas(QtWidgets.QWidget):
                 f"Unexpected value for double_click event: {self.double_click}"
             )
         self.num_backups = kwargs.pop("num_backups", 10)
-        super(Canvas, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Initialise local state.
         self.mode = self.EDIT
         self.shapes = []
@@ -475,6 +477,7 @@ class Canvas(QtWidgets.QWidget):
         return True
 
     def hide_background_shapes(self, value):
+        """Set hide background - hide other shapes when some shapes are selected"""
         self.hide_backround = value
         if self.selected_shapes:
             # Only hide other shapes if there is a current selection.
@@ -483,13 +486,16 @@ class Canvas(QtWidgets.QWidget):
             self.update()
 
     def set_hiding(self, enable=True):
+        """Set background hiding"""
         self._hide_backround = self.hide_backround if enable else False
 
     def can_close_shape(self):
+        """Check if a shape can be closed (number of points > 2)"""
         return self.drawing() and self.current and len(self.current) > 2
 
     # QT Overload
     def mouseDoubleClickEvent(self, _):
+        """Mouse double click event"""
         # We need at least 4 points here, since the mousePress handler
         # adds an extra one before this handler is called.
         if (
@@ -501,6 +507,7 @@ class Canvas(QtWidgets.QWidget):
             self.finalise()
 
     def select_shapes(self, shapes):
+        """Select some shapes"""
         self.set_hiding()
         self.selection_changed.emit(shapes)
         self.update()
@@ -529,6 +536,7 @@ class Canvas(QtWidgets.QWidget):
         self.deselect_shape()
 
     def calculate_offsets(self, point):
+        """Calculate offsets of a point to pixmap borders"""
         left = self.pixmap.width() - 1
         right = 0
         top = self.pixmap.height() - 1
@@ -551,6 +559,7 @@ class Canvas(QtWidgets.QWidget):
         self.offsets = QtCore.QPoint(x1, y1), QtCore.QPoint(x2, y2)
 
     def bounded_move_vertex(self, pos):
+        """Move a vertex. Adjust position to be bounded by pixmap border"""
         index, shape = self.h_vertex, self.h_hape
         point = shape[index]
         if self.out_off_pixmap(pos):
@@ -558,6 +567,7 @@ class Canvas(QtWidgets.QWidget):
         shape.move_vertex_by(index, pos - point)
 
     def bounded_move_shapes(self, shapes, pos):
+        """Move shapes. Adjust position to be bounded by pixmap border"""
         if self.out_off_pixmap(pos):
             return False  # No need to move
         o1 = pos + self.offsets[0]
@@ -583,6 +593,7 @@ class Canvas(QtWidgets.QWidget):
         return False
 
     def deselect_shape(self):
+        """Deselect all shapes"""
         if self.selected_shapes:
             self.set_hiding(False)
             self.selection_changed.emit([])
@@ -590,6 +601,7 @@ class Canvas(QtWidgets.QWidget):
             self.update()
 
     def delete_selected(self):
+        """Remove selected shapes"""
         deleted_shapes = []
         if self.selected_shapes:
             for shape in self.selected_shapes:
@@ -601,6 +613,7 @@ class Canvas(QtWidgets.QWidget):
         return deleted_shapes
 
     def delete_shape(self, shape):
+        """Remove a specific shape"""
         if shape in self.selected_shapes:
             self.selected_shapes.remove(shape)
         if shape in self.shapes:
@@ -609,6 +622,7 @@ class Canvas(QtWidgets.QWidget):
         self.update()
 
     def duplicate_selected_shapes(self):
+        """Duplicate selected shapes"""
         if self.selected_shapes:
             self.selected_shapes_copy = [
                 s.copy() for s in self.selected_shapes
@@ -618,6 +632,7 @@ class Canvas(QtWidgets.QWidget):
         return self.selected_shapes
 
     def bounded_shift_shapes(self, shapes):
+        """Shift shapes by an offset. Adjust positions to be bounded by pixmap borders"""
         # Try to move in one direction, and if it fails in another.
         # Give up if both fail.
         point = shapes[0][0]
@@ -629,12 +644,13 @@ class Canvas(QtWidgets.QWidget):
 
     # QT Overload
     def paintEvent(self, event):
+        """Paint event for canvas"""
         if (
             self.pixmap is None
             or self.pixmap.width() == 0
             or self.pixmap.height() == 0
         ):
-            super(Canvas, self).paintEvent(event)
+            super().paintEvent(event)
             return
 
         p = self._painter
@@ -673,22 +689,18 @@ class Canvas(QtWidgets.QWidget):
 
         # Draw mouse coordinates
         if self.show_cross_line:
-            pen = QtGui.QPen(QtGui.QColor("#000000"), 2, Qt.SolidLine)
+            pen = QtGui.QPen(QtGui.QColor("#000000"), 1, Qt.SolidLine)
             p.setPen(pen)
             p.setOpacity(1.0)
             p.drawLine(
-                QtCore.QPoint(self.prev_move_point.x() - 1, 0),
-                QtCore.QPoint(
-                    self.prev_move_point.x() - 1, self.pixmap.height()
-                ),
+                QtCore.QPoint(self.prev_move_point.x(), 0),
+                QtCore.QPoint(self.prev_move_point.x(), self.pixmap.height()),
             )
             p.drawLine(
-                QtCore.QPoint(0, self.prev_move_point.y() - 1),
-                QtCore.QPoint(
-                    self.pixmap.width(), self.prev_move_point.y() - 1
-                ),
+                QtCore.QPoint(0, self.prev_move_point.y()),
+                QtCore.QPoint(self.pixmap.width(), self.prev_move_point.y()),
             )
-            pen = QtGui.QPen(QtGui.QColor("#FFFFFF"), 2, Qt.SolidLine)
+            pen = QtGui.QPen(QtGui.QColor("#FFFFFF"), 1, Qt.SolidLine)
             p.setPen(pen)
             p.setOpacity(1.0)
             p.drawLine(
@@ -711,10 +723,11 @@ class Canvas(QtWidgets.QWidget):
         return point / self.scale - self.offset_to_center()
 
     def offset_to_center(self):
+        """Calculate offset to the center"""
         if self.pixmap is None:
             return QtCore.QPoint()
         s = self.scale
-        area = super(Canvas, self).size()
+        area = super().size()
         w, h = self.pixmap.width() * s, self.pixmap.height() * s
         area_width, area_height = area.width(), area.height()
         x = (area_width - w) / (2 * s) if area_width > w else 0
@@ -722,12 +735,14 @@ class Canvas(QtWidgets.QWidget):
         return QtCore.QPoint(x, y)
 
     def out_off_pixmap(self, p):
+        """Check if a position is out of pixmap"""
         if self.pixmap is None:
             return True
         w, h = self.pixmap.width(), self.pixmap.height()
         return not (0 <= p.x() <= w - 1 and 0 <= p.y() <= h - 1)
 
     def finalise(self):
+        """Finish drawing for a shape"""
         assert self.current
         self.current.close()
         self.shapes.append(self.current)
@@ -738,6 +753,7 @@ class Canvas(QtWidgets.QWidget):
         self.update()
 
     def close_enough(self, p1, p2):
+        """Check if 2 points are close enough (by an threshold epsilon)"""
         # d = distance(p1 - p2)
         # m = (p1-p2).manhattanLength()
         # print "d %.2f, m %d, %.2f" % (d, m, d - m)
@@ -745,9 +761,9 @@ class Canvas(QtWidgets.QWidget):
         return utils.distance(p1 - p2) < (self.epsilon / self.scale)
 
     def intersection_point(self, p1, p2):
-        # Cycle through each image edge in clockwise fashion,
-        # and find the one intersecting the current line segment.
-        # http://paulbourke.net/geometry/lineline2d/
+        """Cycle through each image edge in clockwise fashion,
+        and find the one intersecting the current line segment.
+        """
         size = self.pixmap.size()
         points = [
             (0, 0),
@@ -803,16 +819,19 @@ class Canvas(QtWidgets.QWidget):
     # scroll area.
     # QT Overload
     def sizeHint(self):
+        """Get size hint"""
         return self.minimumSizeHint()
 
     # QT Overload
     def minimumSizeHint(self):
+        """Get minimum size hint"""
         if self.pixmap:
             return self.scale * self.pixmap.size()
-        return super(Canvas, self).minimumSizeHint()
+        return super().minimumSizeHint()
 
     # QT Overload
     def wheelEvent(self, ev: QWheelEvent):
+        """Mouse wheel event"""
         mods = ev.modifiers()
         delta = ev.angleDelta()
         if QtCore.Qt.ControlModifier == int(mods):
@@ -826,6 +845,7 @@ class Canvas(QtWidgets.QWidget):
         ev.accept()
 
     def move_by_keyboard(self, offset):
+        """Move selected shapes by an offset (using keyboard)"""
         if self.selected_shapes:
             self.bounded_move_shapes(
                 self.selected_shapes, self.prev_point + offset
@@ -835,6 +855,7 @@ class Canvas(QtWidgets.QWidget):
 
     # QT Overload
     def keyPressEvent(self, ev):
+        """Key press event"""
         modifiers = ev.modifiers()
         key = ev.key()
         if self.drawing():
@@ -858,6 +879,7 @@ class Canvas(QtWidgets.QWidget):
 
     # QT Overload
     def keyReleaseEvent(self, ev):
+        """Key release event"""
         modifiers = ev.modifiers()
         if self.drawing():
             if int(modifiers) == 0:
@@ -875,6 +897,7 @@ class Canvas(QtWidgets.QWidget):
                 self.moving_shape = False
 
     def set_last_label(self, text, flags):
+        """Set label and flags for last shape"""
         assert text
         self.shapes[-1].label = text
         self.shapes[-1].flags = flags
@@ -883,6 +906,7 @@ class Canvas(QtWidgets.QWidget):
         return self.shapes[-1]
 
     def undo_last_line(self):
+        """Undo last line"""
         assert self.shapes
         self.current = self.shapes.pop()
         self.current.set_open()
@@ -895,6 +919,7 @@ class Canvas(QtWidgets.QWidget):
         self.drawing_polygon.emit(True)
 
     def undo_last_point(self):
+        """Undo last point"""
         if not self.current or self.current.is_closed():
             return
         self.current.pop_point()
@@ -906,12 +931,14 @@ class Canvas(QtWidgets.QWidget):
         self.update()
 
     def load_pixmap(self, pixmap, clear_shapes=True):
+        """Load pixmap"""
         self.pixmap = pixmap
         if clear_shapes:
             self.shapes = []
         self.update()
 
     def load_shapes(self, shapes, replace=True):
+        """Load shapes"""
         if replace:
             self.shapes = list(shapes)
         else:
@@ -924,22 +951,27 @@ class Canvas(QtWidgets.QWidget):
         self.update()
 
     def set_shape_visible(self, shape, value):
+        """Set visibility for a shape"""
         self.visible[shape] = value
         self.update()
 
     def override_cursor(self, cursor):
+        """Override cursor"""
         self.restore_cursor()
         self._cursor = cursor
         QtWidgets.QApplication.setOverrideCursor(cursor)
 
     def restore_cursor(self):
+        """Restore override cursor"""
         QtWidgets.QApplication.restoreOverrideCursor()
 
     def reset_state(self):
+        """Clear shapes and pixmap"""
         self.restore_cursor()
         self.pixmap = None
         self.shapes_backups = []
         self.update()
 
     def set_show_cross_line(self, enabled):
+        """Set show cross line or not"""
         self.show_cross_line = enabled

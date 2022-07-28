@@ -1,8 +1,6 @@
 import os
 import sys
 
-sys.setrecursionlimit(10000)
-
 import pyqtgraph as pg
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QApplication

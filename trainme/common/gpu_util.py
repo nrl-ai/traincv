@@ -451,17 +451,17 @@ def show_utilization(show_all=False, attr_list=None, use_old_code=False):
 
                     attr_precision = (
                         "." + str(attr_dict["precision"])
-                        if ("precision" in attr_dict.keys())
+                        if ("precision" in attr_dict)
                         else ""
                     )
                     attr_suffix = (
                         str(attr_dict["suffix"])
-                        if ("suffix" in attr_dict.keys())
+                        if ("suffix" in attr_dict)
                         else ""
                     )
                     attr_transform = (
                         attr_dict["transform"]
-                        if ("transform" in attr_dict.keys())
+                        if ("transform" in attr_dict)
                         else lambda x: x
                     )
                     for gpu in gp_us:
@@ -474,7 +474,7 @@ def show_utilization(show_all=False, attr_list=None, use_old_code=False):
                                 attr
                             )
                         elif isinstance(attr, int):
-                            attr_str = ("{0:d}").format(attr)
+                            attr_str = (f"{attr:d}")
                         elif isinstance(attr, str):
                             attr_str = attr
                         else:

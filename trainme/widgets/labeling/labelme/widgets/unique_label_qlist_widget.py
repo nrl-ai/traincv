@@ -12,7 +12,7 @@ class UniqueLabelQListWidget(EscapableQListWidget):
 
     # QT Overload
     def mousePressEvent(self, event):
-        super(UniqueLabelQListWidget, self).mousePressEvent(event)
+        super().mousePressEvent(event)
         if not self.indexAt(event.pos()).isValid():
             self.clearSelection()
 

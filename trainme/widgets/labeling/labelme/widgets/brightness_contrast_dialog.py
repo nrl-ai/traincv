@@ -1,3 +1,5 @@
+"""This module defines brightness/contrast dialog"""
+
 import PIL.Image
 import PIL.ImageEnhance
 from PyQt5 import QtGui, QtWidgets
@@ -7,6 +9,8 @@ from .. import utils
 
 
 class BrightnessContrastDialog(QtWidgets.QDialog):
+    """Dialog for adjusting brightness and contrast of current image"""
+
     def __init__(self, img, callback, parent=None):
         super(BrightnessContrastDialog, self).__init__(parent)
         self.setModal(True)
@@ -25,6 +29,7 @@ class BrightnessContrastDialog(QtWidgets.QDialog):
         self.callback = callback
 
     def on_new_value(self, value):
+        """On new value event"""
         brightness = self.slider_brightness.value() / 50.0
         contrast = self.slider_contrast.value() / 50.0
 
@@ -37,6 +42,7 @@ class BrightnessContrastDialog(QtWidgets.QDialog):
         self.callback(qimage)
 
     def _create_slider(self):
+        """Create brightness/contrast slider"""
         slider = QtWidgets.QSlider(Qt.Horizontal)
         slider.setRange(0, 150)
         slider.setValue(50)

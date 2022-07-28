@@ -57,8 +57,5 @@ class TrainingTab(QWidget):
         train_config["learning_rate"] = self.learning_rate_spin.value()
         # TODO (vietanhdev): Start training here
 
-    def set_output_folder(self, output_folder):
-        self.output_folder = output_folder
-
     def on_close(self):
         return True

@@ -13,7 +13,7 @@ PIL.Image.MAX_IMAGE_PIXELS = None
 
 
 @contextlib.contextmanager
-def open(name, mode):
+def io_open(name, mode):
     assert mode in ["r", "w"]
     encoding = "utf-8"
     yield io.open(name, mode, encoding=encoding)
@@ -74,7 +74,7 @@ class LabelFile:
             "flags",
         ]
         try:
-            with open(filename, "r") as f:
+            with io_open(filename, "r") as f:
                 data = json.load(f)
             version = data.get("version")
             if version is None:
@@ -196,7 +196,7 @@ class LabelFile:
             assert key not in data
             data[key] = value
         try:
-            with open(filename, "w") as f:
+            with io_open(filename, "w") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
             self.filename = filename
         except Exception as e:

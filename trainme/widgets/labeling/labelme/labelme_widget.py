@@ -1,3 +1,5 @@
+"""This module defines labelme widget, where all labeling happens"""
+
 import functools
 import html
 import math
@@ -33,6 +35,7 @@ LABEL_COLORMAP[1] = [0, 180, 33]
 
 
 class LabelmeWidget(LabelDialog):
+    """Labelme widget"""
 
     FIT_WINDOW, FIT_WIDTH, MANUAL_ZOOM = 0, 1, 2
 
