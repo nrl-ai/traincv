@@ -49,6 +49,7 @@ class LabelFile:
         with io.BytesIO() as f:
             ext = osp.splitext(filename)[1].lower()
             if ext in [".jpg", ".jpeg"]:
+                image_pil = image_pil.convert('RGB')
                 img_format = "JPEG"
             else:
                 img_format = "PNG"
