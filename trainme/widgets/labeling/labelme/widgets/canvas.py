@@ -693,19 +693,22 @@ class Canvas(
                     max_x = max(max_x, rect.x() + rect.width())
                     max_y = max(max_y, rect.y() + rect.height())
                     group_color = LABEL_COLORMAP[int(group_id) % len(LABEL_COLORMAP)]
-                    pen.setWidth(6)
+                    pen.setStyle(Qt.SolidLine)
+                    pen.setWidth(max(1, int(round(4.0 / Shape.scale))))
                     pen.setColor(QtGui.QColor(*group_color))
                     p.setPen(pen)
                     cx = rect.x() + rect.width() / 2
                     cy = rect.y() + rect.height() / 2
-                    p.drawRect(QtCore.QRectF(
-                        cx - 3,
-                        cy - 3,
-                        6,
-                        6
+                    circle_radius = max(1, int(round(3.0 / Shape.scale)))
+                    p.drawEllipse(QtCore.QRectF(
+                        cx - circle_radius,
+                        cy - circle_radius,
+                        2 * circle_radius,
+                        2 * circle_radius,
                     ))
-                pen.setWidth(2)
-                pen.setColor(QtGui.QColor("#AAAAAA"))
+                pen.setStyle(Qt.DashLine)
+                pen.setWidth(max(1, int(round(1.0 / Shape.scale))))
+                pen.setColor(QtGui.QColor("#EEEEEE"))
                 p.setPen(pen)
                 wrap_rect = QtCore.QRectF(min_x, min_y, max_x - min_x, max_y - min_y)
                 p.drawRect(
@@ -738,7 +741,7 @@ class Canvas(
 
         # Draw mouse coordinates
         if self.show_cross_line:
-            pen = QtGui.QPen(QtGui.QColor("#00FF00"), 2, Qt.DashLine)
+            pen = QtGui.QPen(QtGui.QColor("#00FF00"), max(1, int(round(2.0 / Shape.scale))), Qt.DashLine)
             p.setPen(pen)
             p.setOpacity(0.5)
             p.drawLine(
@@ -1018,7 +1021,7 @@ class Canvas(
 
     def gen_new_group_id(self):
         """Generate new shape's group_id based on current shapes"""
-        max_group_id = -1
+        max_group_id = 0
         for shape in self.shapes:
             if shape.group_id is not None:
                 max_group_id = max(max_group_id, shape.group_id)
@@ -1055,9 +1058,10 @@ class Canvas(
         # Merge group ids
         if len(group_ids) > 1:
             self.merge_group_ids(group_ids=group_ids, new_group_id=new_group_id)
-
         # Assign new_group_id to non-group shapes
         if has_non_group_shape:
             for shape in self.selected_shapes:
                 if shape.group_id is None:
                     shape.group_id = new_group_id
+
+        self.update()

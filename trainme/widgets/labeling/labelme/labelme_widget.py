@@ -367,10 +367,10 @@ class LabelmeWidget(LabelDialog):
             enabled=False,
         )
         group_selected_shapes = action(
-            self.tr("Group shapes"),
+            self.tr("Group Selected Shapes"),
             self.canvas.group_selected_shapes,
             shortcuts["group_selected_shapes"],
-            "edit",
+            None,
             self.tr("Group shapes by assigning a same group_id"),
             enabled=True,
         )
@@ -716,7 +716,7 @@ class LabelmeWidget(LabelDialog):
             view=self.menu(self.tr("&View")),
             help=self.menu(self.tr("&Help")),
             recent_files=QtWidgets.QMenu(self.tr("Open &Recent")),
-            labelList=label_menu,
+            label_list=label_menu,
         )
 
         utils.add_actions(
@@ -762,6 +762,7 @@ class LabelmeWidget(LabelDialog):
                 brightness_contrast,
                 show_cross_line,
                 show_groups,
+                group_selected_shapes,
             ),
         )
 
@@ -1138,7 +1139,7 @@ class LabelmeWidget(LabelDialog):
             menu.addAction(action)
 
     def pop_label_list_menu(self, point):
-        self.menus.labelList.exec_(self.label_list.mapToGlobal(point))
+        self.menus.label_list.exec_(self.label_list.mapToGlobal(point))
 
     def validate_label(self, label):
         # no validation
