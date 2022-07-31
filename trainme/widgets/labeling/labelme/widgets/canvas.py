@@ -689,9 +689,9 @@ class Canvas(
 
         # Draw mouse coordinates
         if self.show_cross_line:
-            pen = QtGui.QPen(QtGui.QColor("#000000"), 1, Qt.SolidLine)
+            pen = QtGui.QPen(QtGui.QColor("#0000FF"), 1, Qt.DashLine)
             p.setPen(pen)
-            p.setOpacity(1.0)
+            p.setOpacity(0.5)
             p.drawLine(
                 QtCore.QPoint(self.prev_move_point.x(), 0),
                 QtCore.QPoint(self.prev_move_point.x(), self.pixmap.height()),
@@ -699,21 +699,6 @@ class Canvas(
             p.drawLine(
                 QtCore.QPoint(0, self.prev_move_point.y()),
                 QtCore.QPoint(self.pixmap.width(), self.prev_move_point.y()),
-            )
-            pen = QtGui.QPen(QtGui.QColor("#FFFFFF"), 1, Qt.SolidLine)
-            p.setPen(pen)
-            p.setOpacity(1.0)
-            p.drawLine(
-                QtCore.QPoint(self.prev_move_point.x() + 1, 0),
-                QtCore.QPoint(
-                    self.prev_move_point.x() + 1, self.pixmap.height()
-                ),
-            )
-            p.drawLine(
-                QtCore.QPoint(0, self.prev_move_point.y() + 1),
-                QtCore.QPoint(
-                    self.pixmap.width(), self.prev_move_point.y() + 1
-                ),
             )
 
         p.end()
