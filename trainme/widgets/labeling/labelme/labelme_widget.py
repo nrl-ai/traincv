@@ -13,7 +13,7 @@ import natsort
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QDockWidget, QHBoxLayout, QLabel, QMessageBox,
-                             QVBoxLayout, QWhatsThis)
+                             QVBoxLayout, QWhatsThis, QPlainTextEdit)
 
 from trainme.inference_services.yolov5 import YOLOv5Predictor
 
@@ -60,7 +60,7 @@ class LabelmeWidget(LabelDialog):
         self.image_path = None
         self.image_data = None
         self.label_file = None
-        self.other_data = None
+        self.other_data = {}
 
         # Tracker
         self.tracker = Tracker()
@@ -832,6 +832,10 @@ class LabelmeWidget(LabelDialog):
 
         right_sidebar_layout = QVBoxLayout()
         right_sidebar_layout.setContentsMargins(0, 0, 0, 0)
+        self.shape_text_label = QLabel("Shape Text")
+        self.shape_text_edit = QPlainTextEdit()
+        right_sidebar_layout.addWidget(self.shape_text_label)
+        right_sidebar_layout.addWidget(self.shape_text_edit)
         right_sidebar_layout.addWidget(self.flag_dock)
         right_sidebar_layout.addWidget(self.label_dock)
         right_sidebar_layout.addWidget(self.shape_dock)
@@ -856,6 +860,8 @@ class LabelmeWidget(LabelDialog):
             self.shape_dock.features() & rev_dock_features
         )
 
+        self.shape_text_edit.textChanged.connect(self.shape_text_changed)
+
         layout.addItem(right_sidebar_layout)
         self.setLayout(layout)
 
@@ -873,7 +879,7 @@ class LabelmeWidget(LabelDialog):
         self.image_path = None
         self.recent_files = []
         self.max_recent = 7
-        self.other_data = None
+        self.other_data = {}
         self.zoom_level = 100
         self.fit_window = False
         self.zoom_values = {}  # key=filename, value=(zoom_mode, zoom_value)
@@ -1023,7 +1029,7 @@ class LabelmeWidget(LabelDialog):
         self.image_path = None
         self.image_data = None
         self.label_file = None
-        self.other_data = None
+        self.other_data = {}
         self.canvas.reset_state()
 
     def current_item(self):
@@ -1240,6 +1246,12 @@ class LabelmeWidget(LabelDialog):
         self.actions.duplicate.setEnabled(n_selected)
         self.actions.copy.setEnabled(n_selected)
         self.actions.edit.setEnabled(n_selected == 1)
+        if len(selected_shapes) == 1:
+            self.shape_text_label.setText("Shape Text")
+            self.shape_text_edit.setPlainText(selected_shapes[0].text)
+        else:
+            self.shape_text_label.setText("Image Text")
+            self.shape_text_edit.setPlainText(self.other_data.get("image_text", ""))
 
     def add_label(self, shape):
         if shape.group_id is None:
@@ -1263,6 +1275,15 @@ class LabelmeWidget(LabelDialog):
                 html.escape(text), *shape.fill_color.getRgb()[:3]
             )
         )
+
+    def shape_text_changed(self):
+        if len(self.canvas.selected_shapes) != 1:
+            self.other_data["image_text"] = self.shape_text_edit.toPlainText()
+            self.set_dirty()
+            return
+        shape = self.canvas.selected_shapes[0]
+        shape.text = self.shape_text_edit.toPlainText()
+        self.set_dirty()
 
     def _update_shape_color(self, shape):
         r, g, b = self._get_rgb_by_label(shape.label)
@@ -1306,6 +1327,7 @@ class LabelmeWidget(LabelDialog):
         s = []
         for shape in shapes:
             label = shape["label"]
+            text = shape.get("text", "")
             points = shape["points"]
             shape_type = shape["shape_type"]
             flags = shape["flags"]
@@ -1318,6 +1340,7 @@ class LabelmeWidget(LabelDialog):
 
             shape = Shape(
                 label=label,
+                text=text,
                 shape_type=shape_type,
                 group_id=group_id,
             )
@@ -1354,6 +1377,7 @@ class LabelmeWidget(LabelDialog):
             data.update(
                 dict(
                     label=s.label,
+                    text=s.text,
                     points=[(p.x(), p.y()) for p in s.points],
                     group_id=s.group_id,
                     shape_type=s.shape_type,
@@ -1639,6 +1663,9 @@ class LabelmeWidget(LabelDialog):
                 self.label_file.image_path,
             )
             self.other_data = self.label_file.other_data
+            self.shape_text_edit.textChanged.disconnect()
+            self.shape_text_edit.setPlainText(self.other_data.get("image_text", ""))
+            self.shape_text_edit.textChanged.connect(self.shape_text_changed)
         else:
             self.image_data = LabelFile.load_image_file(filename)
             if self.image_data:

@@ -68,6 +68,7 @@ class LabelFile:
         ]
         shape_keys = [
             "label",
+            "text",
             "points",
             "group_id",
             "shape_type",
@@ -93,17 +94,6 @@ class LabelFile:
                     __version__,
                 )
 
-            # Upgrade old data format
-            if "image_data" in data:
-                data["imageData"] = data["image_data"]
-                data["imagePath"] = data["image_path"]
-                data["imageHeight"] = data["image_height"]
-                data["imageWidth"] = data["image_width"]
-                del data["image_data"]
-                del data["image_path"]
-                del data["image_height"]
-                del data["image_width"]
-
             if data["imageData"] is not None:
                 image_data = base64.b64decode(data["imageData"])
             else:
@@ -120,6 +110,7 @@ class LabelFile:
             shapes = [
                 dict(
                     label=s["label"],
+                    text=s["text"],
                     points=s["points"],
                     shape_type=s.get("shape_type", "polygon"),
                     flags=s.get("flags", {}),
@@ -165,11 +156,11 @@ class LabelFile:
 
     def save(
         self,
-        filename,
-        shapes,
-        image_path,
-        image_height,
-        image_width,
+        filename=None,
+        shapes=None,
+        image_path=None,
+        image_height=None,
+        image_width=None,
         image_data=None,
         other_data=None,
         flags=None,
