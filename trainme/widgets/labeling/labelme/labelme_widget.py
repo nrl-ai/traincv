@@ -366,6 +366,15 @@ class LabelmeWidget(LabelDialog):
             self.tr("Move and edit the selected polygons"),
             enabled=False,
         )
+        group_selected_shapes = action(
+            self.tr("Group shapes"),
+            self.canvas.group_selected_shapes,
+            shortcuts["group_selected_shapes"],
+            "edit",
+            self.tr("Group shapes by assigning a same group_id"),
+            enabled=True,
+        )
+
 
         delete = action(
             self.tr("Delete"),
@@ -531,6 +540,15 @@ class LabelmeWidget(LabelDialog):
             checked=self._config["show_cross_line"],
             enabled=True,
         )
+        show_groups = action(
+            self.tr("&Show Groups"),
+            self.enable_show_groups,
+            tip=self.tr("Show shape groups"),
+            icon=None,
+            checkable=True,
+            checked=self._config["show_groups"],
+            enabled=True,
+        )
 
         # Group zoom controls into a list for easier toggling.
         zoom_actions = (
@@ -636,6 +654,7 @@ class LabelmeWidget(LabelDialog):
             fit_width=fit_width,
             brightness_contrast=brightness_contrast,
             show_cross_line=show_cross_line,
+            show_groups=show_groups,
             zoom_actions=zoom_actions,
             open_next_image=open_next_image,
             open_prev_image=open_prev_image,
@@ -684,6 +703,7 @@ class LabelmeWidget(LabelDialog):
                 brightness_contrast,
             ),
             on_shapes_present=(save_as, hide_all, show_all),
+            group_selected_shapes=group_selected_shapes,
         )
 
         self.canvas.vertex_selected.connect(
@@ -741,6 +761,7 @@ class LabelmeWidget(LabelDialog):
                 None,
                 brightness_contrast,
                 show_cross_line,
+                show_groups,
             ),
         )
 
@@ -1524,6 +1545,11 @@ class LabelmeWidget(LabelDialog):
         self._config["show_cross_line"] = enabled
         self.actions.show_cross_line.setChecked(enabled)
         self.canvas.set_show_cross_line(enabled)
+
+    def enable_show_groups(self, enabled):
+        self._config["show_groups"] = enabled
+        self.actions.show_groups.setChecked(enabled)
+        self.canvas.set_show_groups(enabled)
 
     def on_new_brightness_contrast(self, qimage):
         self.canvas.load_pixmap(

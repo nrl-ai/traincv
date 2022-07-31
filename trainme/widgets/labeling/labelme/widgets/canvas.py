@@ -1,4 +1,5 @@
 """This module defines Canvas widget - the core component for drawing image labels"""
+import imgviz
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
@@ -14,6 +15,8 @@ CURSOR_MOVE = QtCore.Qt.ClosedHandCursor
 CURSOR_GRAB = QtCore.Qt.OpenHandCursor
 
 MOVE_SPEED = 5.0
+
+LABEL_COLORMAP = imgviz.label_colormap()
 
 
 class Canvas(
@@ -86,6 +89,7 @@ class Canvas(
         self.setMouseTracking(True)
         self.setFocusPolicy(QtCore.Qt.WheelFocus)
         self.show_cross_line = True
+        self.show_shape_groups = True
 
     def fill_drawing(self):
         """Get option to fill shapes by color"""
@@ -663,6 +667,51 @@ class Canvas(
 
         p.drawPixmap(0, 0, self.pixmap)
         Shape.scale = self.scale
+
+        # Draw groups
+        if self.show_shape_groups:
+            pen = QtGui.QPen(QtGui.QColor("#AAAAAA"), 2, Qt.SolidLine)
+            p.setPen(pen)
+            grouped_shapes = {}
+            for shape in self.shapes:
+                if shape.group_id is None:
+                    continue
+                if shape.group_id not in grouped_shapes:
+                    grouped_shapes[shape.group_id] = []
+                grouped_shapes[shape.group_id].append(shape)
+
+            for group_id in grouped_shapes:
+                shapes = grouped_shapes[group_id]
+                min_x = float('inf')
+                min_y = float('inf')
+                max_x = 0
+                max_y = 0
+                for shape in shapes:
+                    rect = shape.bounding_rect()
+                    min_x = min(min_x, rect.x())
+                    min_y = min(min_y, rect.y())
+                    max_x = max(max_x, rect.x() + rect.width())
+                    max_y = max(max_y, rect.y() + rect.height())
+                    group_color = LABEL_COLORMAP[int(group_id) % len(LABEL_COLORMAP)]
+                    pen.setWidth(6)
+                    pen.setColor(QtGui.QColor(*group_color))
+                    p.setPen(pen)
+                    cx = rect.x() + rect.width() / 2
+                    cy = rect.y() + rect.height() / 2
+                    p.drawRect(QtCore.QRectF(
+                        cx - 3,
+                        cy - 3,
+                        6,
+                        6
+                    ))
+                pen.setWidth(2)
+                pen.setColor(QtGui.QColor("#AAAAAA"))
+                p.setPen(pen)
+                wrap_rect = QtCore.QRectF(min_x, min_y, max_x - min_x, max_y - min_y)
+                p.drawRect(
+                    wrap_rect
+                )
+
         for shape in self.shapes:
             if (
                 shape.selected or not self._hide_backround
@@ -689,7 +738,7 @@ class Canvas(
 
         # Draw mouse coordinates
         if self.show_cross_line:
-            pen = QtGui.QPen(QtGui.QColor("#0000FF"), 1, Qt.DashLine)
+            pen = QtGui.QPen(QtGui.QColor("#00FF00"), 2, Qt.DashLine)
             p.setPen(pen)
             p.setOpacity(0.5)
             p.drawLine(
@@ -958,5 +1007,57 @@ class Canvas(
         self.update()
 
     def set_show_cross_line(self, enabled):
-        """Set show cross line or not"""
+        """Set cross line visibility"""
         self.show_cross_line = enabled
+        self.update()
+
+    def set_show_groups(self, enabled):
+        """Set showing shape groups"""
+        self.show_shape_groups = enabled
+        self.update()
+
+    def gen_new_group_id(self):
+        """Generate new shape's group_id based on current shapes"""
+        max_group_id = -1
+        for shape in self.shapes:
+            if shape.group_id is not None:
+                max_group_id = max(max_group_id, shape.group_id)
+        return max_group_id + 1
+
+    def merge_group_ids(self, group_ids, new_group_id):
+        """Merge multiple shapes' group_id into a new one"""
+        for shape in self.shapes:
+            if shape.group_id in group_ids:
+                shape.group_id = new_group_id
+
+    def group_selected_shapes(self):
+        """Group selected shapes"""
+        if len(self.selected_shapes) == 0:
+            return
+
+        # List all group ids for selected shapes
+        group_ids = []
+        has_non_group_shape = False
+        for shape in self.selected_shapes:
+            if shape.group_id is not None:
+                group_ids.append(shape.group_id)
+            else:
+                has_non_group_shape = True
+
+        # If there is at least 1 shape having a group id,
+        # use that id as the new group id. Otherwise, generate a new group_id
+        new_group_id = None
+        if len(group_ids) > 0:
+            new_group_id = min(group_ids)
+        else:
+            new_group_id = self.gen_new_group_id()
+
+        # Merge group ids
+        if len(group_ids) > 1:
+            self.merge_group_ids(group_ids=group_ids, new_group_id=new_group_id)
+
+        # Assign new_group_id to non-group shapes
+        if has_non_group_shape:
+            for shape in self.selected_shapes:
+                if shape.group_id is None:
+                    shape.group_id = new_group_id

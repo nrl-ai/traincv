@@ -6,6 +6,7 @@ keep_prev_scale: false
 keep_prev_brightness: false
 keep_prev_contrast: false
 show_cross_line: true
+show_groups: true
 logger_level: info
 
 flags: null
@@ -105,6 +106,7 @@ shortcuts:
   edit_label: Ctrl+E
   toggle_keep_prev_mode: Ctrl+P
   remove_selected_point: [Meta+H, Backspace]
+  group_selected_shapes: G
 
   tracking: T
   load_ai_model: L
