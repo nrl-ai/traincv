@@ -13,7 +13,7 @@ import natsort
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QDockWidget, QHBoxLayout, QLabel, QMessageBox,
-                             QVBoxLayout, QWhatsThis, QPlainTextEdit)
+                             QPlainTextEdit, QVBoxLayout, QWhatsThis)
 
 from trainme.inference_services.yolov5 import YOLOv5Predictor
 
@@ -382,7 +382,6 @@ class LabelmeWidget(LabelDialog):
             self.tr("Ungroup shapes"),
             enabled=True,
         )
-
 
         delete = action(
             self.tr("Delete"),
@@ -1275,7 +1274,9 @@ class LabelmeWidget(LabelDialog):
         else:
             self.shape_text_label.setText("Image Text")
             self.shape_text_edit.textChanged.disconnect()
-            self.shape_text_edit.setPlainText(self.other_data.get("image_text", ""))
+            self.shape_text_edit.setPlainText(
+                self.other_data.get("image_text", "")
+            )
             self.shape_text_edit.textChanged.connect(self.shape_text_changed)
 
     def add_label(self, shape):
@@ -1695,7 +1696,9 @@ class LabelmeWidget(LabelDialog):
             )
             self.other_data = self.label_file.other_data
             self.shape_text_edit.textChanged.disconnect()
-            self.shape_text_edit.setPlainText(self.other_data.get("image_text", ""))
+            self.shape_text_edit.setPlainText(
+                self.other_data.get("image_text", "")
+            )
             self.shape_text_edit.textChanged.connect(self.shape_text_changed)
         else:
             self.image_data = LabelFile.load_image_file(filename)

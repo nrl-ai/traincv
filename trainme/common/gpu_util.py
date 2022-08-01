@@ -474,7 +474,7 @@ def show_utilization(show_all=False, attr_list=None, use_old_code=False):
                                 attr
                             )
                         elif isinstance(attr, int):
-                            attr_str = (f"{attr:d}")
+                            attr_str = f"{attr:d}"
                         elif isinstance(attr, str):
                             attr_str = attr
                         else:

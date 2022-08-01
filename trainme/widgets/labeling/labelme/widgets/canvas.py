@@ -1,6 +1,5 @@
 """This module defines Canvas widget - the core component for drawing image labels"""
 import imgviz
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QWheelEvent
@@ -683,8 +682,8 @@ class Canvas(
 
             for group_id in grouped_shapes:
                 shapes = grouped_shapes[group_id]
-                min_x = float('inf')
-                min_y = float('inf')
+                min_x = float("inf")
+                min_y = float("inf")
                 max_x = 0
                 max_y = 0
                 for shape in shapes:
@@ -693,7 +692,9 @@ class Canvas(
                     min_y = min(min_y, rect.y())
                     max_x = max(max_x, rect.x() + rect.width())
                     max_y = max(max_y, rect.y() + rect.height())
-                    group_color = LABEL_COLORMAP[int(group_id) % len(LABEL_COLORMAP)]
+                    group_color = LABEL_COLORMAP[
+                        int(group_id) % len(LABEL_COLORMAP)
+                    ]
                     pen.setStyle(Qt.SolidLine)
                     pen.setWidth(max(1, int(round(4.0 / Shape.scale))))
                     pen.setColor(QtGui.QColor(*group_color))
@@ -701,20 +702,22 @@ class Canvas(
                     cx = rect.x() + rect.width() / 2
                     cy = rect.y() + rect.height() / 2
                     circle_radius = max(1, int(round(3.0 / Shape.scale)))
-                    p.drawEllipse(QtCore.QRectF(
-                        cx - circle_radius,
-                        cy - circle_radius,
-                        2 * circle_radius,
-                        2 * circle_radius,
-                    ))
+                    p.drawEllipse(
+                        QtCore.QRectF(
+                            cx - circle_radius,
+                            cy - circle_radius,
+                            2 * circle_radius,
+                            2 * circle_radius,
+                        )
+                    )
                 pen.setStyle(Qt.DashLine)
                 pen.setWidth(max(1, int(round(1.0 / Shape.scale))))
                 pen.setColor(QtGui.QColor("#EEEEEE"))
                 p.setPen(pen)
-                wrap_rect = QtCore.QRectF(min_x, min_y, max_x - min_x, max_y - min_y)
-                p.drawRect(
-                    wrap_rect
+                wrap_rect = QtCore.QRectF(
+                    min_x, min_y, max_x - min_x, max_y - min_y
                 )
+                p.drawRect(wrap_rect)
 
         for shape in self.shapes:
             if (
@@ -744,16 +747,29 @@ class Canvas(
         if self.show_texts:
             pen = QtGui.QPen(QtGui.QColor("#333333"), 2, Qt.SolidLine)
             p.setPen(pen)
-            p.setFont(QtGui.QFont("Arial", int(max(6.0, int(round(8.0 / Shape.scale))))))
+            p.setFont(
+                QtGui.QFont(
+                    "Arial", int(max(6.0, int(round(8.0 / Shape.scale))))
+                )
+            )
             for shape in self.shapes:
                 text = shape.text
                 if text:
                     bbox = shape.bounding_rect()
-                    p.drawText(bbox.x(), bbox.y() - int(max(2.0, int(round(4.0 / Shape.scale)))), text)
+                    p.drawText(
+                        bbox.x(),
+                        bbox.y()
+                        - int(max(2.0, int(round(4.0 / Shape.scale)))),
+                        text,
+                    )
 
         # Draw mouse coordinates
         if self.show_cross_line:
-            pen = QtGui.QPen(QtGui.QColor("#00FF00"), max(1, int(round(2.0 / Shape.scale))), Qt.DashLine)
+            pen = QtGui.QPen(
+                QtGui.QColor("#00FF00"),
+                max(1, int(round(2.0 / Shape.scale))),
+                Qt.DashLine,
+            )
             p.setPen(pen)
             p.setOpacity(0.5)
             p.drawLine(
@@ -1074,7 +1090,9 @@ class Canvas(
 
         # Merge group ids
         if len(group_ids) > 1:
-            self.merge_group_ids(group_ids=group_ids, new_group_id=new_group_id)
+            self.merge_group_ids(
+                group_ids=group_ids, new_group_id=new_group_id
+            )
         # Assign new_group_id to non-group shapes
         if has_non_group_shape:
             for shape in self.selected_shapes:
