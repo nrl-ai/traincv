@@ -374,6 +374,16 @@ class LabelmeWidget(LabelDialog):
             self.tr("Group shapes by assigning a same group_id"),
             enabled=True,
         )
+        ungroup_selected_shapes = action(
+            self.tr("Ungroup Selected Shapes"),
+            self.canvas.ungroup_selected_shapes,
+            shortcuts["ungroup_selected_shapes"],
+            None,
+            self.tr("Ungroup shapes"),
+            enabled=True,
+        )
+
+
 
 
         delete = action(
@@ -704,6 +714,7 @@ class LabelmeWidget(LabelDialog):
             ),
             on_shapes_present=(save_as, hide_all, show_all),
             group_selected_shapes=group_selected_shapes,
+            ungroup_selected_shapes=ungroup_selected_shapes,
         )
 
         self.canvas.vertex_selected.connect(
@@ -763,6 +774,7 @@ class LabelmeWidget(LabelDialog):
                 show_cross_line,
                 show_groups,
                 group_selected_shapes,
+                ungroup_selected_shapes,
             ),
         )
 

@@ -1039,11 +1039,11 @@ class Canvas(
             return
 
         # List all group ids for selected shapes
-        group_ids = []
+        group_ids = set()
         has_non_group_shape = False
         for shape in self.selected_shapes:
             if shape.group_id is not None:
-                group_ids.append(shape.group_id)
+                group_ids.add(shape.group_id)
             else:
                 has_non_group_shape = True
 
@@ -1063,5 +1063,23 @@ class Canvas(
             for shape in self.selected_shapes:
                 if shape.group_id is None:
                     shape.group_id = new_group_id
+
+        self.update()
+
+    def ungroup_selected_shapes(self):
+        """Ungroup selected shapes"""
+        if len(self.selected_shapes) == 0:
+            return
+
+        # List all group ids for selected shapes
+        group_ids = set()
+        for shape in self.selected_shapes:
+            if shape.group_id is not None:
+                group_ids.add(shape.group_id)
+
+        for group_id in group_ids:
+            for shape in self.shapes:
+                if shape.group_id == group_id:
+                    shape.group_id = None
 
         self.update()

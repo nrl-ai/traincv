@@ -105,8 +105,9 @@ shortcuts:
   add_point_to_edge: Ctrl+Shift+P
   edit_label: Ctrl+E
   toggle_keep_prev_mode: Ctrl+P
-  remove_selected_point: [Delete, Backspace]
+  remove_selected_point: Backspace
   group_selected_shapes: G
+  ungroup_selected_shapes: U
 
   tracking: T
   load_ai_model: L
