@@ -745,21 +745,38 @@ class Canvas(
 
         # Draw texts
         if self.show_texts:
-            pen = QtGui.QPen(QtGui.QColor("#333333"), 2, Qt.SolidLine)
-            p.setPen(pen)
             p.setFont(
                 QtGui.QFont(
-                    "Arial", int(max(6.0, int(round(8.0 / Shape.scale))))
+                    "Arial", int(max(4.0, int(round(10.0 / Shape.scale))))
                 )
             )
+            pen = QtGui.QPen(QtGui.QColor("#00FF00"), 8, Qt.SolidLine)
+            p.setPen(pen)
+            for shape in self.shapes:
+                text = shape.text
+                if text:
+                    bbox = shape.bounding_rect()
+                    fm = QtGui.QFontMetrics(p.font())
+                    rect = fm.boundingRect(text)
+                    p.fillRect(rect.x() + bbox.x() - 3,
+                        rect.y() + bbox.y() - 3,
+                        rect.width(), 
+                        rect.height(),
+                        QtGui.QColor("#00FF00"))
+                    p.drawText(
+                        bbox.x(),
+                        bbox.y(),
+                        text,
+                    )
+            pen = QtGui.QPen(QtGui.QColor("#000000"), 8, Qt.SolidLine)
+            p.setPen(pen)
             for shape in self.shapes:
                 text = shape.text
                 if text:
                     bbox = shape.bounding_rect()
                     p.drawText(
                         bbox.x(),
-                        bbox.y()
-                        - int(max(2.0, int(round(4.0 / Shape.scale)))),
+                        bbox.y(),
                         text,
                     )
 
