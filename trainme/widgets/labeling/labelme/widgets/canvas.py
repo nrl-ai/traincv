@@ -90,6 +90,7 @@ class Canvas(
         self.setFocusPolicy(QtCore.Qt.WheelFocus)
         self.show_cross_line = True
         self.show_shape_groups = True
+        self.show_texts = True
 
     def fill_drawing(self):
         """Get option to fill shapes by color"""
@@ -739,6 +740,17 @@ class Canvas(
             drawing_shape.fill = True
             drawing_shape.paint(p)
 
+        # Draw texts
+        if self.show_texts:
+            pen = QtGui.QPen(QtGui.QColor("#333333"), 2, Qt.SolidLine)
+            p.setPen(pen)
+            p.setFont(QtGui.QFont("Arial", int(max(6.0, int(round(8.0 / Shape.scale))))))
+            for shape in self.shapes:
+                text = shape.text
+                if text:
+                    bbox = shape.bounding_rect()
+                    p.drawText(bbox.x(), bbox.y() - int(max(2.0, int(round(4.0 / Shape.scale)))), text)
+
         # Draw mouse coordinates
         if self.show_cross_line:
             pen = QtGui.QPen(QtGui.QColor("#00FF00"), max(1, int(round(2.0 / Shape.scale))), Qt.DashLine)
@@ -1017,6 +1029,11 @@ class Canvas(
     def set_show_groups(self, enabled):
         """Set showing shape groups"""
         self.show_shape_groups = enabled
+        self.update()
+
+    def set_show_texts(self, enabled):
+        """Set showing texts"""
+        self.show_texts = enabled
         self.update()
 
     def gen_new_group_id(self):

@@ -384,8 +384,6 @@ class LabelmeWidget(LabelDialog):
         )
 
 
-
-
         delete = action(
             self.tr("Delete"),
             self.delete_selected_shape,
@@ -559,6 +557,15 @@ class LabelmeWidget(LabelDialog):
             checked=self._config["show_groups"],
             enabled=True,
         )
+        show_texts = action(
+            self.tr("&Show Texts"),
+            self.enable_show_texts,
+            tip=self.tr("Show text above shapes"),
+            icon=None,
+            checkable=True,
+            checked=self._config["show_texts"],
+            enabled=True,
+        )
 
         # Group zoom controls into a list for easier toggling.
         zoom_actions = (
@@ -665,6 +672,7 @@ class LabelmeWidget(LabelDialog):
             brightness_contrast=brightness_contrast,
             show_cross_line=show_cross_line,
             show_groups=show_groups,
+            show_texts=show_texts,
             zoom_actions=zoom_actions,
             open_next_image=open_next_image,
             open_prev_image=open_prev_image,
@@ -772,6 +780,7 @@ class LabelmeWidget(LabelDialog):
                 None,
                 brightness_contrast,
                 show_cross_line,
+                show_texts,
                 show_groups,
                 group_selected_shapes,
                 ungroup_selected_shapes,
@@ -1260,10 +1269,14 @@ class LabelmeWidget(LabelDialog):
         self.actions.edit.setEnabled(n_selected == 1)
         if len(selected_shapes) == 1:
             self.shape_text_label.setText("Shape Text")
+            self.shape_text_edit.textChanged.disconnect()
             self.shape_text_edit.setPlainText(selected_shapes[0].text)
+            self.shape_text_edit.textChanged.connect(self.shape_text_changed)
         else:
             self.shape_text_label.setText("Image Text")
+            self.shape_text_edit.textChanged.disconnect()
             self.shape_text_edit.setPlainText(self.other_data.get("image_text", ""))
+            self.shape_text_edit.textChanged.connect(self.shape_text_changed)
 
     def add_label(self, shape):
         if shape.group_id is None:
@@ -1289,12 +1302,13 @@ class LabelmeWidget(LabelDialog):
         )
 
     def shape_text_changed(self):
-        if len(self.canvas.selected_shapes) != 1:
-            self.other_data["image_text"] = self.shape_text_edit.toPlainText()
-            self.set_dirty()
-            return
-        shape = self.canvas.selected_shapes[0]
-        shape.text = self.shape_text_edit.toPlainText()
+        text = self.shape_text_edit.toPlainText()
+        if self.canvas.current is not None:
+            self.canvas.current.text = text
+        elif self.canvas.editing() and len(self.canvas.selected_shapes) == 1:
+            self.canvas.selected_shapes[0].text = text
+        else:
+            self.other_data["image_text"] = text
         self.set_dirty()
 
     def _update_shape_color(self, shape):
@@ -1587,6 +1601,11 @@ class LabelmeWidget(LabelDialog):
         self._config["show_groups"] = enabled
         self.actions.show_groups.setChecked(enabled)
         self.canvas.set_show_groups(enabled)
+
+    def enable_show_texts(self, enabled):
+        self._config["show_texts"] = enabled
+        self.actions.show_texts.setChecked(enabled)
+        self.canvas.set_show_texts(enabled)
 
     def on_new_brightness_contrast(self, qimage):
         self.canvas.load_pixmap(
