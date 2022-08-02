@@ -30,6 +30,8 @@ def get_install_requires():
         "PyYAML",
         "qtpy!=1.11.2",
         "termcolor",
+        "PyQt5",
+        "trainme-core>=0.0.1",
     ]
 
     # Find python binding for qt with priority:
@@ -104,5 +106,10 @@ setup(
             "trainme/widgets/labeling/labelme/icons/*",
             "trainme/configs/*.yaml",
         ]
+    },
+    entry_points={
+        "console_scripts": [
+            "trainme=trainme.__main__:main",
+        ],
     },
 )

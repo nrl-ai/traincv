@@ -1,6 +1,6 @@
 [submodule "trainme/models/yolov5"]
 	path = trainme/models/yolov5
 	url = https://github.com/ultralytics/yolov5
-[submodule "core"]
-	path = core
+[submodule "trainme_core"]
+	path = trainme_core
 	url = https://github.com/vietanhdev/trainme-core.git

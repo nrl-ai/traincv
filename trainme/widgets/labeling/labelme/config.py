@@ -1,11 +1,17 @@
 import os.path as osp
 import shutil
 
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    # Try backported to PY<37 `importlib_resources`.
+    import importlib_resources as pkg_resources
+
 import yaml
 
-from .logger import logger
+from trainme import configs as trainme_configs
 
-here = osp.dirname(osp.abspath(__file__))
+from .logger import logger
 
 
 def update_dict(target_dict, new_dict, validate_item=None):
@@ -22,8 +28,8 @@ def update_dict(target_dict, new_dict, validate_item=None):
 
 
 def get_default_config():
-    config_file = "configs/labelme_config.yaml"
-    with open(config_file) as f:
+    config_file = "labelme_config.yaml"
+    with pkg_resources.open_text(trainme_configs, config_file) as f:
         config = yaml.safe_load(f)
 
     # save default config to ~/.labelmerc
