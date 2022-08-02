@@ -6,11 +6,26 @@
 
 ![](https://i.imgur.com/waxVImv.png)
 
-## Work in Progress
 
-This is a Work In Progress. Only labeling feature can be used now.
+## I. Install and run
 
-## I. Environment setup
+- Requirements: Python 3.x
+
+```
+git clone https://github.com/vietanhdev/trainme.git --recursive
+cd trainme
+pip install -e .
+```
+
+- Run TrainMe
+
+```
+trainme_app
+```
+
+## II. Development
+
+### 1. Environment setup
 
 - Install Miniconda: <https://docs.conda.io/en/latest/miniconda.html>. Please ensure to **add Miniconda to the PATH** when installing.
 
@@ -49,15 +64,12 @@ conda install -c conda-forge pyqt
 pyrcc5 -o trainme/resources/resources.py trainme/resources/resources.qrc
 ```
 
-
-## II. Run program
-
+### 2. Run program
 
 ```
 conda activate trainme
 python trainme/app.py
 ```
-
 
 ## III. References
 
