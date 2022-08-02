@@ -747,7 +747,7 @@ class Canvas(
         if self.show_texts:
             p.setFont(
                 QtGui.QFont(
-                    "Arial", int(max(4.0, int(round(10.0 / Shape.scale))))
+                    "Arial", int(max(6.0, int(round(8.0 / Shape.scale))))
                 )
             )
             pen = QtGui.QPen(QtGui.QColor("#00FF00"), 8, Qt.SolidLine)
