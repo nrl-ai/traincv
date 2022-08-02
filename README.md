@@ -11,13 +11,13 @@
 
 - Requirements: Python 3.x
 
+- Install:
+
 ```
-git clone https://github.com/vietanhdev/trainme.git --recursive
-cd trainme
-pip install -e .
+pip install git+https://github.com/vietanhdev/trainme.git
 ```
 
-- Run TrainMe
+- Run TrainMe App:
 
 ```
 trainme_app

@@ -21,7 +21,6 @@ def get_version():
 
 def get_install_requires():
     """Get python requirements based on context"""
-    trainme_core_path = f"file://{os.getcwd()}/trainme_core"
     install_requires = [
         "imgviz>=0.11",
         "matplotlib<3.3",  # for PyInstaller
@@ -32,7 +31,7 @@ def get_install_requires():
         "qtpy!=1.11.2",
         "termcolor",
         "PyQt5",
-        f"trainme-core @ {trainme_core_path}"
+        f"trainme-core @ git+https://github.com/vietanhdev/trainme-core.git#egg=trainme-core"
     ]
 
     # Find python binding for qt with priority:
