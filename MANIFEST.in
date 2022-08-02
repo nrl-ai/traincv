@@ -1,0 +1,3 @@
+recursive-include trainme/configs *
+recursive-include trainme/widgets/labeling/labelme/icons *
+global-include *.ui

@@ -31,7 +31,10 @@ def get_install_requires():
         "qtpy!=1.11.2",
         "termcolor",
         "PyQt5",
-        f"trainme-core @ git+https://github.com/vietanhdev/trainme-core.git#egg=trainme-core"
+        "pyqtgraph",
+        "pandas",
+        "psutil",
+        "trainme-core @ git+https://github.com/vietanhdev/trainme-core"
     ]
 
     # Find python binding for qt with priority:
@@ -101,12 +104,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3 :: Only",
     ],
-    package_data={
-        "trainme": [
-            "trainme/widgets/labeling/labelme/icons/*",
-            "trainme/configs/*.yaml",
-        ]
-    },
+    include_package_data=True,
     entry_points={
         "console_scripts": [
             "trainme=trainme.__main__:main",
