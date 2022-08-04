@@ -1,7 +1,9 @@
 """Setup file for trainme package"""
 
 import os
+import sys
 import re
+from sys import platform
 
 from setuptools import find_packages, setup
 
@@ -28,42 +30,24 @@ def get_install_requires():
         "numpy",
         "Pillow>=2.8",
         "PyYAML",
-        "qtpy!=1.11.2",
         "termcolor",
-        "PyQt5",
         "pyqtgraph",
         "pandas",
         "psutil",
         "trainme-core @ git+https://github.com/vietanhdev/trainme-core"
     ]
 
-    # Find python binding for qt with priority:
-    # PyQt5 -> PySide2
-    # and PyQt5 is automatically installed on Python3.
-    QT_BINDING = None
-
-    try:
-        import PyQt5  # noqa # pylint: disable=unused-import,import-outside-toplevel
-
-        QT_BINDING = "pyqt5"
-    except ImportError:
-        pass
-
-    if QT_BINDING is None:
+    # Guide user to install PyQt5 on macOS
+    if platform == "darwin":
         try:
-            import PySide2  # noqa # pylint: disable=unused-import,import-outside-toplevel
-
-            QT_BINDING = "pyside2"
-        except ImportError:
-            pass
-
-    if QT_BINDING is None:
-        # PyQt5 can be installed via pip for Python3
-        # 5.15.3, 5.15.4 won't work with PyInstaller
-        install_requires.append("PyQt5!=5.15.3,!=5.15.4")
-        QT_BINDING = "pyqt5"
-
-    del QT_BINDING
+            import PyQt5
+        except:
+            print("Please try to install PyQt5 on macOS one of following ways:\n"
+                  "+ Using Conda: conda install -c conda-forge pyqt==5.15.7\n"
+                  "+ Using Brew: brew install pyqt@5")
+            sys.exit(1)
+    else:
+        install_requires.append("PyQt5>=5.15.7")
 
     if os.name == "nt":  # Windows
         install_requires.append("colorama")

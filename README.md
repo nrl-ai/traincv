@@ -9,15 +9,29 @@
 
 ## I. Install and run
 
-- Requirements: Python 3.x
+- Requirements: Python >= 3.7
+- Recommended: Miniconda/Anaconda <https://docs.conda.io/en/latest/miniconda.html>
 
-- Install:
+- Create environment:
+
+```
+conda create -n trainme python=3.8
+conda activate trainme
+```
+
+- **(For macOS only)** Install PyQt5 using Conda:
+
+```
+conda install -c conda-forge pyqt==5.15.7
+```
+
+- Install TrainMe:
 
 ```
 pip install git+https://github.com/vietanhdev/trainme.git
 ```
 
-- Run TrainMe App:
+- Run app:
 
 ```
 trainme_app
@@ -25,49 +39,15 @@ trainme_app
 
 ## II. Development
 
-### 1. Environment setup
-
-- Install Miniconda: <https://docs.conda.io/en/latest/miniconda.html>. Please ensure to **add Miniconda to the PATH** when installing.
-
-- Restart the system after installing Conda.
-
-- Create a new Python environment:
-
-```
-conda create -n trainme python=3.8
-```
-
-- Activate the Python environment (need to run everytime on a new Terminal/Bash):
-
-```
-conda activate trainme
-```
-
-- Install Python requirements:
-
-```
-conda activate trainme
-pip install -r requirements.txt
-```
-
-- For macOS, please use:
-
-```
-conda activate trainme
-pip install -r requirements-macos.txt
-conda install -c conda-forge pyqt
-```
-
-- Generate resource and UI:
+- Generate resources:
 
 ```
 pyrcc5 -o trainme/resources/resources.py trainme/resources/resources.qrc
 ```
 
-### 2. Run program
+- Run app:
 
 ```
-conda activate trainme
 python trainme/app.py
 ```
 
