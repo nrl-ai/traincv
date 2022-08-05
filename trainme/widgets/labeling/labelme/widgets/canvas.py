@@ -758,11 +758,13 @@ class Canvas(
                     bbox = shape.bounding_rect()
                     fm = QtGui.QFontMetrics(p.font())
                     rect = fm.boundingRect(text)
-                    p.fillRect(rect.x() + bbox.x() - 3,
+                    p.fillRect(
+                        rect.x() + bbox.x() - 3,
                         rect.y() + bbox.y() - 3,
-                        rect.width(), 
+                        rect.width(),
                         rect.height(),
-                        QtGui.QColor("#00FF00"))
+                        QtGui.QColor("#00FF00"),
+                    )
                     p.drawText(
                         bbox.x(),
                         bbox.y(),

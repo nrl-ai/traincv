@@ -1,8 +1,8 @@
 """Setup file for trainme package"""
 
 import os
-import sys
 import re
+import sys
 from sys import platform
 
 from setuptools import find_packages, setup
@@ -34,7 +34,8 @@ def get_install_requires():
         "pyqtgraph",
         "pandas",
         "psutil",
-        "trainme-core @ git+https://github.com/vietanhdev/trainme-core"
+        "PyQt5>=5.15.7; platform_system != 'darwin'",
+        "trainme-core",
     ]
 
     # Guide user to install PyQt5 on macOS
@@ -43,12 +44,12 @@ def get_install_requires():
             import PyQt5
         except Exception as e:
             print(e)
-            print("Please try to install PyQt5 on macOS in one of following ways:\n"
-                  "+ Using Conda: conda install -c conda-forge pyqt==5.15.7\n"
-                  "+ Using Brew: brew install pyqt@5")
+            print(
+                "Please try to install PyQt5 on macOS in one of following"
+                " ways:\n+ Using Conda: conda install -c conda-forge"
+                " pyqt==5.15.7\n+ Using Brew: brew install pyqt@5"
+            )
             sys.exit(1)
-    else:
-        install_requires.append("PyQt5>=5.15.7")
 
     if os.name == "nt":  # Windows
         install_requires.append("colorama")
@@ -64,7 +65,7 @@ def get_long_description():
 
 
 setup(
-    name="trainme",
+    name="trainme-python",
     version=get_version(),
     packages=find_packages(),
     description="No-code Labeling and Training Toolkit for Computer Vision",

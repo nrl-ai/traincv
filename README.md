@@ -28,7 +28,7 @@ conda install -c conda-forge pyqt==5.15.7
 - Install TrainMe:
 
 ```
-pip install git+https://github.com/vietanhdev/trainme.git
+pip install trainme-python
 ```
 
 - Run app:
