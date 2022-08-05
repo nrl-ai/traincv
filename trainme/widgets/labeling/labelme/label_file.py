@@ -111,7 +111,7 @@ class LabelFile:
             shapes = [
                 dict(
                     label=s["label"],
-                    text=s["text"],
+                    text=s.get("text", ""),
                     points=s["points"],
                     shape_type=s.get("shape_type", "polygon"),
                     flags=s.get("flags", {}),
@@ -129,6 +129,9 @@ class LabelFile:
         for key, value in data.items():
             if key not in keys:
                 other_data[key] = value
+
+        # Add new fields if not available
+        other_data["text"] = other_data.get("text", "")
 
         # Only replace data after everything is loaded.
         self.flags = flags

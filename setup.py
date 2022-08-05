@@ -41,8 +41,9 @@ def get_install_requires():
     if platform == "darwin":
         try:
             import PyQt5
-        except:
-            print("Please try to install PyQt5 on macOS one of following ways:\n"
+        except Exception as e:
+            print(e)
+            print("Please try to install PyQt5 on macOS in one of following ways:\n"
                   "+ Using Conda: conda install -c conda-forge pyqt==5.15.7\n"
                   "+ Using Brew: brew install pyqt@5")
             sys.exit(1)
