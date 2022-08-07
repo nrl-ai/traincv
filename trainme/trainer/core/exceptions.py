@@ -1,2 +1,2 @@
-class ProjectCreationError(Exception):
+class ProjectValidationError(Exception):
     pass

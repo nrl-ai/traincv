@@ -56,6 +56,16 @@
       <widget class="QLineEdit" name="author_edit"/>
      </item>
      <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>License</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="license_edit"/>
+     </item>
+     <item>
       <widget class="QLabel" name="label_4">
        <property name="text">
         <string>Description</string>

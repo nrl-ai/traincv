@@ -3,9 +3,9 @@ import os
 import pandas as pd
 from PyQt5 import QtCore, uic
 from PyQt5.QtWidgets import QFileDialog, QHeaderView, QWidget
-from trainme.trainer.data.data_subset_preparator import DataSubsetPreparator
 
 from trainme.models.tablemodel import TableModel
+from trainme.trainer.data.data_subset_preparator import DataSubsetPreparator
 from trainme.views.common.toaster import QToaster
 
 

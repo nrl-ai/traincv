@@ -1,9 +1,25 @@
-from PyQt5.QtCore import QAbstractTableModel, Qt, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal
+
+from trainme.trainer.core.project import Project
 
 
-class ProjectModel:
-
-    project_data_changed = pyqtSignal()
+class ProjectModel(QObject):
+    project_updated = pyqtSignal(Project)
 
     def __init__(self):
-        pass
+        super().__init__()
+        self.project = None
+
+    def create_project(self, project_folder):
+        """Create a new project"""
+        self.project = Project.create(project_folder=project_folder)
+        self.project_updated.emit(self.project)
+
+    def open_project(self, project_folder):
+        """Open a project"""
+        self.project = Project.open(project_folder)
+        self.project_updated.emit(self.project)
+
+    def save_project(self):
+        """Save project to disk"""
+        self.project.save()
