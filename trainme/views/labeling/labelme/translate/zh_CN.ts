@@ -3,17 +3,17 @@
 <context>
     <name>Canvas</name>
     <message>
-        <location filename="../widgets/canvas.py" line="235"/>
+        <location filename="../views/canvas.py" line="235"/>
         <source>Image</source>
         <translation>图像</translation>
     </message>
     <message>
-        <location filename="../widgets/canvas.py" line="249"/>
+        <location filename="../views/canvas.py" line="249"/>
         <source>Click &amp; drag to move point</source>
         <translation>点击并拖拽以移动控制点</translation>
     </message>
     <message>
-        <location filename="../widgets/canvas.py" line="259"/>
+        <location filename="../views/canvas.py" line="259"/>
         <source>Click &amp; drag to move shape &apos;%s&apos;</source>
         <translation>点击并拖拽以移动形状&apos;%s&apos;</translation>
     </message>

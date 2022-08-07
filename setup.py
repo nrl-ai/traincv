@@ -34,7 +34,7 @@ def get_install_requires():
         "pyqtgraph",
         "pandas",
         "psutil",
-        "PyQt5>=5.15.7; platform_system != 'darwin'",
+        "PyQt5>=5.15.7;platform_system != 'darwin'",
         "trainme-core",
     ]
 
@@ -93,8 +93,8 @@ setup(
     include_package_data=True,
     entry_points={
         "console_scripts": [
-            "trainme=trainme.__main__:main",
-            "trainme_app=trainme.__main__:main",
+            "trainme=trainme.app:main",
+            "trainme_app=trainme.app:main",
         ],
     },
 )

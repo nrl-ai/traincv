@@ -234,7 +234,7 @@
   <customwidget>
    <class>TableViewWidget</class>
    <extends>QListWidget</extends>
-   <header>widgets/common/tableview</header>
+   <header>views/common/tableview</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -10,21 +10,22 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 sys.path.append(".")
 
 from trainme.resources.resources import *
-from trainme.widgets.mainwindow import MainWindow
+from trainme.views.mainwindow import MainWindow
 
-# Enable scaling for high dpi screens
-QtWidgets.QApplication.setAttribute(
-    QtCore.Qt.AA_EnableHighDpiScaling, True
-)  # enable highdpi scaling
-QtWidgets.QApplication.setAttribute(
-    QtCore.Qt.AA_UseHighDpiPixmaps, True
-)  # use highdpi icons
 
-# Setup pyqtgraph default bg/fg colors
-pg.setConfigOption("background", "w")
-pg.setConfigOption("foreground", "k")
+def main():
+    # Enable scaling for high dpi screens
+    QtWidgets.QApplication.setAttribute(
+        QtCore.Qt.AA_EnableHighDpiScaling, True
+    )  # enable highdpi scaling
+    QtWidgets.QApplication.setAttribute(
+        QtCore.Qt.AA_UseHighDpiPixmaps, True
+    )  # use highdpi icons
 
-if __name__ == "__main__":
+    # Setup pyqtgraph default bg/fg colors
+    pg.setConfigOption("background", "w")
+    pg.setConfigOption("foreground", "k")
+
     QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_ShareOpenGLContexts)
     app = QApplication(sys.argv)
     app.processEvents()
@@ -33,3 +34,7 @@ if __name__ == "__main__":
 
     main_win.show()
     sys.exit(app.exec_())
+
+
+if __name__ == "__main__":
+    main()

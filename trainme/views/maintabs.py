@@ -1,4 +1,4 @@
-"""Main tab widget for trainme app"""
+"""Main tab widget for TrainMe app"""
 
 from PyQt5.QtWidgets import QTabWidget
 
@@ -7,7 +7,7 @@ from .workspace.workspace_wrapper import WorkspaceWrapper
 
 
 class MainTabsWidget(QTabWidget):
-    """Main tab widget for trainme app"""
+    """Main tab widget for TrainMe app"""
 
     def __init__(self, parent):
         super().__init__()

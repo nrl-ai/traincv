@@ -12,8 +12,8 @@ a = Analysis(
     pathex=['trainme'],
     binaries=[],
     datas=[
-       ('trainme/configs/labelme_config.yaml', 'trainme/widgets/labeling/labelme/config'),
-       ('trainme/widgets/labeling/labelme/icons/*', 'trainme/widgets/labeling/labelme/icons'),
+       ('trainme/configs/labelme_config.yaml', 'trainme/views/labeling/labelme/config'),
+       ('trainme/views/labeling/labelme/icons/*', 'trainme/views/labeling/labelme/icons'),
     ],
     hiddenimports=[],
     hookspath=[],

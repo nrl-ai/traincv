@@ -1,7 +1,10 @@
 import os
+import typing
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QFileDialog, QMessageBox, QWidget
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QWidget, QMainWindow, QApplication
+
+from ..project_dialog.project_dialog import ProjectDialog
 
 
 class SideBar(QWidget):
@@ -15,7 +18,11 @@ class SideBar(QWidget):
         self.open_project_button.clicked.connect(self.browse_and_open_project)
         self.new_project_button.clicked.connect(self.browse_and_create_project)
 
+        self.project_dialog = ProjectDialog()
+
     def browse_and_create_project(self):
+        self.project_dialog.show()
+        return
         folder = str(
             QFileDialog.getExistingDirectory(
                 self, "Select folder to save new project"
@@ -25,6 +32,8 @@ class SideBar(QWidget):
             folder = os.path.normpath(folder)
 
     def browse_and_open_project(self):
+        self.project_dialog.show()
+        return
         folder = str(
             QFileDialog.getExistingDirectory(self, "Select project to open")
         )

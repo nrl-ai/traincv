@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QGridLayout, QWidget
 
-from trainme.widgets.workspace.workspace import WorkspaceWidget
+from trainme.views.workspace.workspace import WorkspaceWidget
 
 
 class WorkspaceWrapper(QWidget):
