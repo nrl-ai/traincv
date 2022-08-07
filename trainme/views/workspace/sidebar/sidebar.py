@@ -2,7 +2,8 @@ import os
 import typing
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QFileDialog, QMessageBox, QWidget, QMainWindow, QApplication
+from PyQt5.QtWidgets import (QApplication, QFileDialog, QMainWindow,
+                             QMessageBox, QWidget)
 
 from ..project_dialog.project_dialog import ProjectDialog
 

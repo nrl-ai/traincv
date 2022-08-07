@@ -1,8 +1,8 @@
-
 import os
 
-from PyQt5 import uic, QtCore
+from PyQt5 import QtCore, uic
 from PyQt5.QtWidgets import QDialog
+
 
 class ProjectDialog(QDialog):
     def __init__(self, parent=None):
@@ -16,4 +16,3 @@ class ProjectDialog(QDialog):
         self.setWindowModality(QtCore.Qt.ApplicationModal)
 
         self.close_button.clicked.connect(self.close)
-
