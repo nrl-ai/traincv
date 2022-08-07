@@ -35,7 +35,6 @@ def get_install_requires():
         "pandas",
         "psutil",
         "PyQt5>=5.15.7;platform_system != 'darwin'",
-        "trainme-core",
     ]
 
     # Guide user to install PyQt5 on macOS
