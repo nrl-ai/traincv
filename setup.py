@@ -34,6 +34,8 @@ def get_install_requires():
         "pyqtgraph",
         "pandas",
         "psutil",
+        "opencv-python-headless",
+        "imutils",
         'PyQt5>=5.15.7; platform_system != "Darwin"',
     ]
 
