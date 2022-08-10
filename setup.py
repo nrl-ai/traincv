@@ -34,21 +34,8 @@ def get_install_requires():
         "pyqtgraph",
         "pandas",
         "psutil",
-        "PyQt5>=5.15.7;platform_system != 'darwin'",
+        'PyQt5>=5.15.7; platform_system != "Darwin"',
     ]
-
-    # Guide user to install PyQt5 on macOS
-    if platform == "darwin":
-        try:
-            import PyQt5
-        except Exception as e:
-            print(e)
-            print(
-                "Please try to install PyQt5 on macOS in one of following"
-                " ways:\n+ Using Conda: conda install -c conda-forge"
-                " pyqt==5.15.7\n+ Using Brew: brew install pyqt@5"
-            )
-            sys.exit(1)
 
     if os.name == "nt":  # Windows
         install_requires.append("colorama")
@@ -82,8 +69,6 @@ setup(
         "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
