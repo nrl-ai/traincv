@@ -61,6 +61,12 @@ pip install trainme-python
 trainme_app
 ```
 
+Or
+
+```
+python -m trainme.app
+```
+
 ## II. Development
 
 - Generate resources:
