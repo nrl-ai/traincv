@@ -14,13 +14,13 @@ class MainTabsWidget(QTabWidget):
         self.parent = parent
         self.tabs = []
 
-        self.labeling_tab = LabelingWrapper(self)
-        self.tabs.append(self.labeling_tab)
-        self.addTab(self.labeling_tab, "Labeling")
-
         self.workspace_tab = WorkspaceWrapper(self)
         self.tabs.append(self.workspace_tab)
         self.addTab(self.workspace_tab, "Workspace")
+
+        self.labeling_tab = LabelingWrapper(self)
+        self.tabs.append(self.labeling_tab)
+        self.addTab(self.labeling_tab, "Data Labeling")
 
         self.currentChanged.connect(self.on_change)
 

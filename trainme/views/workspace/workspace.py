@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QHBoxLayout, QWidget
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import (QGridLayout, QLabel, QHBoxLayout, QWidget, QSizePolicy)
 
 from trainme.views.workspace.experiment_wizard import ExperimentWizard
 from trainme.views.workspace.sidebar.sidebar import SideBar
@@ -12,11 +13,19 @@ class WorkspaceWidget(QWidget):
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
 
-        sidebar = SideBar(self)
-        sidebar.setMaximumWidth(320)
-        sidebar.setMinimumWidth(250)
+        self.sidebar = SideBar(self)
+        self.sidebar.setMaximumWidth(320)
+        self.sidebar.setMinimumWidth(250)
 
-        wizard = ExperimentWizard(self)
+        self.wizard = ExperimentWizard(self)
 
-        self.layout.addWidget(sidebar)
-        self.layout.addWidget(wizard)
+        self.empty_wizard_label = QLabel("Please select or create an experiment")
+        self.empty_wizard_label.setStyleSheet(
+            "QLabel {background-color: #EFEFEF; color: #888888;}"
+        )
+        self.empty_wizard_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.empty_wizard_label.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.layout.addWidget(self.sidebar)
+        self.layout.addWidget(self.empty_wizard_label)
+

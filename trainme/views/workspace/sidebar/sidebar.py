@@ -8,6 +8,7 @@ from trainme.storage import project_model
 from trainme.trainer.core.project import Project
 
 from ..project_dialog.project_dialog import ProjectDialog
+from .experiment_table_model import ExperimentTableModel
 
 
 class SideBar(QWidget):
@@ -21,6 +22,9 @@ class SideBar(QWidget):
         project_model.project_updated.connect(self.load_project)
 
         self.project_dialog = ProjectDialog(project_model)
+        self.experiment_table_model = ExperimentTableModel([])
+        self.experiment_table.setModel(self.experiment_table_model)
+        self.experiment_table.update()
 
         self.open_project_button.clicked.connect(self.browse_and_open_project)
         self.new_project_button.clicked.connect(self.browse_and_create_project)

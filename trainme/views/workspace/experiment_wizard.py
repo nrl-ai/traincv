@@ -1,3 +1,5 @@
+from asyncio.log import logger
+
 from PyQt5.QtWidgets import QTabWidget
 
 from trainme.views.workspace.data_preparation.data_preparation import \
@@ -15,6 +17,21 @@ class ExperimentWizard(QTabWidget):
 
         self.parent = parent
         self.tabs = []
+        self.last_tab_index = 0
+        self.currentChanged.connect(self.on_change)
+
+        self.setStyleSheet(
+            """
+            QTabWidget::tab-bar {
+                alignment: center;
+            }
+            """
+        )
+        self.setup_tabs()
+
+    def setup_tabs(self):
+        if len(self.tabs) != 0:
+            logger.warning("Number of tabs is not 0.")
 
         self.data_preparation_tab = DataPreparationTab(self)
         self.tabs.append(self.data_preparation_tab)
@@ -33,15 +50,6 @@ class ExperimentWizard(QTabWidget):
         self.addTab(self.export_tab, self.export_tab.name)
 
         self.last_tab_index = 0
-        self.currentChanged.connect(self.on_change)
-
-        self.setStyleSheet(
-            """
-            QTabWidget::tab-bar {
-                alignment: center;
-            }
-            """
-        )
 
     def on_change(self, i):
         if i == self.last_tab_index:
