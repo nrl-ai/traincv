@@ -63,7 +63,6 @@ class ColoredLogger(logging.Logger):
         console.setFormatter(color_formatter)
 
         self.addHandler(console)
-        return
 
 
 logger = logging.getLogger(__appname__)

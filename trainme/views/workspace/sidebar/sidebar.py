@@ -1,3 +1,4 @@
+import logging
 import os
 
 from PyQt5 import uic
@@ -62,4 +63,4 @@ class SideBar(QWidget):
             try:
                 project_model.open_project(folder)
             except Exception as e:
-                print(e)
+                logging.error(e)

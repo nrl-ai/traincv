@@ -72,7 +72,7 @@ class DataSubsetPreparator:
 
     def total_size(self):
         """Total data size"""
-        return sum([len(data["image_label_list"]) for data in self.data])
+        return sum(len(data["image_label_list"]) for data in self.data)
 
     def split_size(self):
         """Size of split set"""

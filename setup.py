@@ -1,9 +1,5 @@
-"""Setup file for trainme package"""
-
 import os
 import re
-import sys
-from sys import platform
 
 from setuptools import find_packages, setup
 

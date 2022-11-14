@@ -257,5 +257,5 @@ if __name__ == "__main__":
         help="Report file of data preparation",
     )
 
-    args = parser.parse_args()
-    sys.exit(main(args))
+    parsed_args = parser.parse_args()
+    sys.exit(main(parsed_args))

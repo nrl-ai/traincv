@@ -15,9 +15,6 @@ class TableModel(QAbstractTableModel):
         self._data = data
         self.editable_cols = []
 
-    def data(self):
-        return self._data
-
     def setEditableCols(self, cols):
         """Set which colmumn can be edit"""
         self.editable_cols = cols

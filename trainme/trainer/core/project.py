@@ -64,7 +64,7 @@ class Project:
         name: str = None,
         task: TaskChoices = TaskChoices.OBJECT_DETECTION,
         author: str = None,
-        license: str = None,
+        project_license: str = None,
         description: str = None,
         project_folder: str = None,
     ):
@@ -75,7 +75,7 @@ class Project:
         project.name = name
         project.task = task
         project.author = author
-        project.license = license
+        project.license = project_license
         project.description = description
         project.project_folder = project_folder
         project.save()

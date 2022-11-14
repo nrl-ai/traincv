@@ -123,7 +123,7 @@ class LabelFile:
                 for s in data["shapes"]
             ]
         except Exception as e:
-            raise LabelFileError(e)
+            raise LabelFileError(e) from e
 
         other_data = {}
         for key, value in data.items():
@@ -195,7 +195,7 @@ class LabelFile:
                 json.dump(data, f, ensure_ascii=False, indent=2)
             self.filename = filename
         except Exception as e:
-            raise LabelFileError(e)
+            raise LabelFileError(e) from e
 
     @staticmethod
     def is_label_file(filename):

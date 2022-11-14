@@ -59,7 +59,7 @@ class HTMLDelegate(QtWidgets.QStyledItemDelegate):
         painter.restore()
 
     # QT Overload
-    def sizeHint(self, option, index):
+    def sizeHint(self, _, _):
         margin_constant = 4
         return QtCore.QSize(
             self.doc.idealWidth(),

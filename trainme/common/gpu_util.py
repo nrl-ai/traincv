@@ -327,9 +327,6 @@ def show_utilization(show_all=False, attr_list=None, use_old_code=False):
                 " Memory total | Memory used | Memory free || Display mode |"
                 " Display active |"
             )
-            print(
-                "------------------------------------------------------------------------------------------------------------------------------"
-            )
             for gpu in gp_us:
                 print(
                     " {0:2d} | {1:s}  | {2:s} | {3:s} || {4:3.0f}% | {5:3.0f}%"
