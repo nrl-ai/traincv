@@ -9,8 +9,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 sys.path.append(".")
 
-from trainme.resources.resources import *
-from trainme.views.mainwindow import MainWindow
+from traincv.resources.resources import *
+from traincv.views.mainwindow import MainWindow
 
 
 def main():

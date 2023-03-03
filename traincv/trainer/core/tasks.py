@@ -1,5 +1,5 @@
 """
-TrainMe is a task-based training toolkit
+traincv is a task-based training toolkit
 This module defines supported tasks
 """
 from enum import Enum

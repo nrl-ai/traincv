@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 
 def get_version():
     """Get package version from __init__.py file"""
-    filename = "trainme/__init__.py"
+    filename = "traincv/__init__.py"
     with open(filename, encoding="utf-8") as f:
         match = re.search(
             r"""^__version__ = ['"]([^'"]*)['"]""", f.read(), re.M
@@ -49,7 +49,7 @@ def get_long_description():
 
 
 setup(
-    name="trainme-python",
+    name="traincv",
     version=get_version(),
     packages=find_packages(),
     description="No-code Labeling and Training Toolkit for Computer Vision",
@@ -57,7 +57,7 @@ setup(
     long_description_content_type="text/markdown",
     author="Viet-Anh Nguyen",
     author_email="vietanh.dev@gmail.com",
-    url="https://github.com/vietanhdev/trainme",
+    url="https://github.com/nrl-ai/traincv",
     install_requires=get_install_requires(),
     license="GPLv3",
     keywords="Image Annotation, Machine Learning, Deep Learning",
@@ -75,8 +75,8 @@ setup(
     include_package_data=True,
     entry_points={
         "console_scripts": [
-            "trainme=trainme.app:main",
-            "trainme_app=trainme.app:main",
+            "traincv=traincv.app:main",
+            "traincv_app=traincv.app:main",
         ],
     },
 )

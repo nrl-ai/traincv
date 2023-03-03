@@ -4,7 +4,7 @@
 block_cipher = None
 
 
-a = Analysis(['trainme/app.py'],
+a = Analysis(['traincv/app.py'],
              pathex=[],
              binaries=[],
              datas=[],

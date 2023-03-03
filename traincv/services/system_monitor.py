@@ -3,7 +3,7 @@ import time
 import psutil
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 
-from trainme.common.gpu_util import get_gp_us
+from traincv.common.gpu_util import get_gp_us
 
 
 class SystemMonitor(QObject):

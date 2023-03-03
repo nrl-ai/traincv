@@ -1,8 +1,8 @@
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QSizePolicy, QWidget
 
-from trainme.views.workspace.experiment_wizard import ExperimentWizard
-from trainme.views.workspace.sidebar.sidebar import SideBar
+from traincv.views.workspace.experiment_wizard import ExperimentWizard
+from traincv.views.workspace.sidebar.sidebar import SideBar
 
 
 class WorkspaceWidget(QWidget):

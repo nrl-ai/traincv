@@ -15,11 +15,11 @@ class MainWindow(QMainWindow):
         self.app = app
 
         self.setContentsMargins(0, 0, 0, 0)
-        self.setWindowTitle("TrainMe")
+        self.setWindowTitle("traincv")
 
         header_widget = QWidget(self)
         header_layout = QHBoxLayout(header_widget)
-        program_title = QLabel("TrainMe - AI toolkit")
+        program_title = QLabel("traincv - AI toolkit")
         program_title.setStyleSheet(
             "QLabel {background-color: #333; color: #fff; font: bold;}"
         )
@@ -39,6 +39,6 @@ class MainWindow(QMainWindow):
 
         status_bar = QStatusBar()
         status_bar.showMessage(
-            "TrainMe - No-code labeling and training toolkit"
+            "traincv - No-code labeling and training toolkit"
         )
         self.setStatusBar(status_bar)

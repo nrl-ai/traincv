@@ -3,7 +3,7 @@ import os
 from PyQt5 import QtCore, uic
 from PyQt5.QtWidgets import QDialog
 
-from trainme.models.project import ProjectModel
+from traincv.models.project import ProjectModel
 
 
 class ProjectDialog(QDialog):

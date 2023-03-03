@@ -3,10 +3,10 @@
 ## 0. Environment
 
 ```shell
-conda activate trainme
+conda activate traincv
 conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
 conda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cpuonly -c pytorch # For CPU
-pip install -r trainme/models/yolov5/requirements.txt
+pip install -r traincv/models/yolov5/requirements.txt
 
 # Fix OpenCV error
 pip uninstall opencv-python opencv-contrib-python
@@ -22,7 +22,7 @@ pip install opencv-contrib-python-headless==4.4.0.46
 
 
 ```shell
-cd trainme/models/yolov5
+cd traincv/models/yolov5
 python train.py --img 640 --batch 16 --epochs 30 --data ../../../configs/yolov5_data.yaml --weights yolov5n.pt
 ```
 
@@ -32,7 +32,7 @@ python train.py --img 640 --batch 16 --epochs 30 --data ../../../configs/yolov5_
 
 
 ```shell
-cd trainme/models/yolov5
+cd traincv/models/yolov5
 python export.py --weights models/YOLOv5s.pt --include onnx
 ```
 

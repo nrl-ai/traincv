@@ -8,12 +8,12 @@ sys.setrecursionlimit(5000)  # required on Windows
 
 
 a = Analysis(
-    ['trainme/app.py'],
-    pathex=['trainme'],
+    ['traincv/app.py'],
+    pathex=['traincv'],
     binaries=[],
     datas=[
-       ('trainme/configs/labelme_config.yaml', 'trainme/views/labeling/labelme/config'),
-       ('trainme/views/labeling/labelme/icons/*', 'trainme/views/labeling/labelme/icons'),
+       ('traincv/configs/labelme_config.yaml', 'traincv/views/labeling/labelme/config'),
+       ('traincv/views/labeling/labelme/icons/*', 'traincv/views/labeling/labelme/icons'),
     ],
     hiddenimports=[],
     hookspath=[],
@@ -27,18 +27,18 @@ exe = EXE(
     a.binaries,
     a.zipfiles,
     a.datas,
-    name='trainme',
+    name='traincv',
     debug=False,
     strip=False,
     upx=False,
     runtime_tmpdir=None,
     console=False,
-    #icon='trainme/icons/icon.ico',
+    #icon='traincv/icons/icon.ico',
 )
 app = BUNDLE(
     exe,
-    name='trainme.app',
-    #icon='trainme/icons/icon.icns',
+    name='traincv.app',
+    #icon='traincv/icons/icon.icns',
     bundle_identifier=None,
     info_plist={'NSHighResolutionCapable': 'True'},
 )

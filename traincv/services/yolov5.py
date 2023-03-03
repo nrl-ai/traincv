@@ -7,8 +7,8 @@ import numpy as np
 import yaml
 from PyQt5 import QtCore
 
-from trainme.views.labeling.labelme.shape import Shape
-from trainme.views.labeling.labelme.utils.opencv import qt_img_to_cv_img
+from traincv.views.labeling.labelme.shape import Shape
+from traincv.views.labeling.labelme.utils.opencv import qt_img_to_cv_img
 
 INPUT_WIDTH = 640
 INPUT_HEIGHT = 640

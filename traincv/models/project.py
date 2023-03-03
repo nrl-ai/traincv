@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from trainme.trainer.core.project import Project
+from traincv.trainer.core.project import Project
 
 
 class ProjectModel(QObject):

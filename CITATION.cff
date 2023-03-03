@@ -4,5 +4,5 @@ authors:
 - family-names: "Nguyen"
   given-names: "Viet Anh"
 title: "No-code Labeling and Training Toolkit"
-url: "https://github.com/vietanhdev/trainme"
+url: "https://github.com/nrl-ai/traincv"
 license: GPL-3

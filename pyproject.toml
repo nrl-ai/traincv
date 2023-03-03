@@ -12,6 +12,6 @@ exclude = '''
   | buck-out
   | build
   | dist
-  | trainme/models/yolov5
+  | traincv/models/yolov5
 )/
 '''

@@ -5,8 +5,8 @@ from PyQt5 import uic
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QFileDialog, QWidget
 
-from trainme.storage import project_model
-from trainme.trainer.core.project import Project
+from traincv.storage import project_model
+from traincv.trainer.core.project import Project
 
 from ..project_dialog.project_dialog import ProjectDialog
 from .experiment_table_model import ExperimentTableModel

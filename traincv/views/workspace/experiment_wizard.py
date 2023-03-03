@@ -2,11 +2,11 @@ from asyncio.log import logger
 
 from PyQt5.QtWidgets import QTabWidget
 
-from trainme.views.workspace.data_preparation.data_preparation import \
+from traincv.views.workspace.data_preparation.data_preparation import \
     DataPreparationTab
-from trainme.views.workspace.evaluation.evaluation import EvaluationTab
-from trainme.views.workspace.export.export import ExportTab
-from trainme.views.workspace.training.training import TrainingTab
+from traincv.views.workspace.evaluation.evaluation import EvaluationTab
+from traincv.views.workspace.export.export import ExportTab
+from traincv.views.workspace.training.training import TrainingTab
 
 
 class ExperimentWizard(QTabWidget):

@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">🌟 Train Me 🌟</h1>
+  <h1 align="center">🌟 TrainCV 🌟</h1>
   <p align="center">No-code Labeling and Training Toolkit for Computer Vision<p>
   <p align="center">With <b>Improved Labelme</b> for Image Labeling<p>
 </p>
@@ -18,10 +18,10 @@ You can request new features through [this contact form](https://aicurious.io/co
 - [x] **Labeling:** Auto-labeling with YOLOv5
 - [ ] **Labeling:** Tracking for video labeling
 - [ ] **Training:** Project + Experiment management
-- [ ] **Training:** object detection
-- [ ] **Training:** image classification
-- [ ] **Training:** image segmentation
-- [ ] **Training:** instance segmentation
+- [ ] **Training:** Object detection
+- [ ] **Training:** Image classification
+- [ ] **Training:** Image segmentation
+- [ ] **Training:** Instance segmentation
 - [ ] **Training:** Add docker support for training
 - [ ] **Deployment:** Export to ONNX
 - [ ] **Deployment:** Export to TFLite
@@ -33,14 +33,14 @@ You can request new features through [this contact form](https://aicurious.io/co
 
 ## I. Install and run
 
-- Requirements: Python >= 3.7
+- Requirements: Python >= 3.8
 - Recommended: Miniconda/Anaconda <https://docs.conda.io/en/latest/miniconda.html>
 
 - Create environment:
 
 ```
-conda create -n trainme python=3.8
-conda activate trainme
+conda create -n traincv python=3.8
+conda activate traincv
 ```
 
 - **(For macOS only)** Install PyQt5 using Conda:
@@ -49,22 +49,22 @@ conda activate trainme
 conda install -c conda-forge pyqt==5.15.7
 ```
 
-- Install TrainMe:
+- Install traincv:
 
 ```
-pip install trainme-python
+pip install traincv
 ```
 
 - Run app:
 
 ```
-trainme_app
+traincv_app
 ```
 
 Or
 
 ```
-python -m trainme.app
+python -m traincv.app
 ```
 
 ## II. Development
@@ -72,13 +72,13 @@ python -m trainme.app
 - Generate resources:
 
 ```
-pyrcc5 -o trainme/resources/resources.py trainme/resources/resources.qrc
+pyrcc5 -o traincv/resources/resources.py traincv/resources/resources.qrc
 ```
 
 - Run app:
 
 ```
-python trainme/app.py
+python traincv/app.py
 ```
 
 ## III. References

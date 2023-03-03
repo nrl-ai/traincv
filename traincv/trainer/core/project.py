@@ -8,9 +8,9 @@ from .tasks import TaskChoices
 
 
 class Project:
-    """TrainMe Project"""
+    """traincv Project"""
 
-    PROJECT_CONFIG_FILENAME = "TrainMe.project"
+    PROJECT_CONFIG_FILENAME = "traincv.project"
 
     def __init__(self):
         self.name = "Untitled"
